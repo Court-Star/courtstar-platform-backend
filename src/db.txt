@@ -1,0 +1,114 @@
+CREATE DATABASE CourtStarV5;
+
+USE CourtStarV5;
+
+CREATE TABLE Account
+(
+    account_id INT AUTO_INCREMENT PRIMARY KEY,
+    email VARCHAR(80),
+    password VARCHAR(30),
+    first_name NVARCHAR(30),
+    last_name NVARCHAR(30),
+    phone CHAR(10),
+    role_id INT
+);
+
+CREATE TABLE Administrator
+(
+    admin_id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT UNIQUE,
+    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+);
+
+CREATE TABLE Customer
+(
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    account_id INT UNIQUE,
+    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+);
+
+CREATE TABLE CentreManager
+(
+    cm_id INT AUTO_INCREMENT PRIMARY KEY,
+    address NVARCHAR(100),
+    current_balance DECIMAL(19, 4),
+    account_id INT UNIQUE,
+    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+);
+
+CREATE TABLE Centre
+(
+    centre_id INT AUTO_INCREMENT PRIMARY KEY,
+    name NVARCHAR(30),
+    address NVARCHAR(100),
+    open_time TIME,
+    close_time TIME,
+    price_per_hour DECIMAL(19, 4),
+    number_of_court INT,
+    payment_method TEXT,
+    approve_date DATE,
+    cm_id INT,
+    admin_id INT,
+    FOREIGN KEY (cm_id) REFERENCES CentreManager(cm_id),
+    FOREIGN KEY (admin_id) REFERENCES Administrator(admin_id)
+);
+
+CREATE TABLE CentreStaff
+(
+    staff_id INT AUTO_INCREMENT PRIMARY KEY,
+    centre_id INT,
+    account_id INT UNIQUE,
+    FOREIGN KEY (centre_id) REFERENCES Centre(centre_id),
+    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+);
+
+CREATE TABLE Court
+(
+    court_no INT,
+    centre_id INT,
+    PRIMARY KEY (court_no, centre_id),
+    FOREIGN KEY (centre_id) REFERENCES Centre(centre_id)
+);
+
+CREATE TABLE BookingSchedule
+(
+    bs_id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE,
+    start_time TIME,
+    end_time TIME,
+    total_price DECIMAL(19, 4),
+    customer_id INT,
+    court_no INT,
+    centre_id INT,
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    FOREIGN KEY (court_no, centre_id) REFERENCES Court(court_no, centre_id)
+);
+
+CREATE TABLE Feedback
+(
+    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
+    content TEXT,
+    create_date DATE,
+    customer_id INT,
+    centre_id INT,
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    FOREIGN KEY (centre_id) REFERENCES Centre(centre_id)
+);
+
+CREATE TABLE Image
+(
+    image_id INT AUTO_INCREMENT PRIMARY KEY,
+    url TEXT,
+    centre_id INT,
+    FOREIGN KEY (centre_id) REFERENCES Centre(centre_id)
+);
+
+CREATE TABLE Payment
+(
+    payment_id INT AUTO_INCREMENT PRIMARY KEY,
+    date DATE,
+    status BIT,
+    payment_method TEXT,
+    bs_id INT UNIQUE,
+    FOREIGN KEY (bs_id) REFERENCES BookingSchedule(bs_id)
+);
