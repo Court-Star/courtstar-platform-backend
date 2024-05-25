@@ -50,8 +50,11 @@ public class AccountService {
     public AccountResponse updateAccount(int id,AccountUpdateRequest request){
         Account account = userReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         accountMapper.updateAccount(account,request);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        AccountResponse accountResponse = accountMapper.toAccountResponse( userReponsitory.save(account));
+
+        AccountResponse accountResponse = accountMapper.toAccountResponse(userReponsitory.save(account));
         return accountResponse;
     }
 }
