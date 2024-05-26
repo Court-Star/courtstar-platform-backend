@@ -2,16 +2,19 @@ package com.example.courtstar.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-@Getter
-@Setter
+import java.util.HashSet;
+import java.util.Set;
+
+@Data
 @Entity
 @Table(name = "account")
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,8 +33,9 @@ public class Account {
     @Column(name = "phone", length = 10)
     String phone;
 
-    @Column(name = "role_id")
-    Integer roleId;
+    @Column(name = "role")
+    Set<String> role;
+
 
     @Size(max = 30)
     @Column(name = "first_name", length = 30)

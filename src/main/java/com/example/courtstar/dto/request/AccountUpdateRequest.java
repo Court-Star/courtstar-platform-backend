@@ -14,7 +14,6 @@ public class AccountUpdateRequest {
     String password;
     @Size(min=10,max = 10,message = "PHONE_INVALID")
     String phone;
-    Integer roleId;
     String firstName;
     String lastName;
 }
