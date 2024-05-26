@@ -2,7 +2,9 @@ package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.AuthenticationRequuest;
+import com.example.courtstar.dto.request.IntrospectRequest;
 import com.example.courtstar.dto.response.AuthenticationResponse;
+import com.example.courtstar.dto.response.IntrospectResponse;
 import com.example.courtstar.service.AccountAuthentication;
 import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
@@ -12,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthenticationRequest {
@@ -19,12 +23,20 @@ public class AuthenticationRequest {
     private AccountAuthentication authentication;
 
     @PostMapping("/token")
-    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequuest requuest) throws JOSEException {
-        AuthenticationResponse authenticationResponse =authentication.Authenticate(requuest);
+    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequuest request) throws JOSEException {
+        AuthenticationResponse authenticationResponse =authentication.Authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .data(authenticationResponse)
                 .code(1000)
                 .message("Login Success")
+                .build();
+    }
+    @PostMapping("/introspect")
+    public ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) throws JOSEException, ParseException {
+        return ApiResponse.<IntrospectResponse>builder()
+                .data(authentication.Introspect(request))
+                .code(1000)
+                .message("Introspect Success")
                 .build();
     }
 }
