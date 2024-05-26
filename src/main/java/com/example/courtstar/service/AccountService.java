@@ -7,7 +7,7 @@ import com.example.courtstar.entity.Account;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.AccountMapper;
-import com.example.courtstar.reponsitory.UserReponsitory;
+import com.example.courtstar.reponsitory.AccountReponsitory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,43 +18,43 @@ import java.util.List;
 @Service
 public class AccountService {
     @Autowired
-    private UserReponsitory userReponsitory;
+    private AccountReponsitory accountReponsitory;
     @Autowired
     private AccountMapper accountMapper;
     public Account CreateAccount(AccountCreationRequest request) {
-        if(userReponsitory.existsByEmail(request.getEmail())){
+        if(accountReponsitory.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.ACCOUNT_EXIST);
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         Account account = accountMapper.toAccount(request);
         System.out.println(passwordEncoder.encode(request.getPassword()));
         account.setPassword(passwordEncoder.encode(request.getPassword()));
-        return userReponsitory.save(account);
+        return accountReponsitory.save(account);
     }
     public List<Account> getAllAccounts(){
-        return userReponsitory.findAll();
+        return accountReponsitory.findAll();
     }
     public AccountResponse getAccountById(int id){
-        Account account = userReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         AccountResponse accountResponse = accountMapper.toAccountResponse(account);
         return accountResponse;
     }
     public boolean deleteAccountById(int id){
         boolean check = false;
-        if(userReponsitory.existsById(id)){
-            userReponsitory.deleteById(id);
+        if(accountReponsitory.existsById(id)){
+            accountReponsitory.deleteById(id);
             check = true;
         }
         return check;
     }
     public AccountResponse updateAccount(int id,AccountUpdateRequest request){
-        Account account = userReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         accountMapper.updateAccount(account,request);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
 
 
-        AccountResponse accountResponse = accountMapper.toAccountResponse(userReponsitory.save(account));
+        AccountResponse accountResponse = accountMapper.toAccountResponse(accountReponsitory.save(account));
         return accountResponse;
     }
 }

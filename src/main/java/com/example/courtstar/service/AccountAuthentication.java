@@ -1,0 +1,59 @@
+package com.example.courtstar.service;
+
+import com.example.courtstar.dto.request.AuthenticationRequuest;
+import com.example.courtstar.dto.response.AuthenticationResponse;
+import com.example.courtstar.entity.Account;
+import com.example.courtstar.exception.AppException;
+import com.example.courtstar.exception.ErrorCode;
+import com.example.courtstar.reponsitory.AccountReponsitory;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import org.aspectj.weaver.ast.Var;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
+@Service
+public class AccountAuthentication {
+    @Value("${jwt.signerKey}")
+    protected String SIGNER_KEY;
+    @Autowired
+    private AccountReponsitory accountService;
+    public AuthenticationResponse Authenticate(AuthenticationRequuest requuest) throws JOSEException {
+        Account account = accountService.findByEmail(requuest.getEmail());
+        if(account == null) {
+            throw new AppException(ErrorCode.NOT_FOUND_USER);
+        }
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        if(!passwordEncoder.matches(requuest.getPassword(), account.getPassword())) {
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+        var token = generateToken(requuest.getEmail());
+        return AuthenticationResponse.builder()
+                .token(token)
+                .success(true)
+                .build();
+    }
+    private String generateToken(String email) throws JOSEException {
+        JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
+        JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
+                .subject(email)
+                .issueTime(new Date())
+                .expirationTime(
+                        new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli())
+                )
+                .issuer("courtstar.com")
+                .build();
+        Payload payload = new Payload(jwtClaimsSet.toJSONObject());
+        JWSObject jwsObject = new JWSObject(header,payload);
+        jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
+        return  jwsObject.serialize();
+    }
+}

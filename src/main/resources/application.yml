@@ -7,3 +7,5 @@ spring:
     url: jdbc:mysql://localhost:3306/courtstarv5
     username: root
     password: 12345
+jwt:
+  signerKey: "OpLoSIHROWo8482Fsk63QXj/jNb95u9Xl2ZZyUDKQwN687kCVo5FVVFBdbQfcqXJ"
