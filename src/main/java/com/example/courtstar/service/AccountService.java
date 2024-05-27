@@ -62,12 +62,17 @@ public class AccountService {
         AccountResponse accountResponse = accountMapper.toAccountResponse(accountReponsitory.save(account));
         return accountResponse;
     }
-    public Optional<AccountResponse> getAccountByEmail(String email){
+    public AccountResponse getAccountByEmail(String email){
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        return Optional.ofNullable(accountMapper.toAccountResponse(account));
+        AccountResponse accountResponse =accountMapper.toAccountResponse(account);
+        accountResponse.setRoles(account.getRole());
+        return accountResponse;
     }
     public Account findAccountByEmail(String email){
         return accountReponsitory.findByEmailAndPassword(email,"1");
+    }
+    public boolean checkExistEmail(String email){
+        return accountReponsitory.existsByEmail(email);
     }
 }

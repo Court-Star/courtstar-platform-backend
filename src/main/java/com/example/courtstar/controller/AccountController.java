@@ -35,14 +35,14 @@ public class AccountController {
     public ApiResponse<AccountResponse> createAccountByGmail(@AuthenticationPrincipal OAuth2User principal){
         Map<String, Object> attributes = principal.getAttributes();
         String email= attributes.get("email").toString();
-        System.out.println(email);
         ApiResponse apiResponse;
-        System.out.println("hello");
-        AccountResponse account = accountService.getAccountByEmail(email).orElse(null);
-        System.out.println(account);
-        if(account==null){
+        boolean check = accountService.checkExistEmail(email);
+
+
+        if(!check){
             String Name = (String) attributes.get("name");
             String[] fullName = Name.split(" ");
+
             apiResponse = ApiResponse.<AccountResponse>builder()
                     .data(accountMapper.toAccountResponse(
                             accountService.CreateAccount(
@@ -50,13 +50,14 @@ public class AccountController {
                                             .email(email)
                                             .password("1")
                                             .firstName(fullName[0])
-                                            .lastName(fullName[1])
+                                            .lastName(fullName[fullName.length-1])
                                             .build()
                             )
                     ))
                     .build();
 
         }
+        AccountResponse account = accountService.getAccountByEmail(email);
         apiResponse = ApiResponse.<AccountResponse>builder()
                 .code(1000)
                 .data(account)
