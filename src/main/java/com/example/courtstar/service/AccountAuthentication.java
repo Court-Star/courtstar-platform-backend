@@ -61,6 +61,7 @@ public class AccountAuthentication {
         jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
         return  jwsObject.serialize();
     }
+
     private String buildScop(Account account) {
         StringJoiner stringJoiner = new StringJoiner(" ");
         if(!account.getRole().isEmpty()){

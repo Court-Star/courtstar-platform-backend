@@ -23,8 +23,8 @@ public class AuthenticationRequest {
     private AccountAuthentication authentication;
 
     @PostMapping("/token")
-    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequuest requuest) throws JOSEException {
-        AuthenticationResponse authenticationResponse =authentication.Authenticate(requuest);
+    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequuest request) throws JOSEException {
+        AuthenticationResponse authenticationResponse =authentication.Authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .data(authenticationResponse)
                 .code(1000)
