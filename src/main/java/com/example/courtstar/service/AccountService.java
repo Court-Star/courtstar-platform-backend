@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class AccountService {
@@ -60,5 +61,13 @@ public class AccountService {
 
         AccountResponse accountResponse = accountMapper.toAccountResponse(accountReponsitory.save(account));
         return accountResponse;
+    }
+    public Optional<AccountResponse> getAccountByEmail(String email){
+        Account account = accountReponsitory.findByEmail(email)
+                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        return Optional.ofNullable(accountMapper.toAccountResponse(account));
+    }
+    public Account findAccountByEmail(String email){
+        return accountReponsitory.findByEmailAndPassword(email,"1");
     }
 }
