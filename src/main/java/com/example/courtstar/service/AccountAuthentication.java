@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.StringJoiner;
 
 @Service
 public class AccountAuthentication {
@@ -32,29 +33,28 @@ public class AccountAuthentication {
     @Autowired
     private AccountReponsitory accountService;
     public AuthenticationResponse Authenticate(AuthenticationRequuest requuest) throws JOSEException {
-        Account account = accountService.findByEmail(requuest.getEmail());
-        if(account == null) {
-            throw new AppException(ErrorCode.NOT_FOUND_USER);
-        }
+        Account account = accountService.findByEmail(requuest.getEmail())
+                .orElseThrow(()-> new AppException(ErrorCode.NOT_FOUND_USER));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         if(!passwordEncoder.matches(requuest.getPassword(), account.getPassword())) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
-        var token = generateToken(requuest.getEmail());
+        var token = generateToken(account);
         return AuthenticationResponse.builder()
                 .token(token)
                 .success(true)
                 .build();
     }
-    private String generateToken(String email) throws JOSEException {
+    private String generateToken(Account account) throws JOSEException {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
-                .subject(email)
+                .subject(account.getEmail())
                 .issueTime(new Date())
                 .expirationTime(
                         new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli())
                 )
                 .issuer("courtstar.com")
+                .claim("Scope",buildScop(account))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header,payload);
@@ -62,8 +62,16 @@ public class AccountAuthentication {
         return  jwsObject.serialize();
     }
 
-    public IntrospectResponse Introspect(IntrospectRequest request) throws JOSEException, ParseException {
-        var token = request.getToken();
+    private String buildScop(Account account) {
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if(!account.getRole().isEmpty()){
+            account.getRole().forEach(stringJoiner::add);
+        }
+        return stringJoiner.toString();
+    }
+
+    public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
+        var token=  request.getToken();
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(token);
         Date expirationDate = signedJWT.getJWTClaimsSet().getExpirationTime();

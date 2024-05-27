@@ -33,10 +33,10 @@ public class AuthenticationRequest {
     }
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) throws JOSEException, ParseException {
+        var authenticated = authentication.introspect(request);
         return ApiResponse.<IntrospectResponse>builder()
-                .data(authentication.Introspect(request))
+                .data(authenticated)
                 .code(1000)
-                .message("Introspect Success")
                 .build();
     }
 }
