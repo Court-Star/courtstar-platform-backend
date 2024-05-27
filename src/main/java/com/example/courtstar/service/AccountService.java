@@ -4,6 +4,7 @@ import com.example.courtstar.dto.request.AccountCreationRequest;
 import com.example.courtstar.dto.request.AccountUpdateRequest;
 import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.entity.Account;
+import com.example.courtstar.enums.Role;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.AccountMapper;
@@ -13,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 
 @Service
@@ -27,8 +29,10 @@ public class AccountService {
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         Account account = accountMapper.toAccount(request);
-        System.out.println(passwordEncoder.encode(request.getPassword()));
         account.setPassword(passwordEncoder.encode(request.getPassword()));
+        HashSet<String> roles = new HashSet<>();
+        roles.add(Role.CUSTOMER.name());
+        account.setRole(roles);
         return accountReponsitory.save(account);
     }
     public List<Account> getAllAccounts(){
