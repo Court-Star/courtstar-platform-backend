@@ -30,20 +30,26 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .authorizeHttpRequests(request
-                ->request.requestMatchers(HttpMethod.POST,PUBLIC_URLS).permitAll()
+                .authorizeHttpRequests()
+                .requestMatchers(HttpMethod.POST,PUBLIC_URLS).permitAll()
                 .requestMatchers(HttpMethod.GET,ROLE_ADMIN).hasRole(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.PUT,ROLE_ADMIN).hasRole(Role.ADMIN.name())
                 .requestMatchers(HttpMethod.DELETE,ROLE_ADMIN).hasRole(Role.ADMIN.name())
-                .anyRequest().authenticated());
+                .anyRequest().authenticated()
+                .and()
+                .oauth2Login()
+                .defaultSuccessUrl("/Account/createEmail", true);
+        ;
+
+
         httpSecurity.oauth2ResourceServer(oauth2 ->
                 oauth2.jwt(jwtConfigurer ->
                         jwtConfigurer.decoder(jwtDecoder())
                             .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
                 );
-
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
+
         return httpSecurity.build();
     }
     @Bean
