@@ -1,7 +1,7 @@
 package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.ApiResponse;
-import com.example.courtstar.dto.request.AuthenticationRequuest;
+import com.example.courtstar.dto.request.AuthenticationRequest;
 import com.example.courtstar.dto.request.IntrospectRequest;
 import com.example.courtstar.dto.response.AuthenticationResponse;
 import com.example.courtstar.dto.response.IntrospectResponse;
@@ -18,12 +18,12 @@ import java.text.ParseException;
 
 @RestController
 @RequestMapping("/auth")
-public class AuthenticationRequest {
+public class AuthenticationController {
     @Autowired
     private AccountAuthentication authentication;
 
     @PostMapping("/token")
-    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequuest request) throws JOSEException {
+    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody @Valid AuthenticationRequest request) throws JOSEException {
         AuthenticationResponse authenticationResponse =authentication.Authenticate(request);
         return ApiResponse.<AuthenticationResponse>builder()
                 .data(authenticationResponse)

@@ -24,8 +24,8 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
     @Value("${jwt.signerKey}")
     protected String signerKey;
-    private String[] PUBLIC_URLS = {"/Account","/auth/token","/auth/introspect"};
-    private String[] ROLE_ADMIN ={"courtstar/Account","courtstar/Account/,"};
+    private String[] PUBLIC_URLS = {"/account","/auth/token","/auth/introspect"};
+    private String[] ROLE_ADMIN ={"courtstar/account","courtstar/account/,"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()
-                .defaultSuccessUrl("/Account/createEmail", true);
+                .defaultSuccessUrl("/account/createEmail", true);
         ;
 
 

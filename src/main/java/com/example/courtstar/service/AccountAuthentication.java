@@ -1,10 +1,11 @@
 package com.example.courtstar.service;
 
-import com.example.courtstar.dto.request.AuthenticationRequuest;
+import com.example.courtstar.dto.request.AuthenticationRequest;
 import com.example.courtstar.dto.request.IntrospectRequest;
 import com.example.courtstar.dto.response.AuthenticationResponse;
 import com.example.courtstar.dto.response.IntrospectResponse;
 import com.example.courtstar.entity.Account;
+import com.example.courtstar.enums.Role;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.reponsitory.AccountReponsitory;
@@ -32,11 +33,11 @@ public class AccountAuthentication {
     protected String SIGNER_KEY;
     @Autowired
     private AccountReponsitory accountService;
-    public AuthenticationResponse Authenticate(AuthenticationRequuest requuest) throws JOSEException {
-        Account account = accountService.findByEmail(requuest.getEmail())
+    public AuthenticationResponse Authenticate(AuthenticationRequest request) throws JOSEException {
+        Account account = accountService.findByEmail(request.getEmail())
                 .orElseThrow(()-> new AppException(ErrorCode.NOT_FOUND_USER));
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        if(!passwordEncoder.matches(requuest.getPassword(), account.getPassword())) {
+        if(!passwordEncoder.matches(request.getPassword(), account.getPassword())) {
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
         var token = generateToken(account);
@@ -54,7 +55,7 @@ public class AccountAuthentication {
                         new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli())
                 )
                 .issuer("courtstar.com")
-                .claim("Scope",buildScop(account))
+                .claim("Scope",buildScope(account))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header,payload);
@@ -62,11 +63,9 @@ public class AccountAuthentication {
         return  jwsObject.serialize();
     }
 
-    private String buildScop(Account account) {
+    private String buildScope(Account account) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!account.getRole().isEmpty()){
-            account.getRole().forEach(stringJoiner::add);
-        }
+        stringJoiner.add(Role.fromValue(account.getRole()).toString());
         return stringJoiner.toString();
     }
 

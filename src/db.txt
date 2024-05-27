@@ -1,114 +1,110 @@
-CREATE DATABASE CourtStarV5;
+create database CourtStarV7
 
-USE CourtStarV5;
+use CourtStarV7
 
-CREATE TABLE Account
+create table Role
 (
-    account_id INT AUTO_INCREMENT PRIMARY KEY,
-    email VARCHAR(80),
-    password VARCHAR(30),
-    first_name NVARCHAR(30),
-    last_name NVARCHAR(30),
-    phone CHAR(10),
-    role_id INT
+  role_id int identity(1, 1) primary key,
+  name varchar(30)
 );
 
-CREATE TABLE Administrator
+create table Account
 (
-    admin_id INT AUTO_INCREMENT PRIMARY KEY,
-    account_id INT UNIQUE,
-    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+  account_id int identity(1, 1) primary key,
+  email varchar(80),
+  password text,
+  first_name nvarchar(30),
+  last_name nvarchar(50),
+  phone char(10),
+  role_id int foreign key references Role(role_id)
 );
 
-CREATE TABLE Customer
+create table Customer
 (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    account_id INT UNIQUE,
-    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+  customer_id int identity(1, 1) primary key,
+  account_id int unique foreign key references Account(account_id)
 );
 
-CREATE TABLE CentreManager
+create table CentreManager
 (
-    cm_id INT AUTO_INCREMENT PRIMARY KEY,
-    address NVARCHAR(100),
-    current_balance DECIMAL(19, 4),
-    account_id INT UNIQUE,
-    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+  manager_id int identity(1,1) primary key,
+  address nvarchar(100),
+  current_balance money,
+  account_id int unique foreign key references Account(account_id)
 );
 
-CREATE TABLE Centre
+create table Centre
 (
-    centre_id INT AUTO_INCREMENT PRIMARY KEY,
-    name NVARCHAR(30),
-    address NVARCHAR(100),
-    open_time TIME,
-    close_time TIME,
-    price_per_hour DECIMAL(19, 4),
-    number_of_court INT,
-    payment_method TEXT,
-    approve_date DATE,
-    cm_id INT,
-    admin_id INT,
-    FOREIGN KEY (cm_id) REFERENCES CentreManager(cm_id),
-    FOREIGN KEY (admin_id) REFERENCES Administrator(admin_id)
+  centre_id int identity(1, 1) primary key,
+  name nvarchar(50),
+  address nvarchar(100),
+  open_time time,
+  close_time time,
+  price_per_hour money,
+  slot_duration int,
+  number_of_court int,
+  payment_method text,
+  status bit,
+  approve_date date,
+  manager_id int foreign key references CentreManager(manager_id),
 );
 
-CREATE TABLE CentreStaff
+create table CentreStaff
 (
-    staff_id INT AUTO_INCREMENT PRIMARY KEY,
-    centre_id INT,
-    account_id INT UNIQUE,
-    FOREIGN KEY (centre_id) REFERENCES Centre(centre_id),
-    FOREIGN KEY (account_id) REFERENCES Account(account_id)
+  staff_id int identity (1,1) primary key,
+  centre_id int foreign key references Centre(centre_id),
+  account_id int unique foreign key references Account(account_id)
 );
 
-CREATE TABLE Court
+create table Court
 (
-    court_no INT,
-    centre_id INT,
-    PRIMARY KEY (court_no, centre_id),
-    FOREIGN KEY (centre_id) REFERENCES Centre(centre_id)
+  court_id int identity(1,1) primary key,
+  court_no int,
+  status bit,
+  centre_id int foreign key references Centre(centre_id),
 );
 
-CREATE TABLE BookingSchedule
+create table Slot
 (
-    bs_id INT AUTO_INCREMENT PRIMARY KEY,
-    date DATE,
-    start_time TIME,
-    end_time TIME,
-    total_price DECIMAL(19, 4),
-    customer_id INT,
-    court_no INT,
-    centre_id INT,
-    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
-    FOREIGN KEY (court_no, centre_id) REFERENCES Court(court_no, centre_id)
+  slot_id int identity(1,1) primary key,
+  slot_no int,
+  start_time time,
+  end_time time,
+  centre_id int foreign key references Centre(centre_id),
 );
 
-CREATE TABLE Feedback
+create table BookingSchedule
 (
-    feedback_id INT AUTO_INCREMENT PRIMARY KEY,
-    content TEXT,
-    create_date DATE,
-    customer_id INT,
-    centre_id INT,
-    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
-    FOREIGN KEY (centre_id) REFERENCES Centre(centre_id)
+  bs_id int identity(1,1) primary key,
+  date date,
+  total_price money,
+  status bit,
+  customer_id int foreign key references Customer(customer_id),
+  slot_id int foreign key references Slot(slot_id),
+  court_id int foreign key references Court(court_id),
 );
 
-CREATE TABLE Image
+create table Feedback
 (
-    image_id INT AUTO_INCREMENT PRIMARY KEY,
-    url TEXT,
-    centre_id INT,
-    FOREIGN KEY (centre_id) REFERENCES Centre(centre_id)
+  feedback_id int identity(1,1) primary key,
+  content text,
+  create_date date,
+  customer_id int foreign key references Customer(customer_id),
+  centre_id int foreign key references Centre(centre_id)
 );
 
-CREATE TABLE Payment
+create table Image
 (
-    payment_id INT AUTO_INCREMENT PRIMARY KEY,
-    date DATE,
-    status BIT,
-    payment_method TEXT,
-    bs_id INT UNIQUE,
-    FOREIGN KEY (bs_id) REFERENCES BookingSchedule(bs_id)
+  image_id int identity(1,1) primary key,
+  url text,
+  centre_id int foreign key references Centre(centre_id)
+);
+
+create table Payment
+(
+  payment_id int identity(1,1) primary key,
+  date date,
+  status bit,
+  payment_method text,
+  bs_id int unique foreign key references BookingSchedule(bs_id)
 );

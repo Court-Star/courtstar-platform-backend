@@ -31,9 +31,8 @@ public class AccountService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         Account account = accountMapper.toAccount(request);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.CUSTOMER.name());
-        account.setRole(roles);
+        int role = Role.CUSTOMER.getValue();
+        account.setRole(role);
         return accountReponsitory.save(account);
     }
     public List<Account> getAllAccounts(){
@@ -42,6 +41,7 @@ public class AccountService {
     public AccountResponse getAccountById(int id){
         Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         AccountResponse accountResponse = accountMapper.toAccountResponse(account);
+        accountResponse.setRole(Role.fromValue(account.getRole()).toString());
         return accountResponse;
     }
     public boolean deleteAccountById(int id){
@@ -60,13 +60,14 @@ public class AccountService {
 
 
         AccountResponse accountResponse = accountMapper.toAccountResponse(accountReponsitory.save(account));
+        accountResponse.setRole(Role.fromValue(account.getRole()).toString());
         return accountResponse;
     }
     public AccountResponse getAccountByEmail(String email){
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         AccountResponse accountResponse =accountMapper.toAccountResponse(account);
-        accountResponse.setRoles(account.getRole());
+        accountResponse.setRole(Role.fromValue(account.getRole()).toString());
         return accountResponse;
     }
     public Account findAccountByEmail(String email){
