@@ -24,6 +24,7 @@ public class AccountController {
     private AccountService accountService;
     @Autowired
     private AccountMapper accountMapper;
+
     @PostMapping
     public ApiResponse<AccountResponse> createAccount(@RequestBody @Valid AccountCreationRequest request){
         ApiResponse apiResponse = ApiResponse.builder()
@@ -31,6 +32,7 @@ public class AccountController {
                 .build();
         return apiResponse;
     }
+
     @GetMapping("/createEmail")
     public ApiResponse<AccountResponse> createAccountByGmail(@AuthenticationPrincipal OAuth2User principal){
         Map<String, Object> attributes = principal.getAttributes();
@@ -65,6 +67,7 @@ public class AccountController {
 
         return apiResponse;
     }
+
     @GetMapping
     public ApiResponse<Account> getAccount(){
         ApiResponse apiResponse = ApiResponse.builder()
@@ -73,12 +76,14 @@ public class AccountController {
 
         return apiResponse;
     }
+
     @GetMapping("/{id}")
     public ApiResponse<AccountResponse> getAccountById(@PathVariable int id){
         return ApiResponse.<AccountResponse>builder()
                 .data(accountService.getAccountById(id))
                 .build();
     }
+
     @DeleteMapping("/{id}")
     public ApiResponse<Boolean> deleteAccountById(@PathVariable int id){
         return ApiResponse.<Boolean>builder()
@@ -87,6 +92,7 @@ public class AccountController {
                 .message("delete success")
                 .build();
     }
+
     @PutMapping("/{id}")
     public ApiResponse<AccountResponse> updateAccountById(@PathVariable int id, @RequestBody @Valid AccountUpdateRequest request){
         return ApiResponse.<AccountResponse>builder()
