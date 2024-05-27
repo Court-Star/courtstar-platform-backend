@@ -10,7 +10,7 @@ import java.util.Set;
 
 @Data
 @Entity
-@Table(name = "account")
+@Table(name = "Account")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 @NoArgsConstructor
@@ -33,16 +33,16 @@ public class Account {
     @Column(name = "phone", length = 10)
     String phone;
 
-    @Column(name = "role")
-    Set<String> role;
+    @Column(name = "role_id")
+    int role;
 
 
     @Size(max = 30)
     @Column(name = "first_name", length = 30)
     String firstName;
 
-    @Size(max = 30)
-    @Column(name = "last_name", length = 30)
+    @Size(max = 50)
+    @Column(name = "last_name", length = 50)
     String lastName;
 
 }

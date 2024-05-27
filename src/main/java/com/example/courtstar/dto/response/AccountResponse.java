@@ -3,8 +3,6 @@ package com.example.courtstar.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Set;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,7 +11,7 @@ import java.util.Set;
 public class AccountResponse {
     String email;
     String phone;
-    Set<String> roles;
+    String role;
     String firstName;
     String lastName;
 }

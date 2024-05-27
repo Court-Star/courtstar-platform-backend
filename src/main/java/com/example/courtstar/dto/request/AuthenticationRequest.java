@@ -1,7 +1,6 @@
 package com.example.courtstar.dto.request;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,7 +9,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class AuthenticationRequuest {
+public class AuthenticationRequest {
     @Email(message = "EMAIL_INVALID")
     String email;
     String password;
