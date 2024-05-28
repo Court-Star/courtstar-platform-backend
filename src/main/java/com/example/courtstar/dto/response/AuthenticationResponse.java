@@ -11,4 +11,5 @@ import lombok.experimental.FieldDefaults;
 public class AuthenticationResponse {
     boolean success;
     String token;
+    int account_id;
 }

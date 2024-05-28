@@ -44,6 +44,7 @@ public class AccountAuthentication {
         return AuthenticationResponse.builder()
                 .token(token)
                 .success(true)
+                .account_id(account.getId())
                 .build();
     }
     private String generateToken(Account account) throws JOSEException {
