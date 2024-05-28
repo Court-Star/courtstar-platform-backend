@@ -22,8 +22,8 @@ import java.util.Optional;
 public class AccountService {
     @Autowired
     private AccountReponsitory accountReponsitory;
-    @Autowired
-    private AccountMapper accountMapper;
+
+    private AccountMapper accountMapper = new AccountMapper();
     public Account CreateAccount(AccountCreationRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.ACCOUNT_EXIST);
