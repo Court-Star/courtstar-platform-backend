@@ -5,8 +5,6 @@ import com.example.courtstar.dto.request.AccountUpdateRequest;
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.entity.Account;
-import com.example.courtstar.exception.AppException;
-import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.AccountMapper;
 import com.example.courtstar.service.AccountService;
 import jakarta.validation.Valid;
@@ -22,8 +20,8 @@ import java.util.Map;
 public class AccountController {
     @Autowired
     private AccountService accountService;
-    @Autowired
-    private AccountMapper accountMapper;
+
+    private AccountMapper accountMapper = new AccountMapper();
 
     @PostMapping
     public ApiResponse<AccountResponse> createAccount(@RequestBody @Valid AccountCreationRequest request){
