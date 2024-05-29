@@ -4,6 +4,9 @@ import com.example.courtstar.dto.request.AccountCreationRequest;
 import com.example.courtstar.dto.request.AccountUpdateRequest;
 import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.entity.Account;
+import com.example.courtstar.enums.Role;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 public class AccountMapper {
 
@@ -12,11 +15,15 @@ public class AccountMapper {
             return null;
         }
 
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
         Account account = Account.builder()
                 .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
+                .role(Role.CUSTOMER.getValue())
                 .build();
 
         return account;
@@ -32,6 +39,7 @@ public class AccountMapper {
                 .firstName(account.getFirstName())
                 .lastName(account.getLastName())
                 .phone(account.getPhone())
+                .role(Role.fromValue(account.getRole()).toString())
                 .build();
 
         return response;
@@ -42,8 +50,10 @@ public class AccountMapper {
             return;
         }
 
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            account.setPassword(request.getPassword());
+            account.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
         if (request.getPhone() != null && !request.getPhone().isEmpty()) {

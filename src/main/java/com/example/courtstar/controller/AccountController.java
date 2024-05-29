@@ -25,7 +25,7 @@ public class AccountController {
     private AccountMapper accountMapper = new AccountMapper();
 
     @PostMapping
-    public ApiResponse<AccountResponse> createAccount(@RequestBody @Valid AccountCreationRequest request){
+    public ApiResponse<Account> createAccount(@RequestBody @Valid AccountCreationRequest request){
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(accountService.CreateAccount(request))
                 .build();

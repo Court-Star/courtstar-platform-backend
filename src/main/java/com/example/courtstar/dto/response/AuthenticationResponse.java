@@ -12,4 +12,5 @@ public class AuthenticationResponse {
     boolean success;
     String token;
     int account_id;
+    String role;
 }
