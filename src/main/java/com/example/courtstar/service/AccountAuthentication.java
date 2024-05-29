@@ -45,6 +45,7 @@ public class AccountAuthentication {
                 .token(token)
                 .success(true)
                 .account_id(account.getId())
+                .role(Role.fromValue(account.getRole()).toString())
                 .build();
     }
     private String generateToken(Account account) throws JOSEException {
