@@ -33,10 +33,6 @@ public class Account {
     @Column(name = "phone", length = 10)
     String phone;
 
-    @Column(name = "role")
-    Set<String> role;
-
-
     @Size(max = 30)
     @Column(name = "first_name", length = 30)
     String firstName;
@@ -44,5 +40,10 @@ public class Account {
     @Size(max = 30)
     @Column(name = "last_name", length = 30)
     String lastName;
+
+    boolean IDelete=false;
+
+    @ManyToMany
+    Set<Role> roles;
 
 }

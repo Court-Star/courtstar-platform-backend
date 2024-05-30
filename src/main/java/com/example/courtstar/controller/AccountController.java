@@ -5,20 +5,19 @@ import com.example.courtstar.dto.request.AccountUpdateRequest;
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.entity.Account;
-import com.example.courtstar.exception.AppException;
-import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.AccountMapper;
-import com.example.courtstar.service.AccountService;
+import com.example.courtstar.services.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/Account")
+@RequestMapping("/account")
 public class AccountController {
     @Autowired
     private AccountService accountService;
@@ -79,9 +78,9 @@ public class AccountController {
                 .data(accountService.getAccountById(id))
                 .build();
     }
-    @DeleteMapping("/{id}")
-    public ApiResponse<Boolean> deleteAccountById(@PathVariable int id){
-        return ApiResponse.<Boolean>builder()
+    @PostMapping("/{id}")
+    public ApiResponse<AccountResponse> deleteAccountById(@PathVariable int id){
+        return ApiResponse.<AccountResponse>builder()
                 .data(accountService.deleteAccountById(id))
                 .code(1000)
                 .message("delete success")
@@ -93,4 +92,20 @@ public class AccountController {
                 .data(accountService.updateAccount(id,request))
                 .build();
     }
+
+    @GetMapping("/myInfor")
+    ApiResponse<AccountResponse> getMyInfor(){
+        return ApiResponse.<AccountResponse>builder()
+                .data(accountService.getMyAccount())
+                .build();
+    }
+    @GetMapping("/accountBanned")
+    ApiResponse<List<AccountResponse>> getAccountBanned(){
+        return ApiResponse.<List<AccountResponse>>builder()
+                .code(1000)
+                .message("getsuccess")
+                .data(accountService.getAllAccountsBanned())
+                .build();
+    }
+
 }
