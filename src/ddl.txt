@@ -1,12 +1,6 @@
-create database CourtStarV7
+create database CourtStar
 
-use CourtStarV7
-
-create table Role
-(
-  role_id int identity(1, 1) primary key,
-  name varchar(30)
-);
+use CourtStar
 
 create table Account
 (
@@ -16,7 +10,39 @@ create table Account
   first_name nvarchar(30),
   last_name nvarchar(50),
   phone char(10),
-  role_id int foreign key references Role(role_id)
+  is_delete bit not null,
+);
+
+create table InvalidatedToken
+(
+    id varchar(255) primary key,
+    expiry_time datetime(6)
+);
+
+create table Permission
+(
+    name varchar(255) primary key,
+    description varchar(255)
+);
+
+create table Role
+(
+    name varchar(255) primary key,
+    description varchar(255)
+);
+
+create table AccountRoles
+(
+    account_id int not null foreign key references Account(account_id),
+    roles_name varchar(255) not null foreign key references Role(name),
+    primary key (account_account_id, roles_name),
+);
+
+create table RolePermissions
+(
+    role_name varchar(255) not null foreign key references Role(name),
+    permissions_name varchar(255) not null foreign key references Permission(name),
+    primary key (role_name, permissions_name),
 );
 
 create table Customer
