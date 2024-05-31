@@ -65,20 +65,22 @@ public class AccountAuthentication {
                         new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli())
                 )
                 .issuer("courtstar.com")
-                .claim("Scope",buildScope(account))
                 .jwtID(UUID.randomUUID().toString())
+                .claim("Scope",buildScope(account))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header,payload);
         jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes()));
         return  jwsObject.serialize();
     }
+
     private String buildScope(Account account) {
         StringJoiner stringJoiner = new StringJoiner(" ");
+        System.out.println(stringJoiner);
         if(!account.getRoles().isEmpty()){
             account.getRoles().forEach(role -> {
                 stringJoiner.add("ROLE_"+role.getName());
-                if(CollectionUtils.isEmpty(role.getPermissions())){
+                if(!CollectionUtils.isEmpty(role.getPermissions())){
                     role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
                 }
             });
@@ -88,7 +90,13 @@ public class AccountAuthentication {
 
     public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException {
         var token=  request.getToken();
-        verifyToken(token);
+        try{
+            verifyToken(token);
+        }catch (AppException e){
+            return IntrospectResponse.builder()
+                    .success(false)
+                    .build();
+        }
         return IntrospectResponse.builder()
                 .success(true)
                 .build();
@@ -112,6 +120,8 @@ public class AccountAuthentication {
     }
 
     private SignedJWT verifyToken(String jwt) throws ParseException, JOSEException {
+
+
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
         SignedJWT signedJWT = SignedJWT.parse(jwt);
         Date expirationDate = signedJWT.getJWTClaimsSet().getExpirationTime();
@@ -119,6 +129,10 @@ public class AccountAuthentication {
         if(!(verified && expirationDate.after(new Date()))){
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
+        if(invalidatedRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID())){
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+        }
+
         return signedJWT;
     }
 }

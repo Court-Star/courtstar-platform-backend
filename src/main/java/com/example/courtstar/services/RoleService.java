@@ -37,6 +37,10 @@ public class RoleService {
         return roleReponsitory.findAll().stream().map(roleMapper::toRoleResponse).toList();
     }
 
+    public List<Role> findAllById(String name) {
+        return roleReponsitory.findAllByName(name);
+    }
+
     public void delete(String role) {
         roleReponsitory.deleteById(role);
     }
