@@ -14,6 +14,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,6 +34,7 @@ public class AccountService {
      AccountReponsitory accountReponsitory;
      RoleReponsitory roleReponsitory;
      AccountMapper accountMapper;
+     RoleService roleService;
 
     public Account CreateAccount(AccountCreationRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
@@ -41,10 +43,8 @@ public class AccountService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         Account account = accountMapper.toAccount(request);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
-        Set<Role> roles = new HashSet<>();
-        Role role = roleReponsitory.findById("CUSTOMER").orElse(null);
-        roles.add(role);
-        account.setRoles(roles);
+        var roles = roleService.findAllById("CUSTOMER");
+        account.setRoles(new HashSet<>(roles));
         return accountReponsitory.save(account);
     }
 
@@ -63,8 +63,23 @@ public class AccountService {
         return accountReponsitory.save(account);
     }
 
-//    @PreAuthorize("hasRole('ADMIN')")
+    public Account CreateStaffAccount(AccountCreationRequest request) {
+        if(accountReponsitory.existsByEmail(request.getEmail())){
+            throw new AppException(ErrorCode.ACCOUNT_EXIST);
+        }
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        Account account = accountMapper.toAccount(request);
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleReponsitory.findById("CUSTOMER").orElse(null));
+        roles.add(roleReponsitory.findById("CENTRE_STAFF").orElse(null));
+        account.setRoles(roles);
+        return accountReponsitory.save(account);
+    }
+
+    @Secured("hasRole('CUSTOMER')")
     public List<Account> getAllAccounts(){
+        log.warn("notfound");
         return accountReponsitory.findAll();
     }
 

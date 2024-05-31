@@ -41,6 +41,14 @@ public class AccountController {
         return apiResponse;
     }
 
+    @PostMapping("/staff")
+    public ApiResponse<AccountResponse> createStaffAccount(@RequestBody @Valid AccountCreationRequest request){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(accountService.CreateStaffAccount(request))
+                .build();
+        return apiResponse;
+    }
+
     @GetMapping("/createEmail")
     public ApiResponse<AccountResponse> createAccountByGmail(@AuthenticationPrincipal OAuth2User principal){
         Map<String, Object> attributes = principal.getAttributes();
