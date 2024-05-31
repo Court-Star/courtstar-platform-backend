@@ -4,7 +4,7 @@ import com.example.courtstar.dto.request.AccountCreationRequest;
 import com.example.courtstar.dto.request.AccountUpdateRequest;
 import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.entity.Account;
-import com.example.courtstar.enums.Role;
+import com.example.courtstar.entity.Role;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.AccountMapper;
@@ -22,6 +22,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -38,16 +40,17 @@ public class AccountService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         Account account = accountMapper.toAccount(request);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
-        HashSet<String> roles = new HashSet<>();
-        roles.add(Role.CUSTOMER.name());
-        //account.setRole(roles);
+        Set<Role> roles = new HashSet<>();
+        Role role = roleReponsitory.findById("CUSTOMER").orElse(null);
+        roles.add(role);
+        account.setRoles(roles);
         return accountReponsitory.save(account);
     }
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     public List<Account> getAllAccounts(){
         return accountReponsitory.findAll();
     }
-    @PreAuthorize("hasAuthority('ADMIN')")
+//    @PreAuthorize("hasAuthority('ADMIN')")
     public AccountResponse getAccountById(int id){
         Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         AccountResponse accountResponse = accountMapper.toAccountResponse(account);
