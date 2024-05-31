@@ -26,7 +26,7 @@ import javax.crypto.spec.SecretKeySpec;
 public class SecurityConfig {
     @Value("${jwt.signerKey}")
     protected String signerKey;
-    private String[] PUBLIC_URLS = {"/account","/auth/token","/auth/introspect","/auth/logout"};
+    private String[] PUBLIC_URLS = {"/account","/account/partner","/auth/token","/auth/introspect","/auth/logout"};
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
