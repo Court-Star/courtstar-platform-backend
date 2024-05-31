@@ -33,6 +33,7 @@ public class AccountService {
      AccountReponsitory accountReponsitory;
      RoleReponsitory roleReponsitory;
      AccountMapper accountMapper;
+
     public Account CreateAccount(AccountCreationRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.ACCOUNT_EXIST);
@@ -46,10 +47,27 @@ public class AccountService {
         account.setRoles(roles);
         return accountReponsitory.save(account);
     }
+
+    public Account CreateManagerAccount(AccountCreationRequest request) {
+        if(accountReponsitory.existsByEmail(request.getEmail())){
+            throw new AppException(ErrorCode.ACCOUNT_EXIST);
+        }
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
+        Account account = accountMapper.toAccount(request);
+        account.setPassword(passwordEncoder.encode(request.getPassword()));
+        Set<Role> roles = new HashSet<>();
+        roles.add(roleReponsitory.findById("CUSTOMER").orElse(null));
+        roles.add(roleReponsitory.findById("CENTRE_MANAGER").orElse(null));
+        roles.add(roleReponsitory.findById("CENTRE_STAFF").orElse(null));
+        account.setRoles(roles);
+        return accountReponsitory.save(account);
+    }
+
 //    @PreAuthorize("hasRole('ADMIN')")
     public List<Account> getAllAccounts(){
         return accountReponsitory.findAll();
     }
+
 //    @PreAuthorize("hasAuthority('ADMIN')")
     public AccountResponse getAccountById(int id){
         Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
@@ -80,6 +98,7 @@ public class AccountService {
         AccountResponse accountResponse = accountMapper.toAccountResponse(accountReponsitory.save(account));
         return accountResponse;
     }
+
     public AccountResponse getAccountByEmail(String email){
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
@@ -87,6 +106,7 @@ public class AccountService {
         //accountResponse.setRoles(account.getRole());
         return accountResponse;
     }
+
     public boolean checkExistEmail(String email){
         return accountReponsitory.existsByEmail(email);
     }
