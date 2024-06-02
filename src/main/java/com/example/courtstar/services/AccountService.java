@@ -4,24 +4,29 @@ import com.example.courtstar.dto.request.AccountCreationRequest;
 import com.example.courtstar.dto.request.AccountUpdateRequest;
 import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.entity.Account;
-import com.example.courtstar.entity.Role;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.AccountMapper;
 import com.example.courtstar.repositories.AccountReponsitory;
 import com.example.courtstar.repositories.RoleReponsitory;
+import com.example.courtstar.util.EmailUtil;
+import com.example.courtstar.util.OtpUtil;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 
@@ -29,11 +34,17 @@ import java.util.List;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
 @Slf4j
+@EnableWebSecurity
+@EnableMethodSecurity
 public class AccountService {
      AccountReponsitory accountReponsitory;
      RoleReponsitory roleReponsitory;
      AccountMapper accountMapper;
      RoleService roleService;
+     @Autowired
+     PasswordEncoder passwordEncoder;
+    private final OtpUtil otpUtil;
+    private final EmailUtil emailUtil;
 
     public Account CreateAccount(AccountCreationRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
@@ -46,16 +57,17 @@ public class AccountService {
         account.setRoles(new HashSet<>(roles));
         return accountReponsitory.save(account);
     }
-    @Secured("hasRole('CUSTOMER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<Account> getAllAccounts(){
-        log.warn("notfound");
         return accountReponsitory.findAll();
     }
+    @PreAuthorize("hasAuthority('GET_ACCOUNT_BY_ID')")
     public AccountResponse getAccountById(int id){
         Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         AccountResponse accountResponse = accountMapper.toAccountResponse(account);
         return accountResponse;
     }
+    @PreAuthorize("hasRole('ADMIN')")
     public AccountResponse deleteAccountById(int id){
          if(accountReponsitory.existsById(id)){
              Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
@@ -68,6 +80,15 @@ public class AccountService {
 
     }
 
+    public AccountResponse UpdatePassword(String email,String newPassword){
+        Account account = accountReponsitory.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        account.setPassword(passwordEncoder.encode(newPassword));
+        accountReponsitory.save(account);
+
+        return accountMapper.toAccountResponse(account);
+    }
+
+    @PreAuthorize("hasAuthority('UPDATE_ACCOUNT')")
     public AccountResponse updateAccount(int id,AccountUpdateRequest request){
         Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         accountMapper.updateAccount(account,request);
@@ -84,21 +105,51 @@ public class AccountService {
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         AccountResponse accountResponse =accountMapper.toAccountResponse(account);
-        //accountResponse.setRoles(account.getRole());
         return accountResponse;
     }
+
     public boolean checkExistEmail(String email){
         return accountReponsitory.existsByEmail(email);
     }
 
+    @PreAuthorize("hasAuthority('GET_MY_INFOR')")
     public  AccountResponse getMyAccount(){
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
         Account account = accountReponsitory.findByEmail(name).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         return accountMapper.toAccountResponse(account);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AccountResponse> getAllAccountsBanned(){
          return accountReponsitory.findAllByIDelete(true).stream().map(accountMapper::toAccountResponse).toList();
     }
+
+    public String generateOtp(String email){
+        System.out.println(email);
+        Account account = accountReponsitory.findByEmail(email)
+                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        String otp = otpUtil.generateOtp();
+        try{
+            emailUtil.sendOtpEmail(email,otp);
+        } catch (MessagingException e) {
+            throw new AppException(ErrorCode.OTP_ERROR);
+        }
+
+        account.setOtp(otp);
+        account.setOtpGeneratedTime(LocalDateTime.now());
+        accountReponsitory.save(account);
+        return otp;
+    }
+
+    public boolean VerifyOtp(String email,String otp){
+        Account account = accountReponsitory.findByEmail(email)
+                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        if(!(otp.equals(account.getOtp())
+                && Duration.between(account.getOtpGeneratedTime(), LocalDateTime.now()).toSeconds() < 60)){
+            throw new AppException(ErrorCode.OTP_ERROR);
+        }
+
+        return true;
+    }
+
 }

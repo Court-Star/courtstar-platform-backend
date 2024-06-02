@@ -18,7 +18,6 @@ import java.util.Objects;
 
 @Component
 public class CustomJwtDecoder implements JwtDecoder {
-
     @Value("${jwt.signerKey}")
     private String signerKey;
 
@@ -26,19 +25,20 @@ public class CustomJwtDecoder implements JwtDecoder {
     private AccountAuthentication accountAuthentication;
 
     private NimbusJwtDecoder nimbusJwtDecoder = null;
-
     @Override
     public Jwt decode(String token) throws JwtException {
         try {
-            var response = accountAuthentication.introspect(IntrospectRequest.builder()
+            var response = accountAuthentication.introspect(
+                    IntrospectRequest.builder()
                     .token(token)
                     .build());
-            if (response == null) {
+            if (!response.isSuccess()) {
                 throw new JwtException("Invalid token");
             }
         } catch (ParseException | JOSEException e) {
-            throw new RuntimeException(e);
+            throw new JwtException(e.getMessage());
         }
+
         if (Objects.isNull(nimbusJwtDecoder)) {
             SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
             nimbusJwtDecoder = NimbusJwtDecoder.withSecretKey(secretKeySpec)

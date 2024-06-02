@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,6 +41,8 @@ public class Account {
     @Size(max = 30)
     @Column(name = "last_name", length = 30)
     String lastName;
+    String otp;
+    LocalDateTime otpGeneratedTime;
 
     boolean IDelete=false;
 
