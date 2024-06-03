@@ -4,14 +4,35 @@ server:
     context-path: /courtstar
 spring:
   datasource:
-    url: jdbc:sqlserver://courtstar.database.windows.net:1433;database=CourtStar;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30
-    username: csadmin
-    password: courtstar123@
+    url: jdbc:sqlserver://courtstarv2.database.windows.net:1433;database=courtstar;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
+    username: adminv2
+    password: Aa@123456
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: minhoan305@gmail.com
+    password: jfcr heji pmzn bmzu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+    thymeleaf:
+      prefix: classpath:/templates/
+      suffix: .html
+      mode: HTML
+      encoding: UTF-8
+      cache: false
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
   security:
     oauth2:
       client:
@@ -22,3 +43,5 @@ spring:
 
 jwt:
   signerKey: "OpLoSIHROWo8482Fsk63QXj/jNb95u9Xl2ZZyUDKQwN687kCVo5FVVFBdbQfcqXJ"
+  valid-duration: 3600
+  refreshable-duration: 36000

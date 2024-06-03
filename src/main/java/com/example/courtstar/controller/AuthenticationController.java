@@ -1,9 +1,6 @@
 package com.example.courtstar.controller;
 
-import com.example.courtstar.dto.request.ApiResponse;
-import com.example.courtstar.dto.request.AuthenticationRequest;
-import com.example.courtstar.dto.request.IntrospectRequest;
-import com.example.courtstar.dto.request.LogoutRequest;
+import com.example.courtstar.dto.request.*;
 import com.example.courtstar.dto.response.AuthenticationResponse;
 import com.example.courtstar.dto.response.IntrospectResponse;
 import com.example.courtstar.services.AccountAuthentication;
@@ -43,6 +40,15 @@ public class AuthenticationController {
     public ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws JOSEException, ParseException {
         authentication.logout(request);
         return ApiResponse.<Void>builder()
+                .build();
+    }
+
+    @PostMapping("/refresh")
+    public ApiResponse<AuthenticationResponse> authenticate(@RequestBody RefreshRequest request) throws JOSEException, ParseException {
+        AuthenticationResponse authenticationResponse =authentication.refreshToken(request);
+        return ApiResponse.<AuthenticationResponse>builder()
+                .data(authenticationResponse)
+                .code(1000)
                 .build();
     }
 

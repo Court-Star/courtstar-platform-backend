@@ -1,5 +1,7 @@
 package com.example.courtstar.configuration;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.catalina.filters.CorsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -17,38 +19,41 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Slf4j
 
 public class SecurityConfig {
     @Value("${jwt.signerKey}")
     protected String signerKey;
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
-    private String[] PUBLIC_URLS = {"/account","/account/partner","/auth/token","/auth/introspect","/auth/logout"};
+    private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect","/auth/logout","/auth/refresh"};
+    private final String[] PUBLIC_URLS_GET = {"/auth/token","/auth/introspect","/auth/logout","/auth/refresh","/account/regenerate-otp","account/verify-account"};
+    private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests()
-                .requestMatchers(HttpMethod.POST,PUBLIC_URLS).permitAll()
+                .requestMatchers(HttpMethod.POST,PUBLIC_URLS_POST).permitAll()
+                .requestMatchers(HttpMethod.PUT,PUBLIC_URLS_PUT).permitAll()
+                .requestMatchers(HttpMethod.GET,PUBLIC_URLS_GET).permitAll()
                 .anyRequest().authenticated()
-//                .and()
-//                .oauth2Login()
-//                .defaultSuccessUrl("/account/createEmail", true);
-        ;
+                .and()
+                .oauth2Login()
+                .defaultSuccessUrl("/account/createEmail", true);
 
+        httpSecurity.oauth2ResourceServer()
+                .jwt(jwtConfigurer -> jwtConfigurer.decoder(customJwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(new JWTAuthenticationEntryPoint());
 
-        httpSecurity.oauth2ResourceServer(oauth2 ->
-                oauth2.jwt(jwtConfigurer ->
-                                jwtConfigurer.decoder(jwtDecoder())
-                                        .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                        .authenticationEntryPoint(new JWTAuthenticationEntryPoint())
-        );
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
         return httpSecurity.build();
@@ -56,19 +61,10 @@ public class SecurityConfig {
     @Bean
     JwtAuthenticationConverter jwtAuthenticationConverter(){
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
         JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
         converter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
         return converter;
-    }
-
-    @Bean
-    JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(signerKey.getBytes(), "HS512");
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
-                .macAlgorithm(MacAlgorithm.HS512)
-                .build();
     }
 
     @Bean
