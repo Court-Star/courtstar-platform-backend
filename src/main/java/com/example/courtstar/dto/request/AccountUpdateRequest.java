@@ -21,5 +21,4 @@ public class AccountUpdateRequest {
     String phone;
     String firstName;
     String lastName;
-    List<String> roles;
 }

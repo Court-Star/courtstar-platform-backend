@@ -95,8 +95,6 @@ public class AccountService {
 
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
-        var roles = roleReponsitory.findAllById(request.getRoles());
-        account.setRoles(new HashSet<>(roles));
         AccountResponse accountResponse = accountMapper.toAccountResponse(accountReponsitory.save(account));
         return accountResponse;
     }
