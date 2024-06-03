@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" >
+<head>
+    <title>OTP Verification</title>
+</head>
+<body>
+<div>
+    <p>What's up, babe</p>
+    <p>click on the following link to reset password:</p>
+    <div>
+        <a th:href="@{'http://localhost:8080/courtstar/account/verify-account?email=' + ${email} + '&otp=' +${otp}}" target="_blank">click link to verify</a>
+    </div>
+</div>
+</body>
+</html>

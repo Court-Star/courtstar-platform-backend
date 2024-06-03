@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -18,7 +19,7 @@ import java.util.Set;
 public class Account {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "account_id", nullable = false)
+    @Column(name = "id", nullable = false)
     Integer id;
 
     @Size(max = 80)
@@ -42,6 +43,9 @@ public class Account {
     String lastName;
 
     boolean isDelete=false;
+
+    String otp;
+    LocalDateTime otpGeneratedTime;
 
     @ManyToMany
     Set<Role> roles;
