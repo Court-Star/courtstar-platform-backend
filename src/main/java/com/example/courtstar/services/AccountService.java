@@ -71,8 +71,8 @@ public class AccountService {
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         Set<Role> roles = new HashSet<>();
         roles.add(roleReponsitory.findById("CUSTOMER").orElse(null));
-        roles.add(roleReponsitory.findById("CENTRE_MANAGER").orElse(null));
-        roles.add(roleReponsitory.findById("CENTRE_STAFF").orElse(null));
+        roles.add(roleReponsitory.findById("MANAGER").orElse(null));
+        roles.add(roleReponsitory.findById("STAFF").orElse(null));
         account.setRoles(roles);
         return accountReponsitory.save(account);
     }
@@ -86,7 +86,7 @@ public class AccountService {
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         Set<Role> roles = new HashSet<>();
         roles.add(roleReponsitory.findById("CUSTOMER").orElse(null));
-        roles.add(roleReponsitory.findById("CENTRE_STAFF").orElse(null));
+        roles.add(roleReponsitory.findById("STAFF").orElse(null));
         account.setRoles(roles);
         return accountReponsitory.save(account);
     }
