@@ -27,6 +27,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -160,21 +161,30 @@ public class AccountService {
          return accountReponsitory.findAllByIsDelete(true).stream().map(accountMapper::toAccountResponse).toList();
     }
 
-    public boolean generateOtp(String email){
-        System.out.println(email);
+    public String generateOtp(String email){
+        String result = "";
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        String otp = otpUtil.generateOtp();
-        try{
-            emailUtil.sendOtpEmail(email,otp);
-        } catch (MessagingException e) {
-            throw new AppException(ErrorCode.OTP_ERROR);
+        Timestamp oldOtp = Timestamp.valueOf(account.getOtpGeneratedTime());
+        Timestamp current = Timestamp.valueOf(LocalDateTime.now());
+        if (oldOtp.getTime()/1000 + 3*60 > current.getTime()/1000 ) {
+            result = String.valueOf((oldOtp.getTime()/1000));
+        } else {
+            String otp = otpUtil.generateOtp();
+            try{
+                emailUtil.sendOtpEmail(email,otp);
+            } catch (MessagingException e) {
+                throw new AppException(ErrorCode.OTP_ERROR);
+            }
+
+            account.setOtp(otp);
+            account.setOtpGeneratedTime(LocalDateTime.now());
+            accountReponsitory.save(account);
+            Timestamp newOtp = Timestamp.valueOf(account.getOtpGeneratedTime());
+            result = String.valueOf(newOtp.getTime()/1000);
         }
 
-        account.setOtp(otp);
-        account.setOtpGeneratedTime(LocalDateTime.now());
-        accountReponsitory.save(account);
-        return true;
+        return result;
     }
 
     public boolean VerifyOtp(String email,String otp){
