@@ -160,7 +160,7 @@ public class AccountService {
          return accountReponsitory.findAllByIsDelete(true).stream().map(accountMapper::toAccountResponse).toList();
     }
 
-    public String generateOtp(String email){
+    public boolean generateOtp(String email){
         System.out.println(email);
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
@@ -174,7 +174,7 @@ public class AccountService {
         account.setOtp(otp);
         account.setOtpGeneratedTime(LocalDateTime.now());
         accountReponsitory.save(account);
-        return otp;
+        return true;
     }
 
     public boolean VerifyOtp(String email,String otp){
