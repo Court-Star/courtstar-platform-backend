@@ -6,9 +6,12 @@
 <body>
 <div>
     <p>What's up, babe</p>
-    <p>Click on the following link to reset password:</p>
+<!--    <p>Click on the following link to reset password:</p>-->
     <div>
-        <a th:href="@{'http://localhost:8080/courtstar/account/verify-account?email=' + ${email} + '&otp=' +${otp}}" target="_blank">Verify</a>
+        <div>
+            <p>Your OTP is: <span th:text="${otp}"></span></p>
+        </div>
+<!--        <a th:href="@{'http://localhost:8080/courtstar/account/verify-account?email=' + ${email} + '&otp=' +${otp}}" target="_blank">Verify</a>-->
     </div>
 </div>
 </body>
