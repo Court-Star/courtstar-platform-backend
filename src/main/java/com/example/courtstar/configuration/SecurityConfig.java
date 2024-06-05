@@ -36,14 +36,14 @@ public class SecurityConfig {
     private CustomJwtDecoder customJwtDecoder;
     private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect","/auth/logout","/auth/refresh"};
     private final String[] PUBLIC_URLS_GET = {"/auth/token","/auth/introspect","/auth/logout","/auth/refresh","/account/regenerate-otp","account/verify-account"};
-    private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};
+    private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp,/account/"};
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST,PUBLIC_URLS_POST).permitAll()
-                .requestMatchers(HttpMethod.PUT,PUBLIC_URLS_PUT).permitAll()
-                .requestMatchers(HttpMethod.GET,PUBLIC_URLS_GET).permitAll()
+                .requestMatchers(HttpMethod.PUT,PUBLIC_URLS_GET).permitAll()
+                .requestMatchers(HttpMethod.GET,PUBLIC_URLS_PUT).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()

@@ -50,4 +50,6 @@ public class Account {
     @ManyToMany
     Set<Role> roles;
 
+    @OneToOne
+    CentreManager centreManager;
 }

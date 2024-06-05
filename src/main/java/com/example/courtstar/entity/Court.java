@@ -2,6 +2,7 @@ package com.example.courtstar.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,9 +13,11 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Permission {
+public class Court {
     @Id
-    String name;
-    String description;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Integer id;
+    int courtNo;
+    boolean status;
 }
 
