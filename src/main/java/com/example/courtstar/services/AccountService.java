@@ -172,7 +172,7 @@ public class AccountService {
         } else {
             String otp = otpUtil.generateOtp();
             try{
-                emailUtil.sendOtpEmail(email,otp);
+                emailUtil.sendOtpEmail(email,account.getFirstName(),otp);
             } catch (MessagingException e) {
                 throw new AppException(ErrorCode.OTP_ERROR);
             }
