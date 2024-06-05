@@ -1,9 +1,6 @@
 package com.example.courtstar.controller;
 
-import com.example.courtstar.dto.request.AccountCreationRequest;
-import com.example.courtstar.dto.request.AccountUpdateRequest;
-import com.example.courtstar.dto.request.ApiResponse;
-import com.example.courtstar.dto.request.OtpRequest;
+import com.example.courtstar.dto.request.*;
 import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.entity.Account;
 import com.example.courtstar.mapper.AccountMapper;
@@ -14,9 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import java.util.List;
 import java.util.Map;
@@ -143,37 +138,49 @@ public class AccountController {
         return new ResponseEntity<>(apiResponse, HttpStatus.OK);
     }
 
-    @GetMapping("/verify-account")
-    public ModelAndView verifyAccount(@RequestParam String email, @RequestParam String otp, Model model){
-        System.out.println(email);
-        boolean isVerify = accountService.VerifyOtp(email,otp);
-        System.out.println(isVerify);
-        if(isVerify){
-            model.addAttribute("email", email);
-            return new ModelAndView("Update-Password");
-        }
-        else{
-            return new ModelAndView("otp-error");
-        }
-    }
+    @PostMapping("/reset-password")
+    public ApiResponse resetPassword(@RequestBody ResetPasswordRequest request){
+        boolean isVerify = accountService.VerifyOtp(request.getEmail(),request.getOtp());
+//        return ApiResponse.builder()
+//                .code(1000)
+//                .message("success")
+//                .build();
+//        if(isVerify){
+//            model.addAttribute("email", email);
+//            return new ModelAndView("Update-Password");
+//        }
+//        else{
+//            return new ModelAndView("otp-error");
+//        }
 
-    @PostMapping("/update-password")
-    public ApiResponse<AccountResponse> updatePassword(@RequestParam("email") String email,
-                                                       @RequestParam("newPassword") String newPassword,
-                                                       @RequestParam("confirmPassword") String confirmPassword){
-        AccountResponse accountResponse=null;
-        if(newPassword.equals(confirmPassword)){
-            accountResponse=accountService.UpdatePassword(email,newPassword);
-        }else{
-            ModelAndView modelAndView = new ModelAndView("Update-Password");
-            modelAndView.addObject("email",email);
-            modelAndView.addObject("error","passwords do not match");
+        if (isVerify) {
+            if(request.getNewPassword().equals(request.getConfirmPassword())){
+                accountService.UpdatePassword(request.getEmail(),request.getNewPassword());
+            }
+            else {
+                return ApiResponse.builder()
+                        .code(1000)
+                        .message("password not match")
+                        .build();
+            }
         }
 
-        return ApiResponse.<AccountResponse>builder()
-                .data(accountResponse)
+        return ApiResponse.builder()
+                .code(1000)
+                .message("success")
                 .build();
     }
 
+//    @PostMapping("/update-password")
+//    public ApiResponse<AccountResponse> updatePassword(@RequestBody ResetPasswordRequest request){
+//        AccountResponse accountResponse=null;
+//        if(request.getNewPassword().equals(request.getConfirmPassword())){
+//            accountResponse=accountService.UpdatePassword(request.getEmail(),request.getNewPassword());
+//        }
+//
+//        return ApiResponse.<AccountResponse>builder()
+//                .data(accountResponse)
+//                .build();
+//    }
 
 }
