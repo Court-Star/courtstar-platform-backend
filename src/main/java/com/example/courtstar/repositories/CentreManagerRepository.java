@@ -10,5 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface CentreManagerRepository extends JpaRepository<CentreManager, Integer> {
-
+    Optional<CentreManager> findByAccountId(Integer accountId);
 }

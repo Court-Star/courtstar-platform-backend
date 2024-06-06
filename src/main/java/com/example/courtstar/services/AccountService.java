@@ -68,7 +68,7 @@ public class AccountService {
         return accountReponsitory.save(account);
     }
 
-    public Account CreateManagerAccount(AccountCreationRequest request) {
+    public CentreManager CreateManagerAccount(AccountCreationRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.ACCOUNT_EXIST);
         }
@@ -81,9 +81,15 @@ public class AccountService {
         roles.add(roleReponsitory.findById("STAFF").orElse(null));
         account.setRoles(roles);
 
-        account.setCentreManager(centreManagerRepository.save(CentreManager.builder().build()));
-        System.out.println(account.getCentreManager());
-        return accountReponsitory.save(account);
+        accountReponsitory.save(account);
+
+
+
+        return centreManagerRepository.save(
+                CentreManager.builder()
+                        .account(account)
+                        .currentBalance(500)
+                        .build());
     }
 
     public Account CreateStaffAccount(AccountCreationRequest request) {

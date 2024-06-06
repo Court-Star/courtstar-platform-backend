@@ -53,28 +53,25 @@ public class CentreManagerService {
         return centreManagerRepository.save(centreManager);
     }
 
-    public CentreManager updateInformation(String email,CentreManagerRequest request){
-        Account account = accountReponsitory.findByEmail(email).orElseThrow(null);
-        Role role= account.getRoles().stream().filter(i->i.getName().equals("MANAGER")).findFirst().orElse(null);
+    public CentreManager updateInformation(int id,CentreManagerRequest request){
+        CentreManager manager = centreManagerRepository.findById(id).orElseThrow(null);
+        Role role= manager.getAccount().getRoles().stream().filter(i->i.getName().equals("MANAGER")).findFirst().orElse(null);
         if(role==null){
             throw new AppException(ErrorCode.ERROR_ROLE);
         }
-        CentreManager centreManager = centreManagerRepository
-                .findById(account.getCentreManager().getId()).orElseThrow(null);
-        centreManagerMapper.updateCentre(centreManager,request);
-        return centreManagerRepository.save(centreManager);
+        centreManagerMapper.updateCentre(manager,request);
+        return centreManagerRepository.save(manager);
     }
 
-    public CentreManager addCentre(String email, CentreRequest request){
-        Account account = accountReponsitory.findByEmail(email).orElseThrow(()-> new AppException(ErrorCode.NOT_FOUND_USER));
-        Role role= account.getRoles().stream().filter(i->i.getName().equals("MANAGER")).findFirst().orElse(null);
+    public CentreManager addCentre(int id, CentreRequest request){
+        CentreManager manager = centreManagerRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_FOUND_USER));
+        Role role= manager.getAccount().getRoles().stream().filter(i->i.getName().equals("MANAGER")).findFirst().orElse(null);
         if(role==null){
             throw new RuntimeException();
         }
         Centre centre = centreRepository.save(centreMapper.toCentre(request));
-        CentreManager centreManager = centreManagerRepository
-                .findById(account.getCentreManager().getId()).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        Set<Centre> centreSet = centreManager.getCentres();
+
+        Set<Centre> centreSet = manager.getCentres();
         centreSet.add(centre);
 
         CourtRequest courtRequest = new CourtRequest();
@@ -88,7 +85,7 @@ public class CentreManagerService {
         centre.setImages(images);
         imgRepository.saveAll(images);
         centreRepository.save(centre);
-        return centreManagerRepository.save(centreManager);
+        return centreManagerRepository.save(manager);
     }
 
     private Set<Court> AddCourt(int idCentre, CourtRequest request){
