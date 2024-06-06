@@ -20,12 +20,13 @@ public class EmailUtil {
         this.templateEngine = templateEngine;
     }
 
-    public void sendOtpEmail(String email, String otp) throws MessagingException {
+    public void sendOtpEmail(String email, String firstName, String otp) throws MessagingException {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,true);
 
         Context context = new Context();
         context.setVariable("email", email);
+        context.setVariable("name", firstName);
         context.setVariable("otp", otp);
 
         String htmlContent = templateEngine.process("otp-email", context);

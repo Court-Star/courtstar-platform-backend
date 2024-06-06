@@ -34,9 +34,10 @@ public class SecurityConfig {
     protected String signerKey;
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
-    private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect","/auth/logout","/auth/refresh"};
-    private final String[] PUBLIC_URLS_GET = {"/auth/token","/auth/introspect","/auth/logout","/auth/refresh","/account/regenerate-otp","account/verify-account"};
-    private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp,/account/"};
+    private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect"
+            ,"/auth/logout","/auth/refresh","account/reset-password"};
+    private final String[] PUBLIC_URLS_GET = {"/auth/token","/auth/introspect","/auth/logout","/auth/refresh"};
+    private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
