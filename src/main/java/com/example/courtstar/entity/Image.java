@@ -1,9 +1,6 @@
 package com.example.courtstar.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -18,5 +15,9 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
     String text;
+    @ManyToOne
+    @JoinColumn(name = "centre_id")
+    Centre centre;
+
 }
 

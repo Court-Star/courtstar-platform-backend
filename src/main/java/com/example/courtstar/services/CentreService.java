@@ -79,7 +79,7 @@ public class CentreService {
     public Set<CentreResponse> getAllCentresOfManager(String Email){
         Account account = accountReponsitory.findByEmail(Email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         CentreManager centreManager = account.getCentreManager();
-        return centreManager.getCentreManagers().stream().map(centreMapper::toCentreResponse).collect(Collectors.toSet());
+        return centreManager.getCentres().stream().map(centreMapper::toCentreResponse).collect(Collectors.toSet());
     }
     public CentreResponse isActive(int id, boolean active) {
         Centre centre = centreRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
@@ -90,20 +90,5 @@ public class CentreService {
         CentreResponse centreResponse = centreMapper.toCentreResponse(centre1);
         System.out.println(centreResponse.isHoatDong());
         return centreResponse;
-    }
-
-    private Set<Court> AddCourt(int idCentre, CourtRequest request){
-        Centre centre = centreRepository.findById(idCentre).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-        var setCentre = centre.getCourts();
-        for(int i=0;i<centre.getNumberOfCourt();i++){
-            Court court = courtMapper.toCourt(request.builder()
-                            .courtNo(i+1)
-                            .status(true)
-                    .build());
-            setCentre.add(court);
-            courtRepository.save(court);
-        }
-
-        return centreRepository.save(centre).getCourts();
     }
 }

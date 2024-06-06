@@ -104,14 +104,14 @@ public class AccountService {
         return accountReponsitory.findAll();
     }
 
-    @PreAuthorize("hasAuthority('GET_ACCOUNT_BY_ID')")
+    //@PreAuthorize("hasAuthority('GET_ACCOUNT_BY_ID')")
     public AccountResponse getAccountById(int id){
         Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         AccountResponse accountResponse = accountMapper.toAccountResponse(account);
         return accountResponse;
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public AccountResponse deleteAccountById(int id){
          if(accountReponsitory.existsById(id)){
              Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
@@ -132,7 +132,7 @@ public class AccountService {
         return accountMapper.toAccountResponse(account);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public AccountResponse updateAccount(int id,AccountUpdateRequest request){
         Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         accountMapper.updateAccount(account,request);
@@ -167,7 +167,7 @@ public class AccountService {
         return accountMapper.toAccountResponse(account);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public List<AccountResponse> getAllAccountsBanned(){
          return accountReponsitory.findAllByIsDelete(true).stream().map(accountMapper::toAccountResponse).toList();
     }

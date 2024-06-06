@@ -2,7 +2,9 @@ package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.RoleRequest;
+import com.example.courtstar.dto.request.UpdateRoleRequest;
 import com.example.courtstar.dto.response.RoleResponse;
+import com.example.courtstar.mapper.RoleMapper;
 import com.example.courtstar.services.RoleService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleController {
     RoleService roleService;
+    RoleMapper roleMapper;
 
     @PostMapping
     public ApiResponse<RoleResponse> createRole(@RequestBody RoleRequest request) {
@@ -38,12 +41,10 @@ public class RoleController {
                 .data(roleService.getAllRoles())
                 .build();
     }
-    @DeleteMapping("/{role}")
-    public ApiResponse<Void> deleteRole(@PathVariable String role) {
-        roleService.delete(role);
-        return ApiResponse.<Void>builder()
-                .code(1000)
-                .message("delete role success")
-                .build();
+
+    @PutMapping("/{name}")
+    public ApiResponse<RoleResponse> updateRole(@PathVariable String name, @RequestBody UpdateRoleRequest request) {
+        return ApiResponse.<RoleResponse>builder().data(roleService.updateRole(name,request)).build();
     }
+
 }

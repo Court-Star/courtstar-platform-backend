@@ -1,7 +1,9 @@
 package com.example.courtstar.services;
 
 import com.example.courtstar.dto.request.RoleRequest;
+import com.example.courtstar.dto.request.UpdateRoleRequest;
 import com.example.courtstar.dto.response.RoleResponse;
+import com.example.courtstar.entity.Permission;
 import com.example.courtstar.entity.Role;
 import com.example.courtstar.mapper.RoleMapper;
 import com.example.courtstar.repositories.PermissionReponsitory;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +44,21 @@ public class RoleService {
         return roleReponsitory.findAllByName(name);
     }
 
-    public void delete(String role) {
-        roleReponsitory.deleteById(role);
+    public RoleResponse updateRole(String name,UpdateRoleRequest request) {
+        Role role = roleReponsitory.findById(name).orElseThrow(()->new RuntimeException("Role not found"));
+        Set<Permission> permissions = role.getPermissions();
+        if(permissions == null) {
+            permissions = new HashSet<>();
+        }
+        for (var re : request.getPermissions()) {
+            Permission permission=Permission.builder()
+                    .name(re)
+                    .build();
+            permissions.add(permission);
+        }
+        role.setPermissions(permissions);
+
+        return roleMapper.toRoleResponse(roleReponsitory.save(role));
     }
+
 }
