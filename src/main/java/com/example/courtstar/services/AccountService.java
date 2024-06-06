@@ -158,7 +158,7 @@ public class AccountService {
         return accountReponsitory.existsByEmail(email);
     }
 
-    //@PreAuthorize("hasAuthority('GET_MY_INFO')")
+    @PreAuthorize("hasAuthority('GET_MY_INFO')")
     public  AccountResponse getMyAccount(){
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
