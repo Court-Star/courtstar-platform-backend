@@ -17,7 +17,6 @@ public class AccountResponse {
     String firstName;
     String lastName;
     Set<RoleResponse> roles;
-    CentreManager centreManager;
-    boolean IDelete;
+    boolean isDelete;
 
 }

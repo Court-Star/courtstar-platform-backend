@@ -13,6 +13,7 @@ import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.CentreMapper;
 import com.example.courtstar.mapper.CourtMapper;
 import com.example.courtstar.repositories.AccountReponsitory;
+import com.example.courtstar.repositories.CentreManagerRepository;
 import com.example.courtstar.repositories.CentreRepository;
 import com.example.courtstar.repositories.CourtRepository;
 import lombok.AccessLevel;
@@ -47,6 +48,8 @@ public class CentreService {
     CourtRepository courtRepository;
     @Autowired
     CourtMapper courtMapper;
+    @Autowired
+    private CentreManagerRepository centreManagerRepository;
 
     public CentreResponse createCentre(CentreRequest request) {
         Centre centre = centreMapper.toCentre(request);
@@ -55,7 +58,7 @@ public class CentreService {
 
     public CentreResponse UpdateCentre(int id,CentreRequest request) {
         Centre centre = centreRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-      if(!centre.isHoatDong()){
+      if(!centre.isStatus()){
            throw new AppException(ErrorCode.CENTRE_DISABLE);
         }
         centreMapper.updateCentre(centre,request);
@@ -67,7 +70,7 @@ public class CentreService {
     }
 
     public List<CentreResponse> getAllCentresIsActive(String email,boolean isActive) {
-        return centreRepository.findAllByNameAndHoatDong(email,isActive).stream().map(centreMapper::toCentreResponse).toList();
+        return centreRepository.findAllByNameAndStatus(email,isActive).stream().map(centreMapper::toCentreResponse).toList();
     }
 
     public CentreResponse getCentre(int id) {
@@ -76,19 +79,19 @@ public class CentreService {
     }
 
 
-    public Set<CentreResponse> getAllCentresOfManager(String Email){
-        Account account = accountReponsitory.findByEmail(Email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        CentreManager centreManager = account.getCentreManager();
+    public Set<CentreResponse> getAllCentresOfManager(String email){
+        Account account = accountReponsitory.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        CentreManager centreManager = centreManagerRepository.findByAccountId(account.getId()).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         return centreManager.getCentres().stream().map(centreMapper::toCentreResponse).collect(Collectors.toSet());
     }
     public CentreResponse isActive(int id, boolean active) {
         Centre centre = centreRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
         System.out.println(active);
-        centre.setHoatDong(active);
+        centre.setStatus(active);
         Centre centre1= centreRepository.save(centre);
-        System.out.println(centre1.isHoatDong());
+        System.out.println(centre1.isStatus());
         CentreResponse centreResponse = centreMapper.toCentreResponse(centre1);
-        System.out.println(centreResponse.isHoatDong());
+        System.out.println(centreResponse.isStatus());
         return centreResponse;
     }
 }

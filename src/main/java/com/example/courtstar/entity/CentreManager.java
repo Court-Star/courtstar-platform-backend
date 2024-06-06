@@ -21,9 +21,10 @@ public class CentreManager {
     String address;
     @Column(nullable = true)
     int currentBalance;
-    @OneToMany(mappedBy = "centreManager")
+    @OneToMany(mappedBy = "manager")
     Set<Centre> centres;
 
-
+    @OneToOne
+    Account account;
 }
 

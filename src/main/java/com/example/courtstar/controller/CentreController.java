@@ -17,7 +17,7 @@ import java.util.Set;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/Centre")
+@RequestMapping("/centre")
 public class CentreController {
     @Autowired
     private CentreService centreService;
@@ -32,7 +32,7 @@ public class CentreController {
                 .build();
     }
 
-    @GetMapping("/GetAllCentresOfManager")
+    @GetMapping("/getAllCentresOfManager")
     public ApiResponse<Set<CentreResponse>> GetAllCentresOfManager(){
        var context = SecurityContextHolder.getContext();
        String email = context.getAuthentication().getName();
@@ -40,14 +40,14 @@ public class CentreController {
                 .data(centreService.getAllCentresOfManager(email)).build();
     }
 
-    @GetMapping("/GetCentre/{id}")
+    @GetMapping("/getCentre/{id}")
     public ApiResponse<CentreResponse> GetCentre(@PathVariable int id){
         return ApiResponse
                 .<CentreResponse>builder().data(centreService.getCentre(id)).build();
     }
 
 
-    @GetMapping("/GetAllCentreActive")
+    @GetMapping("/getAllCentreActive")
     public ApiResponse<List<CentreResponse>> GetAllCentreActive(){
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
@@ -56,7 +56,7 @@ public class CentreController {
                 .build();
     }
 
-    @GetMapping("/GetAllCentreDisable")
+    @GetMapping("/getAllCentreDisable")
     public ApiResponse<List<CentreResponse>> GetAllCentreDisable(){
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();

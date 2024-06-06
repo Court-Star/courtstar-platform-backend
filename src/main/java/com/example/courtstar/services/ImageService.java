@@ -26,7 +26,7 @@ public class ImageService {
     ImgRepository imgRepository;
 
    public Image addImage(ImgRequest request){
-       return imgRepository.save(Image.builder().text(request.getText()).build());
+       return imgRepository.save(Image.builder().url(request.getText()).build());
    }
    public List<Image> getImages(){
        return imgRepository.findAll();

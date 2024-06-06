@@ -24,8 +24,7 @@ public class CentreResponse {
     int slotDuration;
     int numberOfCourt;
     String paymentMethod;
-    boolean status;
-    boolean hoatDong = true;
+    boolean status = true;
     LocalDate approveDate;
     Set<Court> courts;
 }

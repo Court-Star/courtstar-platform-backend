@@ -171,16 +171,4 @@ public class AccountController {
                 .build();
     }
 
-//    @PostMapping("/update-password")
-//    public ApiResponse<AccountResponse> updatePassword(@RequestBody ResetPasswordRequest request){
-//        AccountResponse accountResponse=null;
-//        if(request.getNewPassword().equals(request.getConfirmPassword())){
-//            accountResponse=accountService.UpdatePassword(request.getEmail(),request.getNewPassword());
-//        }
-//
-//        return ApiResponse.<AccountResponse>builder()
-//                .data(accountResponse)
-//                .build();
-//    }
-
 }

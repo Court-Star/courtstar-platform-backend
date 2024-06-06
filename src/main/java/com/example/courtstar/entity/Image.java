@@ -14,7 +14,7 @@ public class Image {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
-    String text;
+    String url;
     @ManyToOne
     @JoinColumn(name = "centre_id")
     Centre centre;

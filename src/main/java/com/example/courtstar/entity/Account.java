@@ -6,7 +6,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
 import java.util.Set;
 
 @Data
@@ -49,7 +48,4 @@ public class Account {
 
     @ManyToMany
     Set<Role> roles;
-
-    @OneToOne
-    CentreManager centreManager;
 }

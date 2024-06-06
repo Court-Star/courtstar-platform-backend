@@ -15,22 +15,22 @@ import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/ManagerControler")
+@RequestMapping("/manager")
 public class CentreManagerController {
     @Autowired
     private CentreManagerService centreManagerService;
 
 
-    @PutMapping("/updateManagerCentre")
-    public ApiResponse<CentreManager> updateManagerCentre(@RequestParam String email,@RequestBody CentreManagerRequest request){
-        CentreManager centreManager = centreManagerService.updateInformation(email,request);
+    @PutMapping("/updateInfo/{id}")
+    public ApiResponse<CentreManager> updateManagerCentre(@PathVariable int id ,@RequestBody CentreManagerRequest request) {
+        CentreManager centreManager = centreManagerService.updateInformation(id,request);
         return ApiResponse.<CentreManager>builder()
                 .data(centreManager)
                 .build();
     }
-    @PostMapping("/createCentre")
-    public ApiResponse<CentreManager> createCentre(@RequestParam String email , @RequestBody CentreRequest request){
-        CentreManager centreManager = centreManagerService.addCentre(email,request);
+    @PostMapping("/createCentre/{id}")
+    public ApiResponse<CentreManager> createCentre(@PathVariable int id , @RequestBody CentreRequest request){
+        CentreManager centreManager = centreManagerService.addCentre(id,request);
         return ApiResponse.<CentreManager>builder()
                 .data(centreManager)
                 .build();

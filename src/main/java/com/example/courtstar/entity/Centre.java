@@ -26,9 +26,9 @@ public class Centre {
     int slotDuration;
     int numberOfCourt;
     String paymentMethod;
-    boolean status;
+
     @Builder.Default
-    boolean hoatDong = true;
+    boolean status = true;
     LocalDate approveDate;
 
     @OneToMany(mappedBy = "centre")
@@ -36,7 +36,7 @@ public class Centre {
     @OneToMany(mappedBy = "centre")
     Set<Image> images;
     @ManyToOne
-    @JoinColumn(name = "centre_managers_id")
-    CentreManager centreManager;
+    @JoinColumn(name = "manager_id")
+    CentreManager manager;
 }
 
