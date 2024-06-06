@@ -30,9 +30,13 @@ public class Centre {
     @Builder.Default
     boolean hoatDong = true;
     LocalDate approveDate;
-    @OneToMany
+
+    @OneToMany(mappedBy = "centre")
     Set<Court> courts;
-    @OneToMany
+    @OneToMany(mappedBy = "centre")
     Set<Image> images;
+    @ManyToOne
+    @JoinColumn(name = "centre_managers_id")
+    CentreManager centreManager;
 }
 

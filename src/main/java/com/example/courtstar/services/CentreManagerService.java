@@ -49,7 +49,7 @@ public class CentreManagerService {
     ImgRepository imgRepository;
     public CentreManager addInformation(CentreManagerRequest request) {
         CentreManager centreManager = centreManagerMapper.toCentreManager(request);
-        centreManager.setCentreManagers(new HashSet<Centre>());
+        centreManager.setCentres(new HashSet<Centre>());
         return centreManagerRepository.save(centreManager);
     }
 
@@ -62,7 +62,6 @@ public class CentreManagerService {
         CentreManager centreManager = centreManagerRepository
                 .findById(account.getCentreManager().getId()).orElseThrow(null);
         centreManagerMapper.updateCentre(centreManager,request);
-
         return centreManagerRepository.save(centreManager);
     }
 
@@ -75,7 +74,7 @@ public class CentreManagerService {
         Centre centre = centreRepository.save(centreMapper.toCentre(request));
         CentreManager centreManager = centreManagerRepository
                 .findById(account.getCentreManager().getId()).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        Set<Centre> centreSet = centreManager.getCentreManagers();
+        Set<Centre> centreSet = centreManager.getCentres();
         centreSet.add(centre);
 
         CourtRequest courtRequest = new CourtRequest();
@@ -87,7 +86,6 @@ public class CentreManagerService {
         }
         images.addAll(request.getImages());
         centre.setImages(images);
-
         imgRepository.saveAll(images);
         centreRepository.save(centre);
         return centreManagerRepository.save(centreManager);

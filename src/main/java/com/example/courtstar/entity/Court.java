@@ -1,9 +1,6 @@
 package com.example.courtstar.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,5 +16,8 @@ public class Court {
     Integer id;
     int courtNo;
     boolean status;
+    @ManyToOne
+    @JoinColumn(name = "centre_id")
+    Centre centre;
 }
 
