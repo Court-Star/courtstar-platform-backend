@@ -40,6 +40,11 @@ spring:
           google:
             client-id: 1099077344805-af8jknff9pfv2hfvffu3b521p1sgdja0.apps.googleusercontent.com
             client-secret: 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
+  main:
+    allow-circular-references: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 jwt:
   signerKey: "OpLoSIHROWo8482Fsk63QXj/jNb95u9Xl2ZZyUDKQwN687kCVo5FVVFBdbQfcqXJ"

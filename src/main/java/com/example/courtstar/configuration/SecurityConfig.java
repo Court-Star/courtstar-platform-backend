@@ -43,8 +43,8 @@ public class SecurityConfig {
         httpSecurity
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST,PUBLIC_URLS_POST).permitAll()
-                .requestMatchers(HttpMethod.PUT,PUBLIC_URLS_PUT).permitAll()
-                .requestMatchers(HttpMethod.GET,PUBLIC_URLS_GET).permitAll()
+                .requestMatchers(HttpMethod.PUT,PUBLIC_URLS_GET).permitAll()
+                .requestMatchers(HttpMethod.GET,PUBLIC_URLS_PUT).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()

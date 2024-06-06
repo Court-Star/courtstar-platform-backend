@@ -29,33 +29,29 @@ public class ApplicationInitConfig {
     @NonFinal
     static final String ADMIN_PASSWORD = "admin";
     @Bean
-    @ConditionalOnProperty(
-            prefix ="spring",
-            value = "datasource.driverClassName",
-            havingValue = "com.mysql.cj.jdbc.Driver"
-    )
     ApplicationRunner applicationContext(AccountReponsitory accountReponsitory, RoleReponsitory roleReponsitory) {
         log.info("Initializing application.....");
+        roleReponsitory.save(Role.builder()
+                .name(PredefinedRole.CUSTOMER_ROLE)
+                .description("Customer role")
+                .build());
+        roleReponsitory.save(Role.builder()
+                .name(PredefinedRole.MANAGER_ROLE)
+                .description("Manager role")
+                .build());
+        roleReponsitory.save(Role.builder()
+                .name(PredefinedRole.STAFF_ROLE)
+                .description("Staff role")
+                .build());
+
+        Role adminRole = roleReponsitory.save(Role.builder()
+                .name(PredefinedRole.ADMIN_ROLE)
+                .description("Admin role")
+                .build());
         return args->{
             if(accountReponsitory.findByEmail(ADMIN_EMAIL).isEmpty()) {
 
-                roleReponsitory.save(Role.builder()
-                        .name(PredefinedRole.CUSTOMER_ROLE)
-                        .description("Customer role")
-                        .build());
-                roleReponsitory.save(Role.builder()
-                        .name(PredefinedRole.MANAGER_ROLE)
-                        .description("Manager role")
-                        .build());
-                roleReponsitory.save(Role.builder()
-                        .name(PredefinedRole.STAFF_ROLE)
-                        .description("Staff role")
-                        .build());
 
-                Role adminRole = roleReponsitory.save(Role.builder()
-                        .name(PredefinedRole.ADMIN_ROLE)
-                        .description("Admin role")
-                        .build());
 
                 var roles = new HashSet<Role>();
                 roles.add(adminRole);

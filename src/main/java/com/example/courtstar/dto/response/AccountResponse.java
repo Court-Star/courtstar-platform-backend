@@ -1,5 +1,6 @@
 package com.example.courtstar.dto.response;
 
+import com.example.courtstar.entity.CentreManager;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,6 +17,7 @@ public class AccountResponse {
     String firstName;
     String lastName;
     Set<RoleResponse> roles;
+    CentreManager centreManager;
     boolean IDelete;
 
 }

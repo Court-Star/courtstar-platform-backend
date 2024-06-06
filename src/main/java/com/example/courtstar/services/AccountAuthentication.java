@@ -79,6 +79,7 @@ public class AccountAuthentication {
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
         JWTClaimsSet jwtClaimsSet = new JWTClaimsSet.Builder()
                 .subject(account.getEmail())
+                .claim("id",account.getId())
                 .issueTime(new Date())
                 .expirationTime(
                         new Date(Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli())

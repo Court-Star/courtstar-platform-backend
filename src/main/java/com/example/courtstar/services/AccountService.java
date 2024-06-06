@@ -2,13 +2,16 @@ package com.example.courtstar.services;
 
 import com.example.courtstar.dto.request.AccountCreationRequest;
 import com.example.courtstar.dto.request.AccountUpdateRequest;
+import com.example.courtstar.dto.request.CentreManagerRequest;
 import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.entity.Account;
+import com.example.courtstar.entity.CentreManager;
 import com.example.courtstar.entity.Role;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.AccountMapper;
 import com.example.courtstar.repositories.AccountReponsitory;
+import com.example.courtstar.repositories.CentreManagerRepository;
 import com.example.courtstar.repositories.RoleReponsitory;
 import com.example.courtstar.util.EmailUtil;
 import com.example.courtstar.util.OtpUtil;
@@ -18,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -46,8 +50,9 @@ public class AccountService {
      RoleReponsitory roleReponsitory;
      AccountMapper accountMapper;
      RoleService roleService;
-    @Autowired
-    PasswordEncoder passwordEncoder;
+     CentreManagerRepository centreManagerRepository;
+
+    private PasswordEncoder passwordEncoder;
     private final OtpUtil otpUtil;
     private final EmailUtil emailUtil;
 
@@ -75,6 +80,9 @@ public class AccountService {
         roles.add(roleReponsitory.findById("MANAGER").orElse(null));
         roles.add(roleReponsitory.findById("STAFF").orElse(null));
         account.setRoles(roles);
+
+        account.setCentreManager(centreManagerRepository.save(CentreManager.builder().build()));
+        System.out.println(account.getCentreManager());
         return accountReponsitory.save(account);
     }
 
@@ -92,7 +100,6 @@ public class AccountService {
         return accountReponsitory.save(account);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     public List<Account> getAllAccounts(){
         return accountReponsitory.findAll();
     }
@@ -125,11 +132,10 @@ public class AccountService {
         return accountMapper.toAccountResponse(account);
     }
 
-    @PreAuthorize("hasAuthority('UPDATE_ACCOUNT')")
+    @PreAuthorize("hasRole('ADMIN')")
     public AccountResponse updateAccount(int id,AccountUpdateRequest request){
         Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         accountMapper.updateAccount(account,request);
-
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         AccountResponse accountResponse = accountMapper.toAccountResponse(accountReponsitory.save(account));
@@ -142,6 +148,11 @@ public class AccountService {
         AccountResponse accountResponse =accountMapper.toAccountResponse(account);
         //accountResponse.setRoles(account.getRole());
         return accountResponse;
+    }
+    public Account getAccountByEmail1(String email){
+        return  accountReponsitory.findByEmail(email)
+                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+
     }
 
     public boolean checkExistEmail(String email){

@@ -18,6 +18,10 @@ public enum ErrorCode {
     NOT_DELETE(1008,"not delete",HttpStatus.NOT_ACCEPTABLE),
     KEY_INVALID(1009,"key is invalid",HttpStatus.BAD_REQUEST),
     OTP_ERROR(1010,"otp error",HttpStatus.BAD_REQUEST),
+    ERROR_ROLE(1011,"error role",HttpStatus.BAD_REQUEST),
+    NOT_FOUND_CENTRE(1012,"not found centre",HttpStatus.NOT_FOUND),
+    CENTRE_DISABLE(1013,"centre disabled",HttpStatus.BAD_REQUEST),
+    NOT_FOUND_COURT(1014,"not found court",HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {
