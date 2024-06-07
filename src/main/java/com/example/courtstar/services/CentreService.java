@@ -82,7 +82,13 @@ public class CentreService {
     public Set<CentreResponse> getAllCentresOfManager(String email){
         Account account = accountReponsitory.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         CentreManager centreManager = centreManagerRepository.findByAccountId(account.getId()).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        return centreManager.getCentres().stream().map(centreMapper::toCentreResponse).collect(Collectors.toSet());
+        Set<CentreResponse> centreResponses = centreManager.getCentres().stream()
+                .map(centre -> {
+                    CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
+                    centreResponse.setManagerId(centreManager.getId());
+                    return centreResponse;
+                }).collect(Collectors.toSet());
+        return centreResponses;
     }
     public CentreResponse isActive(int id, boolean active) {
         Centre centre = centreRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));

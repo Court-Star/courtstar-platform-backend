@@ -24,6 +24,14 @@ public class CentreController {
     @Autowired
     private CentreMapper centreMapper;
 
+    @GetMapping("/allCentre")
+    public ApiResponse<List<CentreResponse>> GetAllCentre(){
+        return ApiResponse.<List<CentreResponse>>builder()
+                .data(centreService.getAllCentres())
+                .build();
+    }
+
+
     @PutMapping("/updateCentre/{id}")
     public ApiResponse<CentreResponse> updateCentre(@PathVariable int id, @RequestBody CentreRequest request){
         CentreResponse centreResponse =centreService.UpdateCentre(id, request);

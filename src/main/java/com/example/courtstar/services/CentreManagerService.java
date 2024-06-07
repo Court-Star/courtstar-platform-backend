@@ -4,10 +4,12 @@ import com.example.courtstar.dto.request.CentreManagerRequest;
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.request.CourtRequest;
 import com.example.courtstar.dto.response.AccountResponse;
+import com.example.courtstar.dto.response.CentreManagerResponse;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
+import com.example.courtstar.mapper.AccountMapper;
 import com.example.courtstar.mapper.CentreManagerMapper;
 import com.example.courtstar.mapper.CentreMapper;
 import com.example.courtstar.mapper.CourtMapper;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -47,45 +50,72 @@ public class CentreManagerService {
     CourtMapper courtMapper;
     @Autowired
     ImgRepository imgRepository;
+    @Autowired
+    private AccountMapper accountMapper;
+
     public CentreManager addInformation(CentreManagerRequest request) {
         CentreManager centreManager = centreManagerMapper.toCentreManager(request);
         centreManager.setCentres(new HashSet<Centre>());
         return centreManagerRepository.save(centreManager);
     }
 
-    public CentreManager updateInformation(int id,CentreManagerRequest request){
-        CentreManager manager = centreManagerRepository.findById(id).orElseThrow(null);
+    public CentreManagerResponse updateInformation(int account_id, CentreManagerRequest request){
+        CentreManager manager = centreManagerRepository.findByAccountId(account_id).orElseThrow(null);
         Role role= manager.getAccount().getRoles().stream().filter(i->i.getName().equals("MANAGER")).findFirst().orElse(null);
         if(role==null){
             throw new AppException(ErrorCode.ERROR_ROLE);
         }
         centreManagerMapper.updateCentre(manager,request);
-        return centreManagerRepository.save(manager);
+        centreManagerRepository.save(manager);
+        AccountResponse accountResponse = accountMapper.toAccountResponse(manager.getAccount());
+
+        return CentreManagerResponse.builder()
+                .account(accountResponse)
+                .address(manager.getAddress())
+                .currentBalance(manager.getCurrentBalance())
+                .build();
     }
 
-    public CentreManager addCentre(int id, CentreRequest request){
-        CentreManager manager = centreManagerRepository.findById(id).orElseThrow(()-> new AppException(ErrorCode.NOT_FOUND_USER));
-        Role role= manager.getAccount().getRoles().stream().filter(i->i.getName().equals("MANAGER")).findFirst().orElse(null);
+    public CentreResponse addCentre(int account_id, CentreRequest request){
+        CentreManager manager = centreManagerRepository.findByAccountId(account_id)
+                .orElseThrow( () -> new AppException(ErrorCode.NOT_FOUND_USER));
+        Role role= manager.getAccount().getRoles().stream()
+                .filter( i -> i.getName().equals("MANAGER"))
+                .findFirst()
+                .orElse(null);
         if(role==null){
             throw new RuntimeException();
         }
-        Centre centre = centreRepository.save(centreMapper.toCentre(request));
+        Centre centre = centreMapper.toCentre(request);
+
+        Set<Image> imgList = request.getImages().stream().map(url -> {
+            Image image = new Image();
+            image.setUrl(url);
+            image.setCentre(centre);
+            return image;
+        }).collect(Collectors.toSet());
+
+        centre.setImages(imgList);
+        centre.setManager(manager);
+        centreRepository.save(centre);
 
         Set<Centre> centreSet = manager.getCentres();
+        if (centreSet == null) {
+            centreSet = new HashSet<>();
+        }
         centreSet.add(centre);
+        manager.setCentres(centreSet);
 
         CourtRequest courtRequest = new CourtRequest();
         centre.setCourts(AddCourt(centre.getId(),courtRequest));
 
-        Set<Image> images = centre.getImages();
-        if(images==null){
-            images = new HashSet<>();
-        }
-        images.addAll(request.getImages());
-        centre.setImages(images);
-        imgRepository.saveAll(images);
+        imgRepository.saveAll(imgList);
         centreRepository.save(centre);
-        return centreManagerRepository.save(manager);
+        centreManagerRepository.save(manager);
+
+        CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
+        centreResponse.setManagerId(manager.getId());
+        return centreResponse;
     }
 
     private Set<Court> AddCourt(int idCentre, CourtRequest request){
@@ -100,6 +130,7 @@ public class CentreManagerService {
                     .courtNo(i+1)
                     .status(true)
                     .build());
+            court.setCentre(centre);
             setCentre.add(courtRepository.save(court));
         }
         centre.setCourts(setCentre);

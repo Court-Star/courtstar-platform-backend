@@ -40,15 +40,15 @@ public class SecurityConfig {
     private CustomJwtDecoder customJwtDecoder;
     private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect"
             ,"/auth/logout","/auth/refresh","account/reset-password"};
-    private final String[] PUBLIC_URLS_GET = {"/auth/token","/auth/introspect","/auth/logout","/auth/refresh"};
+    private final String[] PUBLIC_URLS_GET = {"/centre/allCentre"};
     private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST,PUBLIC_URLS_POST).permitAll()
-                .requestMatchers(HttpMethod.PUT,PUBLIC_URLS_GET).permitAll()
-                .requestMatchers(HttpMethod.GET,PUBLIC_URLS_PUT).permitAll()
+                .requestMatchers(HttpMethod.PUT,PUBLIC_URLS_PUT).permitAll()
+                .requestMatchers(HttpMethod.GET,PUBLIC_URLS_GET).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .oauth2Login()

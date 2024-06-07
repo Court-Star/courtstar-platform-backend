@@ -1,5 +1,6 @@
 package com.example.courtstar.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,9 +16,14 @@ public class Court {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
     int courtNo;
-    boolean status;
+    @Builder.Default
+    boolean status = true;
+
     @ManyToOne
     @JoinColumn(name = "centre_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
     Centre centre;
 }
 

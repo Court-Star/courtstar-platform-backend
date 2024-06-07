@@ -10,5 +10,6 @@ import lombok.experimental.FieldDefaults;
 @Builder
 public class CentreManagerResponse {
     String address;
-    int currentBalance;
+    double currentBalance;
+    AccountResponse account;
 }

@@ -1,11 +1,10 @@
 package com.example.courtstar.dto.request;
 
-import com.example.courtstar.entity.Image;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Data
@@ -16,13 +15,11 @@ import java.util.List;
 public class CentreRequest {
     String name;
     String address;
-    LocalDateTime openTime;
-    LocalDateTime closeTime;
-    int pricePerHour;
-    int slotDuration;
+    LocalTime openTime;
+    LocalTime closeTime;
+    double pricePerHour;
     int numberOfCourt;
     String paymentMethod;
-    boolean status;
     LocalDate approveDate;
-    List<Image> images;
+    List<String> images;
 }

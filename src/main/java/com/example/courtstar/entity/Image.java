@@ -1,5 +1,6 @@
 package com.example.courtstar.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,8 +16,12 @@ public class Image {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
     String url;
+
     @ManyToOne
     @JoinColumn(name = "centre_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
     Centre centre;
 
 }
