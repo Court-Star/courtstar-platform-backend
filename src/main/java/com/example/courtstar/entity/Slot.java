@@ -5,18 +5,21 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalTime;
+
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Image {
+public class Slot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
-    int imageNo;
-    String url;
+    int slotNo;
+    LocalTime startTime;
+    LocalTime endTime;
 
     @ManyToOne
     @JoinColumn(name = "centre_id")
@@ -24,6 +27,4 @@ public class Image {
     @ToString.Exclude
     @JsonIgnore
     Centre centre;
-
 }
-

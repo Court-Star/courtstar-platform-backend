@@ -132,6 +132,7 @@ create table feedback
 create table image
 (
   id int identity(1,1) primary key,
+  image_no int,
   url text,
   centre_id int foreign key references centre(id)
 );
