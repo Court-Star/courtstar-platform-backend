@@ -174,9 +174,19 @@ public class AccountAuthentication {
         var user = accountReponsitory.findByEmail(accountName)
                 .orElseThrow(()->new AppException(ErrorCode.UNAUTHENTICATED));
         var token = generateToken(user);
+
+        StringJoiner stringJoiner = new StringJoiner(" ");
+        if(!user.getRoles().isEmpty()){
+            user.getRoles().forEach(role -> {
+                stringJoiner.add(role.getName());
+            });
+        }
+
         return AuthenticationResponse.builder()
                 .token(token)
                 .success(true)
+                .account_id(user.getId())
+                .role(stringJoiner.toString())
                 .build();
     }
 }
