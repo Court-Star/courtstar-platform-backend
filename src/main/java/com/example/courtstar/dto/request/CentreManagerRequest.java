@@ -12,6 +12,15 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class CentreManagerRequest {
+    @Email(message = "EMAIL_INVALID")
+    @NotNull(message = "EMAIL_NULL")
+    String email;
+    @Size(min = 6,message = "PASSWORD_INVALID")
+    @NotNull(message = "PASSWORD_NULL")
+    String password;
+    @Size(min=10,max = 10,message = "PHONE_INVALID")
+    String phone;
+    String firstName;
+    String lastName;
     String address;
-    int currentBalance;
 }

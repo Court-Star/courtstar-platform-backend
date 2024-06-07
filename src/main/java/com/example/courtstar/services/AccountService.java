@@ -20,9 +20,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,7 +33,6 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -68,12 +64,19 @@ public class AccountService {
         return accountReponsitory.save(account);
     }
 
-    public CentreManager CreateManagerAccount(AccountCreationRequest request) {
+    public CentreManager CreateManagerAccount(CentreManagerRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.ACCOUNT_EXIST);
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        Account account = accountMapper.toAccount(request);
+        Account account = Account.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .phone(request.getPhone())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .build();
+
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         Set<Role> roles = new HashSet<>();
         roles.add(roleReponsitory.findById("CUSTOMER").orElse(null));
@@ -88,6 +91,7 @@ public class AccountService {
         return centreManagerRepository.save(
                 CentreManager.builder()
                         .account(account)
+                        .address(request.getAddress())
                         .currentBalance(500)
                         .build());
     }

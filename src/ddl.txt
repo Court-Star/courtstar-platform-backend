@@ -101,6 +101,14 @@ create table slot
   centre_id int foreign key references centre(id),
 );
 
+create table slot_unavailable
+(
+  id int identity(1,1) primary key,
+  date date,
+  slot_id int foreign key references slot(id),
+  court_id int foreign key references court(id),
+);
+
 create table booking_schedule
 (
   id int identity(1,1) primary key,

@@ -1,7 +1,6 @@
 package com.example.courtstar.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Null;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -20,8 +19,11 @@ public class CentreManager {
     @Column(nullable = true)
     String address;
     @Column(nullable = true)
-    int currentBalance;
-    @OneToMany(mappedBy = "manager")
+    double currentBalance;
+
+    @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     Set<Centre> centres;
 
     @OneToOne

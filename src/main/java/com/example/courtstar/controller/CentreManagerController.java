@@ -4,12 +4,8 @@ import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.CentreManagerRequest;
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.response.CentreManagerResponse;
-import com.example.courtstar.entity.Centre;
-import com.example.courtstar.entity.CentreManager;
-import com.example.courtstar.mapper.CentreManagerMapper;
-import com.example.courtstar.mapper.CentreMapper;
+import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.services.CentreManagerService;
-import com.example.courtstar.services.CentreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,18 +17,18 @@ public class CentreManagerController {
     private CentreManagerService centreManagerService;
 
 
-    @PutMapping("/updateInfo/{id}")
-    public ApiResponse<CentreManager> updateManagerCentre(@PathVariable int id ,@RequestBody CentreManagerRequest request) {
-        CentreManager centreManager = centreManagerService.updateInformation(id,request);
-        return ApiResponse.<CentreManager>builder()
+    @PutMapping("/updateInfo/{account_id}")
+    public ApiResponse<CentreManagerResponse> updateManagerCentre(@PathVariable int account_id ,@RequestBody CentreManagerRequest request) {
+        CentreManagerResponse centreManager = centreManagerService.updateInformation(account_id,request);
+        return ApiResponse.<CentreManagerResponse>builder()
                 .data(centreManager)
                 .build();
     }
-    @PostMapping("/createCentre/{id}")
-    public ApiResponse<CentreManager> createCentre(@PathVariable int id , @RequestBody CentreRequest request){
-        CentreManager centreManager = centreManagerService.addCentre(id,request);
-        return ApiResponse.<CentreManager>builder()
-                .data(centreManager)
+    @PostMapping("/createCentre/{account_id}")
+    public ApiResponse<CentreResponse> createCentre(@PathVariable int account_id , @RequestBody CentreRequest request){
+        CentreResponse centreResponse = centreManagerService.addCentre(account_id,request);
+        return ApiResponse.<CentreResponse>builder()
+                .data(centreResponse)
                 .build();
     }
     

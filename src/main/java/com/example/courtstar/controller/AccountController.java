@@ -2,7 +2,9 @@ package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.*;
 import com.example.courtstar.dto.response.AccountResponse;
+import com.example.courtstar.dto.response.CentreManagerResponse;
 import com.example.courtstar.entity.Account;
+import com.example.courtstar.entity.CentreManager;
 import com.example.courtstar.mapper.AccountMapper;
 import com.example.courtstar.services.AccountService;
 import jakarta.validation.Valid;
@@ -26,7 +28,7 @@ public class AccountController {
     private AccountMapper accountMapper;
 
     @PostMapping
-    public ApiResponse<AccountResponse> createAccount(@RequestBody @Valid AccountCreationRequest request){
+    public ApiResponse<Account> createAccount(@RequestBody @Valid AccountCreationRequest request){
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(accountService.CreateAccount(request))
                 .build();
@@ -34,7 +36,7 @@ public class AccountController {
     }
 
     @PostMapping("/partner")
-    public ApiResponse<AccountResponse> createManagerAccount(@RequestBody @Valid AccountCreationRequest request){
+    public ApiResponse<CentreManager> createManagerAccount(@RequestBody @Valid CentreManagerRequest request){
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(accountService.CreateManagerAccount(request))
                 .build();
