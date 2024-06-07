@@ -2,6 +2,7 @@ package com.example.courtstar.dto.response;
 
 import com.example.courtstar.entity.Court;
 import com.example.courtstar.entity.Image;
+import com.example.courtstar.entity.Slot;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -29,4 +30,5 @@ public class CentreResponse {
     LocalDate approveDate;
     Set<Court> courts;
     Set<Image> images;
+    Set<Slot> slots;
 }

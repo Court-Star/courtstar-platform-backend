@@ -23,8 +23,12 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,6 +56,8 @@ public class CentreManagerService {
     ImgRepository imgRepository;
     @Autowired
     private AccountMapper accountMapper;
+    @Autowired
+    private SlotRepository slotRepository;
 
     public CentreManager addInformation(CentreManagerRequest request) {
         CentreManager centreManager = centreManagerMapper.toCentreManager(request);
@@ -88,27 +94,26 @@ public class CentreManagerService {
         }
         Centre centre = centreMapper.toCentre(request);
 
-        Set<Image> imgList = request.getImages().stream().map(url -> {
-            Image image = new Image();
-            image.setUrl(url);
-            image.setCentre(centre);
-            return image;
-        }).collect(Collectors.toSet());
+        Set<Slot> slotList = generateSlots(centre);
+        centre.setSlots(slotList);
+
+        Set<Image> imgList = generateImages(request, centre);
 
         centre.setImages(imgList);
         centre.setManager(manager);
         centreRepository.save(centre);
 
-        Set<Centre> centreSet = manager.getCentres();
-        if (centreSet == null) {
-            centreSet = new HashSet<>();
+        Set<Centre> centres = manager.getCentres();
+        if (centres == null) {
+            centres = new TreeSet<>(Comparator.comparingInt(Centre::getId));
         }
-        centreSet.add(centre);
-        manager.setCentres(centreSet);
+        centres.add(centre);
+        manager.setCentres(centres);
 
         CourtRequest courtRequest = new CourtRequest();
-        centre.setCourts(AddCourt(centre.getId(),courtRequest));
+        centre.setCourts(addCourt(centre.getId(),courtRequest));
 
+        slotRepository.saveAll(slotList);
         imgRepository.saveAll(imgList);
         centreRepository.save(centre);
         centreManagerRepository.save(manager);
@@ -118,12 +123,10 @@ public class CentreManagerService {
         return centreResponse;
     }
 
-    private Set<Court> AddCourt(int idCentre, CourtRequest request){
+    private Set<Court> addCourt(int idCentre, CourtRequest request){
         Centre centre = centreRepository.findById(idCentre).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-        var setCentre = centre.getCourts();
-        if(setCentre==null){
-            setCentre= new HashSet<>();
-        }
+
+        Set<Court> courts = new TreeSet<>(Comparator.comparingInt(Court::getCourtNo));
 
         for(int i=0;i<centre.getNumberOfCourt();i++){
             Court court = courtMapper.toCourt(request.builder()
@@ -131,10 +134,46 @@ public class CentreManagerService {
                     .status(true)
                     .build());
             court.setCentre(centre);
-            setCentre.add(courtRepository.save(court));
+            courts.add(courtRepository.save(court));
         }
-        centre.setCourts(setCentre);
+        centre.setCourts(courts);
         return centreRepository.save(centre).getCourts();
+    }
+
+    private Set<Image> generateImages(CentreRequest request, Centre centre) {
+        AtomicInteger imageNo = new AtomicInteger(1);
+        Set<Image> imgList = request.getImages().stream().map(url -> {
+            Image image = new Image();
+            image.setUrl(url);
+            image.setCentre(centre);
+            image.setImageNo(imageNo.getAndIncrement());
+            return image;
+        }).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparingInt(Image::getImageNo))));
+
+        return imgList;
+    }
+
+    private Set<Slot> generateSlots(Centre centre) {
+        Set<Slot> slots = new TreeSet<>(Comparator.comparingInt(Slot::getSlotNo));
+        int slotNo = 1;
+        LocalTime currentTime = centre.getOpenTime();
+        LocalTime closeTime = centre.getCloseTime();
+        int slotDuration = centre.getSlotDuration();
+
+        while (currentTime.plusHours(slotDuration).isBefore(closeTime) || currentTime.plusHours(slotDuration).equals(closeTime)) {
+            Slot slot = Slot.builder()
+                    .slotNo(slotNo)
+                    .startTime(currentTime)
+                    .endTime(currentTime.plusHours(slotDuration))
+                    .centre(centre)
+                    .build();
+            slots.add(slot);
+
+            currentTime = currentTime.plusHours(slotDuration);
+            slotNo++;
+        }
+
+        return slots;
     }
 
 }
