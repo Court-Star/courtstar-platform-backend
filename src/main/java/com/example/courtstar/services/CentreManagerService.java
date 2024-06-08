@@ -21,13 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -61,7 +59,7 @@ public class CentreManagerService {
 
     public CentreManager addInformation(CentreManagerRequest request) {
         CentreManager centreManager = centreManagerMapper.toCentreManager(request);
-        centreManager.setCentres(new HashSet<Centre>());
+        centreManager.setCentres(new ArrayList<>());
         return centreManagerRepository.save(centreManager);
     }
 
@@ -82,8 +80,11 @@ public class CentreManagerService {
                 .build();
     }
 
-    public CentreResponse addCentre(int account_id, CentreRequest request){
-        CentreManager manager = centreManagerRepository.findByAccountId(account_id)
+    public CentreResponse addCentre(CentreRequest request){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        Account account = accountReponsitory.findByEmail(name).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        CentreManager manager = centreManagerRepository.findByAccountId(account.getId())
                 .orElseThrow( () -> new AppException(ErrorCode.NOT_FOUND_USER));
         Role role= manager.getAccount().getRoles().stream()
                 .filter( i -> i.getName().equals("MANAGER"))
@@ -94,18 +95,18 @@ public class CentreManagerService {
         }
         Centre centre = centreMapper.toCentre(request);
 
-        Set<Slot> slotList = generateSlots(centre);
+        List<Slot> slotList = generateSlots(centre);
         centre.setSlots(slotList);
 
-        Set<Image> imgList = generateImages(request, centre);
+        List<Image> imgList = generateImages(request, centre);
 
         centre.setImages(imgList);
         centre.setManager(manager);
         centreRepository.save(centre);
 
-        Set<Centre> centres = manager.getCentres();
+        List<Centre> centres = manager.getCentres();
         if (centres == null) {
-            centres = new TreeSet<>(Comparator.comparingInt(Centre::getId));
+            centres = new ArrayList<>();
         }
         centres.add(centre);
         manager.setCentres(centres);
@@ -123,10 +124,10 @@ public class CentreManagerService {
         return centreResponse;
     }
 
-    private Set<Court> addCourt(int idCentre, CourtRequest request){
+    private List<Court> addCourt(int idCentre, CourtRequest request){
         Centre centre = centreRepository.findById(idCentre).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
 
-        Set<Court> courts = new TreeSet<>(Comparator.comparingInt(Court::getCourtNo));
+        List<Court> courts = new ArrayList<>();
 
         for(int i=0;i<centre.getNumberOfCourt();i++){
             Court court = courtMapper.toCourt(request.builder()
@@ -140,21 +141,21 @@ public class CentreManagerService {
         return centreRepository.save(centre).getCourts();
     }
 
-    private Set<Image> generateImages(CentreRequest request, Centre centre) {
+    private List<Image> generateImages(CentreRequest request, Centre centre) {
         AtomicInteger imageNo = new AtomicInteger(1);
-        Set<Image> imgList = request.getImages().stream().map(url -> {
+        List<Image> imgList = request.getImages().stream().map(url -> {
             Image image = new Image();
             image.setUrl(url);
             image.setCentre(centre);
             image.setImageNo(imageNo.getAndIncrement());
             return image;
-        }).collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparingInt(Image::getImageNo))));
+        }).collect(Collectors.toCollection(() -> new ArrayList<>()));
 
         return imgList;
     }
 
-    private Set<Slot> generateSlots(Centre centre) {
-        Set<Slot> slots = new TreeSet<>(Comparator.comparingInt(Slot::getSlotNo));
+    private List<Slot> generateSlots(Centre centre) {
+        List<Slot> slots = new ArrayList<>();
         int slotNo = 1;
         LocalTime currentTime = centre.getOpenTime();
         LocalTime closeTime = centre.getCloseTime();

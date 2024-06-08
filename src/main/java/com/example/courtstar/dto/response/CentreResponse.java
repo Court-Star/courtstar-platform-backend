@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -28,7 +28,7 @@ public class CentreResponse {
     String paymentMethod;
     boolean status;
     LocalDate approveDate;
-    Set<Court> courts;
-    Set<Image> images;
-    Set<Slot> slots;
+    List<Court> courts;
+    List<Image> images;
+    List<Slot> slots;
 }
