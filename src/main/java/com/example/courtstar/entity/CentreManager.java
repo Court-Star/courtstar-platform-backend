@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Data
@@ -24,7 +24,7 @@ public class CentreManager {
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    Set<Centre> centres;
+    List<Centre> centres;
 
     @OneToOne
     Account account;

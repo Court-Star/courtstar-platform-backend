@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Data
@@ -36,17 +36,17 @@ public class Centre {
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    Set<Court> courts;
+    List<Court> courts;
 
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    Set<Slot> slots;
+    List<Slot> slots;
 
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    Set<Image> images;
+    List<Image> images;
 
     @ManyToOne
     @JsonIgnore

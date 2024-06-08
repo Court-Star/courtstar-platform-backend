@@ -24,9 +24,9 @@ public class CentreManagerController {
                 .data(centreManager)
                 .build();
     }
-    @PostMapping("/createCentre/{account_id}")
-    public ApiResponse<CentreResponse> createCentre(@PathVariable int account_id , @RequestBody CentreRequest request){
-        CentreResponse centreResponse = centreManagerService.addCentre(account_id,request);
+    @PostMapping("/create")
+    public ApiResponse<CentreResponse> createCentre(@RequestBody CentreRequest request){
+        CentreResponse centreResponse = centreManagerService.addCentre(request);
         return ApiResponse.<CentreResponse>builder()
                 .data(centreResponse)
                 .build();
