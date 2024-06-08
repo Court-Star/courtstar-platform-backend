@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -27,4 +28,16 @@ public class Slot {
     @ToString.Exclude
     @JsonIgnore
     Centre centre;
+
+    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    List<BookingSchedule> bookingSchedules;
+
+    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    List<SlotUnavailable> slotUnavailables;
 }

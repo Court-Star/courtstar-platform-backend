@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -45,6 +46,11 @@ public class Account {
 
     String otp;
     LocalDateTime otpGeneratedTime;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    List<BookingSchedule> bookingSchedules;
 
     @ManyToMany
     Set<Role> roles;
