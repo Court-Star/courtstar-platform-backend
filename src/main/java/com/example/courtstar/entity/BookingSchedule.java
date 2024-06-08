@@ -30,6 +30,13 @@ public class BookingSchedule {
     Account account;
 
     @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "guest_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    Guest guest;
+
+    @ManyToOne
 //    @JsonIgnore
     @JoinColumn(name = "slot_id")
 //    @EqualsAndHashCode.Exclude

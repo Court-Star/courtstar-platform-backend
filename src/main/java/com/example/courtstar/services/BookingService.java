@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,50 +29,111 @@ import java.util.ArrayList;
 public class BookingService {
 
     @Autowired
-    AccountReponsitory accountReponsitory;
+    private AccountReponsitory accountReponsitory;
 
     @Autowired
-    CourtRepository courtRepository;
+    private CourtRepository courtRepository;
 
     @Autowired
-    SlotRepository slotRepository;
+    private SlotRepository slotRepository;
 
     @Autowired
-    SlotUnavailableRepository slotUnavailableRepository;
+    private SlotUnavailableRepository slotUnavailableRepository;
 
     @Autowired
-    BookingScheduleRepository bookingScheduleRepository;
+    private BookingScheduleRepository bookingScheduleRepository;
 
     @Autowired
-    PaymentRepository paymentRepository;
+    private PaymentRepository paymentRepository;
+
+    @Autowired
+    private GuestRepository guestRepository;
 
     public BookingSchedule booking(BookingRequest request) {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
-        Account account = accountReponsitory.findByEmail(name).orElseThrow(
-                () -> new AppException(ErrorCode.NOT_FOUND_USER)
-        );
+
+        Account account = null;
+        Guest guest = null;
+        if (name.equals("anonymousUser")) {
+            guest = Guest.builder()
+                    .email(request.getEmail())
+                    .phone(request.getPhone())
+                    .fullName(request.getFullName())
+                    .build();
+            guestRepository.save(guest);
+        } else {
+            account = accountReponsitory.findByEmail(name).orElseThrow(
+                    () -> new AppException(ErrorCode.NOT_FOUND_USER)
+            );
+        }
 
         Slot slot = slotRepository.findById(request.getSlotId()).orElseThrow(null);
         Court court = courtRepository.findById(request.getCourtId()).orElseThrow(null);
         Centre centre = court.getCentre();
 
-        SlotUnavailable slotUnavailable = SlotUnavailable.builder()
+        SlotUnavailable slotUnavailable = slotUnavailableRepository.save(SlotUnavailable.builder()
                 .date(request.getDate())
                 .court(court)
                 .slot(slot)
-                .build();
-
-        slotUnavailableRepository.save(slotUnavailable);
+                .build());
 
         BookingSchedule bookingSchedule = bookingScheduleRepository.save(BookingSchedule.builder()
                 .date(request.getDate())
                 .totalPrice(centre.getPricePerHour())
                 .status(false)
                 .account(account)
+                .guest(guest)
                 .slot(slot)
                 .court(court)
                 .build());
+
+        List<BookingSchedule> slotBookingSchedules = slot.getBookingSchedules();
+        if (slotBookingSchedules == null) {
+            slotBookingSchedules = new ArrayList<>();
+            slot.setBookingSchedules(slotBookingSchedules);
+        }
+        slotBookingSchedules.add(bookingSchedule);
+        List<SlotUnavailable> slotUnavailables = slot.getSlotUnavailables();
+        if (slotUnavailables == null) {
+            slotUnavailables = new ArrayList<>();
+            slot.setSlotUnavailables(slotUnavailables);
+        }
+        slotUnavailables.add(slotUnavailable);
+        slotRepository.save(slot);
+
+
+        List<BookingSchedule> courtBookingSchedules = court.getBookingSchedules();
+        if (courtBookingSchedules == null) {
+            courtBookingSchedules = new ArrayList<>();
+            court.setBookingSchedules(courtBookingSchedules);
+        }
+        courtBookingSchedules.add(bookingSchedule);
+        List<SlotUnavailable> courtSlotUnavailables = court.getSlotUnavailables();
+        if (courtSlotUnavailables == null) {
+            courtSlotUnavailables = new ArrayList<>();
+            court.setSlotUnavailables(courtSlotUnavailables);
+        }
+        courtSlotUnavailables.add(slotUnavailable);
+        courtRepository.save(court);
+
+        if (name.equals("anonymousUser")) {
+            List<BookingSchedule> gueBookingSchedules = guest.getBookingSchedules();
+            if (gueBookingSchedules == null) {
+                gueBookingSchedules = new ArrayList<>();
+                guest.setBookingSchedules(gueBookingSchedules);
+            }
+            gueBookingSchedules.add(bookingSchedule);
+            guestRepository.save(guest);
+        } else {
+            List<BookingSchedule> accBookingSchedules = account.getBookingSchedules();
+            if (accBookingSchedules == null) {
+                accBookingSchedules = new ArrayList<>();
+                account.setBookingSchedules(accBookingSchedules);
+            }
+            accBookingSchedules.add(bookingSchedule);
+            accountReponsitory.save(account);
+        }
 
         Payment payment = Payment.builder()
                 .date(LocalDate.now())

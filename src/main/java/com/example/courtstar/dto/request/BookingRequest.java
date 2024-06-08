@@ -11,6 +11,9 @@ import java.time.LocalDate;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingRequest {
+    String fullName;
+    String phone;
+    String email;
     int slotId;
     int courtId;
     LocalDate date;

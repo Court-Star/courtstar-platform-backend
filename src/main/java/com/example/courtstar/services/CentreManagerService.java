@@ -99,7 +99,6 @@ public class CentreManagerService {
         centre.setSlots(slotList);
 
         List<Image> imgList = generateImages(request, centre);
-
         centre.setImages(imgList);
         centre.setManager(manager);
         centreRepository.save(centre);
@@ -107,9 +106,9 @@ public class CentreManagerService {
         List<Centre> centres = manager.getCentres();
         if (centres == null) {
             centres = new ArrayList<>();
+            manager.setCentres(centres);
         }
         centres.add(centre);
-        manager.setCentres(centres);
 
         CourtRequest courtRequest = new CourtRequest();
         centre.setCourts(addCourt(centre.getId(),courtRequest));
