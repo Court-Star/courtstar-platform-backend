@@ -47,12 +47,6 @@ create table role_permissions
     primary key (role_name, permissions_name),
 );
 
-create table customer
-(
-  id int identity(1, 1) primary key,
-  account_id int unique foreign key references account(id)
-);
-
 create table centre_manager
 (
   id int identity(1,1) primary key,
@@ -115,7 +109,7 @@ create table booking_schedule
   date date,
   total_price money,
   status bit,
-  customer_id int foreign key references customer(id),
+  account_id int foreign key references account(id),
   slot_id int foreign key references slot(id),
   court_id int foreign key references court(id),
 );
@@ -125,7 +119,7 @@ create table feedback
   id int identity(1,1) primary key,
   content text,
   create_date date,
-  customer_id int foreign key references customer(id),
+  account_id int foreign key references account(id),
   centre_id int foreign key references centre(id)
 );
 
@@ -143,7 +137,7 @@ create table payment
   date date,
   status bit,
   payment_method text,
-  bs_id int unique foreign key references booking_schedule(id)
+  booking_schedule_id int unique foreign key references booking_schedule(id)
 );
 
 
@@ -168,7 +162,7 @@ INSERT INTO role (name, description) VALUES ('CUSTOMER', 'Customer role');
 -- INSERT INTO role_permissions (role_id, permission_id) VALUES ('STAFF', 'READ_PRIVILEGE');
 -- INSERT INTO role_permissions (role_id, permission_id) VALUES ('CUSTOMER', 'READ_PRIVILEGE');
 
--- Create accounts and associate roles
+-- Create accounts and associate roles, pass 123
 INSERT INTO account (email, password, phone, first_name, last_name, is_delete, otp, otp_generated_time) VALUES ('thanh@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567890', 'Thanh', 'Nguyen', 0, NULL, NULL);
 INSERT INTO account (email, password, phone, first_name, last_name, is_delete, otp, otp_generated_time) VALUES ('manager@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567891', 'Manager', 'User', 0, NULL, NULL);
 INSERT INTO account (email, password, phone, first_name, last_name, is_delete, otp, otp_generated_time) VALUES ('customer@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567892', 'Customer', 'User', 0, NULL, NULL);

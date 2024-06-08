@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -13,31 +13,24 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Court {
+public class SlotUnavailable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
-    int courtNo;
-    @Builder.Default
-    boolean status = true;
+
+    LocalDate date;
 
     @ManyToOne
-    @JoinColumn(name = "centre_id")
+    @JsonIgnore
+    @JoinColumn(name = "court_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @JsonIgnore
-    Centre centre;
+    Court court;
 
-    @OneToMany(mappedBy = "court", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "slot_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @JsonIgnore
-    List<BookingSchedule> bookingSchedules;
-
-    @OneToMany(mappedBy = "court", cascade = CascadeType.ALL, orphanRemoval = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonIgnore
-    List<SlotUnavailable> slotUnavailables;
+    Slot slot;
 }
-
