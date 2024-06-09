@@ -40,7 +40,7 @@ public class SecurityConfig {
     private CustomJwtDecoder customJwtDecoder;
     private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect"
             ,"/auth/logout","/auth/refresh","/account/reset-password","/booking"};
-    private final String[] PUBLIC_URLS_GET = {"/centre/allCentre"};
+    private final String[] PUBLIC_URLS_GET = {"/centre/allCentre", "/centre/getCentre/{id}"};
     private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
