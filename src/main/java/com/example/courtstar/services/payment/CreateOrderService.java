@@ -46,7 +46,7 @@ public class CreateOrderService {
     public Map<String, Object> createOrder(OrderRequest orderRequest) throws IOException, JSONException {
 
         final Map embeddata = new HashMap(){{
-            put("redirecturl", "https://docs.zalopay.vn/v1/general/overview.html");//truyen url trang web muon tra ve klhi thanh toan xong
+            put("redirecturl", "http://localhost:3000/bookingHistory");//truyen url trang web muon tra ve klhi thanh toan xong
         }};
 
         Map<String, Object> order = new HashMap<String, Object>(){{
