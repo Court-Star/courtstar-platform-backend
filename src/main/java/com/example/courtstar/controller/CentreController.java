@@ -2,6 +2,7 @@ package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.CentreRequest;
+import com.example.courtstar.dto.response.CentreNameResponse;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.entity.Centre;
 import com.example.courtstar.mapper.AccountMapper;
@@ -41,10 +42,10 @@ public class CentreController {
     }
 
     @GetMapping("/getAllCentresOfManager")
-    public ApiResponse<Set<CentreResponse>> GetAllCentresOfManager(){
+    public ApiResponse<Set<CentreNameResponse>> GetAllCentresOfManager(){
        var context = SecurityContextHolder.getContext();
        String email = context.getAuthentication().getName();
-        return ApiResponse.<Set<CentreResponse>>builder()
+        return ApiResponse.<Set<CentreNameResponse>>builder()
                 .data(centreService.getAllCentresOfManager(email)).build();
     }
 

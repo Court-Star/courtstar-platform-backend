@@ -2,6 +2,7 @@ package com.example.courtstar.services;
 
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.request.CourtRequest;
+import com.example.courtstar.dto.response.CentreNameResponse;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.dto.response.CourtResponse;
 import com.example.courtstar.entity.Account;
@@ -79,13 +80,15 @@ public class CentreService {
     }
 
 
-    public Set<CentreResponse> getAllCentresOfManager(String email){
+    public Set<CentreNameResponse> getAllCentresOfManager(String email){
         Account account = accountReponsitory.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         CentreManager centreManager = centreManagerRepository.findByAccountId(account.getId()).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        Set<CentreResponse> centreResponses = centreManager.getCentres().stream()
+        Set<CentreNameResponse> centreResponses = centreManager.getCentres().stream()
                 .map(centre -> {
-                    CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
-                    centreResponse.setManagerId(centreManager.getId());
+                    CentreNameResponse centreResponse = CentreNameResponse.builder()
+                            .id(centre.getId())
+                            .name(centre.getName())
+                            .build();
                     return centreResponse;
                 }).collect(Collectors.toSet());
         return centreResponses;
