@@ -46,7 +46,7 @@ public class CreateOrderService {
     public Map<String, Object> createOrder(OrderRequest orderRequest) throws IOException, JSONException {
 
         final Map embeddata = new HashMap(){{
-            put("redirecturl", "http://localhost:3000/bookingHistory");//truyen url trang web muon tra ve klhi thanh toan xong
+            put("redirecturl", "http://localhost:3000/payment/result");//truyen url trang web muon tra ve klhi thanh toan xong
         }};
 
         Map<String, Object> order = new HashMap<String, Object>(){{
@@ -55,17 +55,16 @@ public class CreateOrderService {
             put("apptime", System.currentTimeMillis());
             put("appuser", "CourtStar");
             put("amount", orderRequest.getAmount());
-
             put("bankcode", "");
             put("item", "[]");
             put("embeddata", new JSONObject(embeddata).toString());
-            put("callback_url", "https://b53b-2405-4802-90b4-f810-1418-2391-b373-2645.ngrok-free.app/payment/callback");
+            put("callback_url", "http://localhost:8080/courtstar/payment/callback"); // URL callback
         }};
 
-        order.put("description", "CourtStar- order centre "+order.get("apptransid"));
+        order.put("description", "CourtStar - Booking Court " + order.get("apptransid"));
 
-        String data = order.get("appid") +"|"+ order.get("apptransid") +"|"+ order.get("appuser") +"|"+ order.get("amount")
-                +"|"+ order.get("apptime") +"|"+ order.get("embeddata") +"|"+ order.get("item");
+        String data = order.get("appid") + "|" + order.get("apptransid") + "|" + order.get("appuser") + "|" + order.get("amount")
+                + "|" + order.get("apptime") + "|" + order.get("embeddata") + "|" + order.get("item");
         order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, KEY1, data));
 
         CloseableHttpClient client = HttpClients.createDefault();
@@ -75,7 +74,6 @@ public class CreateOrderService {
         for (Map.Entry<String, Object> e : order.entrySet()) {
             params.add(new BasicNameValuePair(e.getKey(), e.getValue().toString()));
         }
-
 
         post.setEntity(new UrlEncodedFormEntity(params));
 
@@ -90,9 +88,8 @@ public class CreateOrderService {
 
         JSONObject jsonResult = new JSONObject(resultJsonStr.toString());
         Map<String, Object> finalResult = new HashMap<>();
-        for (Iterator it = jsonResult.keys(); it.hasNext(); ) {
-
-            String key = (String) it.next();
+        for (Iterator<String> it = jsonResult.keys(); it.hasNext(); ) {
+            String key = it.next();
             finalResult.put(key, jsonResult.get(key));
         }
 

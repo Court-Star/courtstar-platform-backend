@@ -39,7 +39,8 @@ public class SecurityConfig {
     @Autowired
     private CustomJwtDecoder customJwtDecoder;
     private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect"
-            ,"/auth/logout","/auth/refresh","/account/reset-password","/booking"};
+            ,"/auth/logout","/auth/refresh","/account/reset-password","/booking","/payment/create-order"
+            ,"/payment/order-status","/payment/callback"};
     private final String[] PUBLIC_URLS_GET = {"/centre/allCentre", "/centre/getCentre/{id}","/court/{centreId}/{courtNo}"};
     private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};
     @Bean
