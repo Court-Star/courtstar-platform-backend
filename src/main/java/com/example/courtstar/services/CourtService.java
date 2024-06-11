@@ -45,8 +45,14 @@ public class CourtService {
         Court court = courtMapper.toCourt(courtRequest);
         return courtMapper.toCourtResponse(courtRepository.save(court));
     }
-    public CourtResponse getCourtById(int id) throws AppException {
-        return courtMapper.toCourtResponse(courtRepository.findById(id)
+    public CourtResponse getCourtById(int centreId, int courtNo) throws AppException {
+        List<Court> courts = courtRepository.findAllByCourtNo(courtNo);
+        Court court = courts.stream()
+                .filter(c -> c.getCentre().getId().equals(centreId))
+                .findFirst()
+                .orElseThrow(null);
+
+        return courtMapper.toCourtResponse(courtRepository.findById(court.getId())
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_COURT)));
     }
 

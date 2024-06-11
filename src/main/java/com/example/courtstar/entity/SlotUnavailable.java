@@ -28,7 +28,6 @@ public class SlotUnavailable {
     Court court;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "slot_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
