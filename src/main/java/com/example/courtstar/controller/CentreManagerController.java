@@ -16,7 +16,7 @@ public class CentreManagerController {
     @Autowired
     private CentreManagerService centreManagerService;
 
-    @GetMapping("info")
+    @GetMapping("/info")
     public ApiResponse<CentreManagerResponse> getManager() {
         CentreManagerResponse centreManager = centreManagerService.getManagerInfo();
         return ApiResponse.<CentreManagerResponse>builder()
