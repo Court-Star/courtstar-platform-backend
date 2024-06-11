@@ -15,6 +15,7 @@ public class BookingRequest {
     String phone;
     String email;
     int slotId;
-    int courtId;
+    int centreId;
+    int courtNo;
     LocalDate date;
 }

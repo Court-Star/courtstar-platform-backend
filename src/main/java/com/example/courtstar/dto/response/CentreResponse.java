@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Data
 @AllArgsConstructor
@@ -31,4 +32,7 @@ public class CentreResponse {
     List<Court> courts;
     List<Image> images;
     List<Slot> slots;
+
+    @Builder.Default
+    int rating = ThreadLocalRandom.current().nextInt(1, 6);
 }

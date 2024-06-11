@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface CourtRepository extends JpaRepository<Court, Integer> {
-
+    List<Court> findAllByCourtNo(Integer integers);
 }
