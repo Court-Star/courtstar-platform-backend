@@ -155,4 +155,8 @@ public class BookingService {
 
         return bookingSchedule;
     }
+
+    public List<BookingSchedule> getBookingSchedules(int centreId) {
+        return bookingScheduleRepository.findAllByCentreId(centreId);
+    }
 }

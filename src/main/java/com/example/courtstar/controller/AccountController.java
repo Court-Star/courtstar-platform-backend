@@ -5,6 +5,7 @@ import com.example.courtstar.dto.response.AccountResponse;
 import com.example.courtstar.dto.response.CentreManagerResponse;
 import com.example.courtstar.entity.Account;
 import com.example.courtstar.entity.CentreManager;
+import com.example.courtstar.entity.CentreStaff;
 import com.example.courtstar.mapper.AccountMapper;
 import com.example.courtstar.services.AccountService;
 import jakarta.validation.Valid;
@@ -44,7 +45,7 @@ public class AccountController {
     }
 
     @PostMapping("/staff")
-    public ApiResponse<AccountResponse> createStaffAccount(@RequestBody @Valid AccountCreationRequest request){
+    public ApiResponse<CentreStaff> createStaffAccount(@RequestBody @Valid CentreStaffRequest request){
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(accountService.CreateStaffAccount(request))
                 .build();

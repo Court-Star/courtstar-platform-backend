@@ -57,6 +57,19 @@ public class CentreManagerService {
     @Autowired
     private SlotRepository slotRepository;
 
+    public CentreManagerResponse getManagerInfo() {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        Account account = accountReponsitory.findByEmail(name).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        CentreManager manager = centreManagerRepository.findByAccountId(account.getId()).orElseThrow(null);
+        AccountResponse accountResponse = accountMapper.toAccountResponse(account);
+        return CentreManagerResponse.builder()
+                .account(accountResponse)
+                .address(manager.getAddress())
+                .currentBalance(manager.getCurrentBalance())
+                .build();
+    }
+
     public CentreManager addInformation(CentreManagerRequest request) {
         CentreManager centreManager = centreManagerMapper.toCentreManager(request);
         centreManager.setCentres(new ArrayList<>());

@@ -48,6 +48,11 @@ public class Centre {
     @ToString.Exclude
     List<Image> images;
 
+    @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    List<CentreStaff> centreStaffs;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "manager_id")
