@@ -186,7 +186,10 @@ public class AccountService {
         String result = "";
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        Timestamp oldOtp = Timestamp.valueOf(account.getOtpGeneratedTime());
+        Timestamp oldOtp = new Timestamp(0);
+        if (account.getOtpGeneratedTime() != null) {
+            oldOtp = Timestamp.valueOf(account.getOtpGeneratedTime());
+        }
         Timestamp current = Timestamp.valueOf(LocalDateTime.now());
         if (oldOtp.getTime()/1000 + 3*60 > current.getTime()/1000 ) {
             result = String.valueOf((oldOtp.getTime()/1000));
