@@ -3,16 +3,13 @@ package com.example.courtstar.services;
 import com.example.courtstar.dto.request.AccountCreationRequest;
 import com.example.courtstar.dto.request.AccountUpdateRequest;
 import com.example.courtstar.dto.request.CentreManagerRequest;
+import com.example.courtstar.dto.request.CentreStaffRequest;
 import com.example.courtstar.dto.response.AccountResponse;
-import com.example.courtstar.entity.Account;
-import com.example.courtstar.entity.CentreManager;
-import com.example.courtstar.entity.Role;
+import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.AccountMapper;
-import com.example.courtstar.repositories.AccountReponsitory;
-import com.example.courtstar.repositories.CentreManagerRepository;
-import com.example.courtstar.repositories.RoleReponsitory;
+import com.example.courtstar.repositories.*;
 import com.example.courtstar.util.EmailUtil;
 import com.example.courtstar.util.OtpUtil;
 import jakarta.mail.MessagingException;
@@ -31,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -51,6 +49,8 @@ public class AccountService {
     private PasswordEncoder passwordEncoder;
     private final OtpUtil otpUtil;
     private final EmailUtil emailUtil;
+    private final CentreStaffRepository centreStaffRepository;
+    private final CentreRepository centreRepository;
 
     public Account CreateAccount(AccountCreationRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
@@ -92,22 +92,47 @@ public class AccountService {
                 CentreManager.builder()
                         .account(account)
                         .address(request.getAddress())
-                        .currentBalance(500)
+                        .currentBalance(5000000)
                         .build());
     }
 
-    public Account CreateStaffAccount(AccountCreationRequest request) {
+    public CentreStaff CreateStaffAccount(CentreStaffRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
             throw new AppException(ErrorCode.ACCOUNT_EXIST);
         }
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
-        Account account = accountMapper.toAccount(request);
+        Account account = Account.builder()
+                .email(request.getEmail())
+                .password(request.getPassword())
+                .phone(request.getPhone())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .build();
+
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         Set<Role> roles = new HashSet<>();
         roles.add(roleReponsitory.findById("CUSTOMER").orElse(null));
         roles.add(roleReponsitory.findById("STAFF").orElse(null));
         account.setRoles(roles);
-        return accountReponsitory.save(account);
+
+        Centre centre = centreRepository.findById(request.getCentreId()).orElse(null);
+
+        accountReponsitory.save(account);
+        CentreStaff centreStaff = centreStaffRepository.save(
+                CentreStaff.builder()
+                        .account(account)
+                        .centre(centre)
+                        .build());
+
+        List<CentreStaff> centreStaffs = centre.getCentreStaffs();
+        if(centreStaffs==null){
+            centreStaffs = new ArrayList<>();
+            centre.setCentreStaffs(centreStaffs);
+        }
+        centreStaffs.add(centreStaff);
+        centreRepository.save(centre);
+
+        return centreStaff;
     }
 
     public List<Account> getAllAccounts(){

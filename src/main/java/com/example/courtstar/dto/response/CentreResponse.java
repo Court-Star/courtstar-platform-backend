@@ -1,5 +1,6 @@
 package com.example.courtstar.dto.response;
 
+import com.example.courtstar.entity.CentreStaff;
 import com.example.courtstar.entity.Court;
 import com.example.courtstar.entity.Image;
 import com.example.courtstar.entity.Slot;
@@ -32,6 +33,7 @@ public class CentreResponse {
     List<Court> courts;
     List<Image> images;
     List<Slot> slots;
+    List<CentreStaff> centreStaffs;
 
     @Builder.Default
     int rating = ThreadLocalRandom.current().nextInt(1, 6);

@@ -7,6 +7,8 @@ import com.example.courtstar.services.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/booking")
@@ -19,6 +21,14 @@ public class BookingController {
     public ApiResponse<BookingSchedule> booking(@RequestBody BookingRequest request){
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(bookingService.booking(request))
+                .build();
+        return apiResponse;
+    }
+
+    @GetMapping("{centreId}")
+    public ApiResponse<List<BookingSchedule>> getBookingSchedules(@PathVariable int centreId){
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(bookingService.getBookingSchedules(centreId))
                 .build();
         return apiResponse;
     }

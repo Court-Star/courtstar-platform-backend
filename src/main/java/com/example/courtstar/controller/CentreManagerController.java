@@ -16,6 +16,13 @@ public class CentreManagerController {
     @Autowired
     private CentreManagerService centreManagerService;
 
+    @GetMapping("info")
+    public ApiResponse<CentreManagerResponse> getManager() {
+        CentreManagerResponse centreManager = centreManagerService.getManagerInfo();
+        return ApiResponse.<CentreManagerResponse>builder()
+                .data(centreManager)
+                .build();
+    }
 
     @PutMapping("/updateInfo/{account_id}")
     public ApiResponse<CentreManagerResponse> updateManagerCentre(@PathVariable int account_id ,@RequestBody CentreManagerRequest request) {
