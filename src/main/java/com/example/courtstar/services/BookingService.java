@@ -49,6 +49,9 @@ public class BookingService {
     @Autowired
     private GuestRepository guestRepository;
 
+    @Autowired
+    private CentreRepository centreRepository;
+
     public BookingSchedule booking(BookingRequest request) {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
@@ -68,9 +71,15 @@ public class BookingService {
             );
         }
 
+        Centre centre = centreRepository.findById(request.getCentreId()).orElseThrow(null);
         Slot slot = slotRepository.findById(request.getSlotId()).orElseThrow(null);
-        Court court = courtRepository.findById(request.getCourtId()).orElseThrow(null);
-        Centre centre = court.getCentre();
+        List<Court> courts = courtRepository.findAllByCourtNo(request.getCourtNo());
+
+        Court court = courts.stream()
+                .filter(c -> c.getCentre().getId().equals(request.getCentreId()))
+                .findFirst()
+                .orElseThrow(null);
+
 
         SlotUnavailable slotUnavailable = slotUnavailableRepository.save(SlotUnavailable.builder()
                 .date(request.getDate())

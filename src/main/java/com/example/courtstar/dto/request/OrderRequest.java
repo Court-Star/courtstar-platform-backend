@@ -12,5 +12,5 @@ public class OrderRequest {
     private Long amount;
     private String description;
     private String email;
-    private String phoneNumber;
+    private String phone;
 }
