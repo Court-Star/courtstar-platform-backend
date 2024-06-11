@@ -16,15 +16,22 @@ import java.util.Set;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/Court")
+@RequestMapping("/court")
 public class CourtController {
     @Autowired
     private CourtService courtService;
 
-    @GetMapping("/GetAllCourt")
+    @GetMapping("/getAllCourt")
     public ApiResponse<List<CourtResponse>> GetAllCourt() {
         return ApiResponse.<List<CourtResponse>>builder()
                 .data(courtService.getAllCourts())
+                .build();
+    }
+
+    @GetMapping("/{centreId}/{courtNo}")
+    public ApiResponse<CourtResponse> getCourt(@PathVariable int centreId, @PathVariable int courtNo) {
+        return ApiResponse.<CourtResponse>builder()
+                .data(courtService.getCourtById(centreId,courtNo))
                 .build();
     }
 
