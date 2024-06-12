@@ -69,6 +69,7 @@ public class BookingService {
             account = accountReponsitory.findByEmail(name).orElseThrow(
                     () -> new AppException(ErrorCode.NOT_FOUND_USER)
             );
+            System.out.println(account);
         }
 
         Centre centre = centreRepository.findById(request.getCentreId()).orElseThrow(null);
@@ -159,4 +160,13 @@ public class BookingService {
     public List<BookingSchedule> getBookingSchedules(int centreId) {
         return bookingScheduleRepository.findAllByCentreId(centreId);
     }
+
+    public BookingSchedule getBookingSchedule(int accountId) {
+        return bookingScheduleRepository.findByAccountId(accountId);
+    }
+
+    public BookingSchedule getBookingBuyGuestID(int guestID) {
+        return bookingScheduleRepository.findByGuestId(guestID);
+    }
+
 }
