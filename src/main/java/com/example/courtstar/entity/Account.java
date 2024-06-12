@@ -1,5 +1,6 @@
 package com.example.courtstar.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -50,6 +51,7 @@ public class Account {
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     List<BookingSchedule> bookingSchedules;
 
     @ManyToMany
