@@ -49,7 +49,7 @@ public class EmailBookingUtil {
 
         mimeMessageHelper.setFrom("minhoan305@gmail.com");
         mimeMessageHelper.setTo(request.getEmail());
-        mimeMessageHelper.setSubject("Verify OTP with QR Code");
+        mimeMessageHelper.setSubject("Your Booking Schedule");
         mimeMessageHelper.setText(htmlContent, true);
 
 

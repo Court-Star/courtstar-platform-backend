@@ -33,13 +33,10 @@ public class Payment {
     private RefundStatusPaymentService refundStatusService;
     @Autowired
     private GetStatusOrderPaymentService orderPaymentService;
-    @Autowired
-    QrCodeService qrCodeService;
 
     @PostMapping("/callback")
     public ResponseEntity<String> callback(@RequestBody CallBackPayment paymentDTO)
             throws JSONException, NoSuchAlgorithmException, InvalidKeyException, org.json.JSONException {
-        System.out.println("hello");
         JSONObject result = new JSONObject();
         return new ResponseEntity<>(this.callBackPaymentService
                 .doCallBack(result, paymentDTO.getJsonString()).toString(), HttpStatus.OK);
@@ -49,9 +46,8 @@ public class Payment {
 
 
     @PostMapping("/create-order")
-    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderRequest request) throws org.json.JSONException, IOException, MessagingException, WriterException {
+    public ResponseEntity<Map<String, Object>> createOrder(@RequestBody OrderRequest request) throws org.json.JSONException, IOException {
         Map<String, Object> resultOrder = this.service.createOrder(request);
-        qrCodeService.generateQrCode(request.getEmail());
         return new ResponseEntity<>(resultOrder, HttpStatus.OK);
     }
 

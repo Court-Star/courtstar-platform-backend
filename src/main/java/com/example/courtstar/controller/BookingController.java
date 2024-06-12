@@ -4,9 +4,12 @@ import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.BookingRequest;
 import com.example.courtstar.entity.BookingSchedule;
 import com.example.courtstar.services.BookingService;
+import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -18,7 +21,7 @@ public class BookingController {
     BookingService bookingService;
 
     @PostMapping
-    public ApiResponse<BookingSchedule> booking(@RequestBody BookingRequest request){
+    public ApiResponse<BookingSchedule> booking(@RequestBody BookingRequest request) throws MessagingException, IOException, WriterException {
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(bookingService.booking(request))
                 .build();
