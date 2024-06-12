@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Verify OTP with QR Code</title>
+</head>
+<body>
+<p>Hello,</p>
+<p>Your username is: <span th:text="${username}">[username]</span></p>
+<p>Your password is: <span th:text="${password}">[password]</span></p>
+<p>Scan the following QR code to verify your OTP:</p>
+<img th:src="'cid:' + ${qrCodeContentId}" alt="QR Code"/>
+</body>
+</html>

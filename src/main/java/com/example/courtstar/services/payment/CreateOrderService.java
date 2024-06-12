@@ -58,7 +58,7 @@ public class CreateOrderService {
             put("bankcode", "");
             put("item", "[]");
             put("embeddata", new JSONObject(embeddata).toString());
-            put("callback_url", "http://localhost:8080/courtstar/payment/callback"); // URL callback
+            put("callback_url", "https://163e-118-69-182-144.ngrok-free.app/payment/callback"); // URL callback
         }};
 
         order.put("description", "CourtStar - Booking Court " + order.get("apptransid"));
