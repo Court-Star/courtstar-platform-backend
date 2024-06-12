@@ -4,10 +4,6 @@ import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.response.CentreNameResponse;
 import com.example.courtstar.dto.response.CentreResponse;
-import com.example.courtstar.entity.Centre;
-import com.example.courtstar.mapper.AccountMapper;
-import com.example.courtstar.mapper.CentreMapper;
-import com.example.courtstar.services.AccountService;
 import com.example.courtstar.services.CentreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,8 +18,14 @@ import java.util.Set;
 public class CentreController {
     @Autowired
     private CentreService centreService;
-    @Autowired
-    private CentreMapper centreMapper;
+
+    @PostMapping("/create")
+    public ApiResponse<CentreResponse> createCentre(@RequestBody CentreRequest request){
+        CentreResponse centreResponse = centreService.addCentre(request);
+        return ApiResponse.<CentreResponse>builder()
+                .data(centreResponse)
+                .build();
+    }
 
     @GetMapping("/allCentre")
     public ApiResponse<List<CentreResponse>> GetAllCentre(){
@@ -33,13 +35,13 @@ public class CentreController {
     }
 
 
-    @PutMapping("/updateCentre/{id}")
-    public ApiResponse<CentreResponse> updateCentre(@PathVariable int id, @RequestBody CentreRequest request){
-        CentreResponse centreResponse =centreService.UpdateCentre(id, request);
-        return ApiResponse.<CentreResponse>builder()
-                .data(centreResponse)
-                .build();
-    }
+//    @PutMapping("/update/{id}")
+//    public ApiResponse<CentreResponse> updateCentre(@PathVariable int id, @RequestBody CentreRequest request){
+//        CentreResponse centreResponse =centreService.updateCentre(id, request);
+//        return ApiResponse.<CentreResponse>builder()
+//                .data(centreResponse)
+//                .build();
+//    }
 
     @GetMapping("/getAllCentresOfManager")
     public ApiResponse<Set<CentreNameResponse>> GetAllCentresOfManager(){
@@ -58,10 +60,8 @@ public class CentreController {
 
     @GetMapping("/getAllCentreActive")
     public ApiResponse<List<CentreResponse>> GetAllCentreActive(){
-        var context = SecurityContextHolder.getContext();
-        String email = context.getAuthentication().getName();
         return ApiResponse.<List<CentreResponse>>builder()
-                .data(centreService.getAllCentresIsActive(email,true))
+                .data(centreService.getAllCentresIsActive(true))
                 .build();
     }
 
@@ -70,21 +70,28 @@ public class CentreController {
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
         return ApiResponse.<List<CentreResponse>>builder()
-                .data(centreService.getAllCentresIsActive(email,false))
+                .data(centreService.getAllCentresIsActive(false))
                 .build();
     }
 
-    @PostMapping("/disableCentre/{id}")
-    public ApiResponse<CentreResponse> disableCentre(@PathVariable int id){
-        return ApiResponse.<CentreResponse>builder()
+    @PostMapping("/disable/{id}")
+    public ApiResponse<Boolean> disableCentre(@PathVariable int id){
+        return ApiResponse.<Boolean>builder()
                 .data(centreService.isActive(id,false))
                 .build();
     }
 
-    @PostMapping("/activeCentre/{id}")
-    public ApiResponse<CentreResponse> ActiveCentre(@PathVariable int id){
-        return ApiResponse.<CentreResponse>builder()
+    @PostMapping("/active/{id}")
+    public ApiResponse<Boolean> ActiveCentre(@PathVariable int id){
+        return ApiResponse.<Boolean>builder()
                 .data(centreService.isActive(id,true))
+                .build();
+    }
+
+    @PostMapping("/delete/{id}")
+    public ApiResponse<Boolean> deleteCentre(@PathVariable int id){
+        return ApiResponse.<Boolean>builder()
+                .data(centreService.delete(id))
                 .build();
     }
 }

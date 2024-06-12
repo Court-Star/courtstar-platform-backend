@@ -2,6 +2,14 @@ create database courtstar
 
 use courtstar
 
+create table guest
+(
+  id int identity(1, 1) primary key,
+  email varchar(80),
+  fullName nvarchar(80),
+  phone char(10)
+)
+
 create table account
 (
   id int identity(1, 1) primary key,
@@ -69,6 +77,7 @@ create table centre
   status bit,
   approve_date date,
   manager_id int foreign key references centre_manager(id),
+  is_delete bit not null,
 );
 
 create table centre_staff
@@ -110,6 +119,7 @@ create table booking_schedule
   total_price money,
   status bit,
   account_id int foreign key references account(id),
+  guest_id int foreign key references guest(id),
   slot_id int foreign key references slot(id),
   court_id int foreign key references court(id),
 );

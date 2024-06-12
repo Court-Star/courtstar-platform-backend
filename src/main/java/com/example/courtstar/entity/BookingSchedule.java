@@ -23,14 +23,14 @@ public class BookingSchedule {
     boolean status;
 
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "account_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     Account account;
 
     @ManyToOne
-    @JsonIgnore
+//    @JsonIgnore
     @JoinColumn(name = "guest_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
