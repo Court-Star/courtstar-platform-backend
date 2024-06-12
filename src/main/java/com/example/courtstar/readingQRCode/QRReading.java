@@ -14,16 +14,12 @@ import com.google.zxing.Result;
 import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.sql.*;
 
-@Component
+
 public class QRReading { CheckInService checkInService;
     private static final String DB_URL = "jdbc:mysql://localhost:3306/courtstarv5";
     private static final String USER = "root";
@@ -89,8 +85,9 @@ public class QRReading { CheckInService checkInService;
 
                             JSONObject jsonObject = new JSONObject(result.getText().toString());
                             boolean check=false;
+                            System.out.println(result.getText());
 
-                            check=searchBooking("leminhzzon@gmail.com",1,1);
+                            check=searchBooking(jsonObject.getString("email"), jsonObject.getInt("court"),jsonObject.getInt("slot"));
                             if(check==true){
 
                                 resultLabel.setText("checkin success");
