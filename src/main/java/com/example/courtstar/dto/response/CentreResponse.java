@@ -29,6 +29,7 @@ public class CentreResponse {
     int numberOfCourt;
     String paymentMethod;
     boolean status;
+    boolean isDelete;
     LocalDate approveDate;
     List<Court> courts;
     List<Image> images;
