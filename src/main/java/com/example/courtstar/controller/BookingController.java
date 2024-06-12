@@ -25,7 +25,7 @@ public class BookingController {
         return apiResponse;
     }
 
-    @GetMapping("{centreId}")
+    @GetMapping("/{centreId}")
     public ApiResponse<List<BookingSchedule>> getBookingSchedules(@PathVariable int centreId){
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(bookingService.getBookingSchedules(centreId))

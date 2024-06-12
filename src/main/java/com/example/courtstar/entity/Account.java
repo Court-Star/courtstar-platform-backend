@@ -29,6 +29,7 @@ public class Account {
 
     @Size(max = 255)
     @Column(name = "password", length = 255)
+    @JsonIgnore
     String password;
 
     @Size(max = 10)
@@ -45,7 +46,9 @@ public class Account {
 
     boolean isDelete=false;
 
+    @JsonIgnore
     String otp;
+    @JsonIgnore
     LocalDateTime otpGeneratedTime;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -55,5 +58,6 @@ public class Account {
     List<BookingSchedule> bookingSchedules;
 
     @ManyToMany
+    @JsonIgnore
     Set<Role> roles;
 }
