@@ -59,5 +59,9 @@ public class Centre {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     CentreManager manager;
+
+    @Builder.Default
+    boolean isDelete = false;
+
 }
 
