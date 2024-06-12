@@ -68,22 +68,22 @@ public class CheckInService {
         return result;
     }
   
-    public boolean checkInBooking(String email, int court_id, int slotId){
-        Account account = accountService.getAccountByEmail1(email);
-        if(account == null){
-            throw new AppException(ErrorCode.NOT_FOUND_USER);
-        }
-        BookingSchedule service = bookingService.getBookingSchedule(account.getId());
-        Slot slot = slotRepository.findById(slotId).orElse(null);
-
-        boolean checkIn = false;
-        if(service.getCourt().isStatus()==false
-                && service.getCourt().getId()==court_id
-                && service.getSlot()==slot){
-            service.setStatus(true);
-            bookingScheduleRepository.save(service);
-            checkIn = true;
-        }
-        return checkIn;
-    }
+//    public boolean checkInBooking(String email, int court_id, int slotId){
+//        Account account = accountService.getAccountByEmail1(email);
+//        if(account == null){
+//            throw new AppException(ErrorCode.NOT_FOUND_USER);
+//        }
+//        BookingSchedule service = bookingService.getBookingSchedule(account.getId());
+//        Slot slot = slotRepository.findById(slotId).orElse(null);
+//
+//        boolean checkIn = false;
+//        if(service.getCourt().isStatus()==false
+//                && service.getCourt().getId()==court_id
+//                && service.getSlot()==slot){
+//            service.setStatus(true);
+//            bookingScheduleRepository.save(service);
+//            checkIn = true;
+//        }
+//        return checkIn;
+//    }
 }

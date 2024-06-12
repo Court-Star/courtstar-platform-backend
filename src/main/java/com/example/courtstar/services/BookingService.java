@@ -6,6 +6,8 @@ import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.repositories.*;
+import com.google.zxing.WriterException;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -16,6 +18,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +55,10 @@ public class BookingService {
     @Autowired
     private CentreRepository centreRepository;
 
-    public BookingSchedule booking(BookingRequest request) {
+    @Autowired
+    QrCodeService qrCodeService;
+
+    public BookingSchedule booking(BookingRequest request) throws MessagingException, IOException, WriterException {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
@@ -69,7 +75,6 @@ public class BookingService {
             account = accountReponsitory.findByEmail(name).orElseThrow(
                     () -> new AppException(ErrorCode.NOT_FOUND_USER)
             );
-            System.out.println(account);
         }
 
         Centre centre = centreRepository.findById(request.getCentreId()).orElseThrow(null);
@@ -153,20 +158,13 @@ public class BookingService {
                 .build();
 
         paymentRepository.save(payment);
+        qrCodeService.generateQrCode(bookingSchedule.getId());
 
         return bookingSchedule;
     }
 
     public List<BookingSchedule> getBookingSchedules(int centreId) {
         return bookingScheduleRepository.findAllByCentreId(centreId);
-    }
-
-    public BookingSchedule getBookingSchedule(int accountId) {
-        return bookingScheduleRepository.findByAccountId(accountId);
-    }
-
-    public BookingSchedule getBookingBuyGuestID(int guestID) {
-        return bookingScheduleRepository.findByGuestId(guestID);
     }
 
 }

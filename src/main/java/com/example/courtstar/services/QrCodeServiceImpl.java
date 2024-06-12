@@ -2,11 +2,11 @@ package com.example.courtstar.services;
 
 
 
-import com.example.courtstar.dto.request.CheckInRequest;
 import com.example.courtstar.dto.request.SendMailBookingRequest;
 import com.example.courtstar.entity.Account;
 import com.example.courtstar.entity.BookingSchedule;
 import com.example.courtstar.entity.Guest;
+import com.example.courtstar.repositories.BookingScheduleRepository;
 import com.example.courtstar.repositories.GuestRepository;
 import com.example.courtstar.util.AppUtils;
 import com.example.courtstar.util.EmailBookingUtil;
@@ -25,24 +25,25 @@ public class QrCodeServiceImpl implements QrCodeService {
     AccountService accountService;
     @Autowired
     GuestRepository guestRepository;
+
     @Autowired
-    BookingService bookingService;
+    private BookingScheduleRepository bookingScheduleRepository;
 
 
     @Override
-    public String generateQrCode(String  email) throws IOException, WriterException, MessagingException {
-        Account account = accountService.getAccountByEmail1(email);
-        System.out.println(account);
+    public String generateQrCode(int bookingScheduleId) throws IOException, WriterException, MessagingException {
+
+        BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingScheduleId).orElse(null);
+        if (bookingSchedule == null) {
+            return null;
+        }
+
         SendMailBookingRequest request = null;
-        int slot= 0;
-        CheckInRequest checkInRequest = CheckInRequest.builder()
-                .email(email)
-                .build();
-        if(account == null){
-            Guest guest = guestRepository.findByEmail(email);
-            BookingSchedule bookingSchedule= bookingService.getBookingBuyGuestID(guest.getId());
+
+        if (bookingSchedule.getAccount() == null) {
+            Guest guest = bookingSchedule.getGuest();
             request = SendMailBookingRequest.builder()
-                    .email(email)
+                    .email(guest.getEmail())
                     .firstName(guest.getFullName())
                     .lastName("")
                     .phone(guest.getPhone())
@@ -50,13 +51,10 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .price(bookingSchedule.getTotalPrice())
                     .booking_id(bookingSchedule.getId())
                     .build();
-            slot=bookingSchedule.getSlot().getId();
-            checkInRequest.setSlot(slot);
-            checkInRequest.setCourt(bookingSchedule.getCourt().getId());
-        }else{
-            BookingSchedule bookingSchedule= bookingService.getBookingSchedule(account.getId());
+        } else {
+            Account account = bookingSchedule.getAccount();
             request = SendMailBookingRequest.builder()
-                    .email(email)
+                    .email(account.getEmail())
                     .firstName(account.getFirstName())
                     .lastName(account.getLastName())
                     .phone(account.getPhone())
@@ -64,15 +62,9 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .price(bookingSchedule.getTotalPrice())
                     .booking_id(bookingSchedule.getId())
                     .build();
-            slot=bookingSchedule.getSlot().getId();
-            checkInRequest.setSlot(slot);
-            checkInRequest.setCourt(bookingSchedule.getCourt().getId());
-
         }
 
-
-
-        String prettyData = AppUtils.prettyObject(checkInRequest);
+        String prettyData = AppUtils.prettyObject(bookingScheduleId);
         String qrCode = AppUtils.generateQrCode(prettyData,300,300);
         return emailBookingUtil.sendORCode(qrCode,request);
     }
