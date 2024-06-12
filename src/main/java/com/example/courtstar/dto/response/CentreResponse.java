@@ -34,7 +34,7 @@ public class CentreResponse {
     List<Court> courts;
     List<Image> images;
     List<Slot> slots;
-    List<CentreStaff> centreStaffs;
+//    List<CentreStaff> centreStaffs;
 
     @Builder.Default
     int rating = ThreadLocalRandom.current().nextInt(1, 6);
