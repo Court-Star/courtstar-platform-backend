@@ -35,9 +35,14 @@ public class EmailBookingUtil {
         File qrCodeImage = convertBase64ToImage(qrCodeBase64);
 
         Context context = new Context();
-        context.setVariable("Name", request.getFirstName()+" "+ request.getLastName());
-        context.setVariable("Number Court", request.getNumber_Court());
-        context.setVariable("booking id: ", request.getBooking_id());
+        context.setVariable("name", request.getFirstName() + " " + request.getLastName());
+        context.setVariable("courtNo", request.getCourtNo());
+        context.setVariable("email", request.getEmail());
+        context.setVariable("centreName", request.getCentreName());
+        context.setVariable("centreAddress", request.getCentreAddress());
+        context.setVariable("date", request.getDate());
+        context.setVariable("price", request.getPrice());
+        context.setVariable("slot", request.getSlot());
 
         String qrCodeContentId = "qrcode";
         context.setVariable("qrCodeContentId", qrCodeContentId);

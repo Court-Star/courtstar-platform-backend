@@ -47,9 +47,12 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .firstName(guest.getFullName())
                     .lastName("")
                     .phone(guest.getPhone())
-                    .number_Court(bookingSchedule.getCourt().getCourtNo())
+                    .centreName(bookingSchedule.getCourt().getCentre().getName())
+                    .centreAddress(bookingSchedule.getCourt().getCentre().getAddress())
+                    .date(bookingSchedule.getDate())
+                    .courtNo(bookingSchedule.getCourt().getCourtNo())
                     .price(bookingSchedule.getTotalPrice())
-                    .booking_id(bookingSchedule.getId())
+                    .slot(bookingSchedule.getSlot())
                     .build();
         } else {
             Account account = bookingSchedule.getAccount();
@@ -58,9 +61,12 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .firstName(account.getFirstName())
                     .lastName(account.getLastName())
                     .phone(account.getPhone())
-                    .number_Court(bookingSchedule.getCourt().getCourtNo())
+                    .centreName(bookingSchedule.getCourt().getCentre().getName())
+                    .centreAddress(bookingSchedule.getCourt().getCentre().getAddress())
+                    .date(bookingSchedule.getDate())
+                    .courtNo(bookingSchedule.getCourt().getCourtNo())
                     .price(bookingSchedule.getTotalPrice())
-                    .booking_id(bookingSchedule.getId())
+                    .slot(bookingSchedule.getSlot())
                     .build();
         }
 

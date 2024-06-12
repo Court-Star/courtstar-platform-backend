@@ -1,7 +1,10 @@
 package com.example.courtstar.dto.request;
 
+import com.example.courtstar.entity.Slot;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.time.LocalDate;
 
 @Data
 @NoArgsConstructor
@@ -13,7 +16,10 @@ public class SendMailBookingRequest {
     String firstName;
     String lastName;
     String phone;
-    int number_Court;
+    String centreName;
+    String centreAddress;
+    LocalDate date;
+    int courtNo;
     double price;
-    int booking_id;
+    Slot slot;
 }
