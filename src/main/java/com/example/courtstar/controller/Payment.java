@@ -1,14 +1,14 @@
 package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.*;
-import com.example.courtstar.services.QrCodeService;
 import com.example.courtstar.services.payment.*;
-import com.google.zxing.WriterException;
-import jakarta.mail.MessagingException;
-import org.json.JSONObject;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
+
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,13 +35,15 @@ public class Payment {
     private GetStatusOrderPaymentService orderPaymentService;
 
     @PostMapping("/callback")
-    public ResponseEntity<String> callback(@RequestBody CallBackPayment paymentDTO)
+    public ResponseEntity<ApiResponse> callback(@RequestBody String jsonSt)
             throws JSONException, NoSuchAlgorithmException, InvalidKeyException, org.json.JSONException {
         JSONObject result = new JSONObject();
-        return new ResponseEntity<>(this.callBackPaymentService
-                .doCallBack(result, paymentDTO.getJsonString()).toString(), HttpStatus.OK);
-
+        Object callBack =this.callBackPaymentService.doCallBack(result,jsonSt);
+        return new ResponseEntity<>(ApiResponse.builder()
+                .data(callBack)
+                .build(), HttpStatus.OK);
     }
+
 
 
 

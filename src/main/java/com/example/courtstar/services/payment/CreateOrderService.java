@@ -24,7 +24,7 @@ import java.util.*;
 @Service
 public class CreateOrderService {
     @Value("${payment.zalopay.APP_ID}")
-    private String APPID;
+    private String APP_ID;
 
     @Value("${payment.zalopay.KEY1}")
     private String KEY1;
@@ -50,21 +50,21 @@ public class CreateOrderService {
         }};
 
         Map<String, Object> order = new HashMap<String, Object>(){{
-            put("appid", APPID);
-            put("apptransid", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime());
-            put("apptime", System.currentTimeMillis());
-            put("appuser", "CourtStar");
+            put("app_id", APP_ID);
+            put("app_trans_id", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime());
+            put("app_time", System.currentTimeMillis());
+            put("app_user", "CourtStar");
             put("amount", orderRequest.getAmount());
-            put("bankcode", "");
+            put("bank_code", "");
             put("item", "[]");
-            put("embeddata", new JSONObject(embeddata).toString());
-            put("callback_url", "https://163e-118-69-182-144.ngrok-free.app/payment/callback"); // URL callback
+            put("embed_data", new JSONObject(embeddata).toString());
+            put("callback_url", "https://1d6f-2405-4802-90b4-f810-915-daf6-c7cd-723b.ngrok-free.app/courtstar/payment/callback"); // URL callback
         }};
 
         order.put("description", "CourtStar - Booking Court " + order.get("apptransid"));
 
-        String data = order.get("appid") + "|" + order.get("apptransid") + "|" + order.get("appuser") + "|" + order.get("amount")
-                + "|" + order.get("apptime") + "|" + order.get("embeddata") + "|" + order.get("item");
+        String data = order.get("app_id") + "|" + order.get("app_trans_id") + "|" + order.get("app_user") + "|" + order.get("amount")
+                + "|" + order.get("app_time") + "|" + order.get("embed_data") + "|" + order.get("item");
         order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, KEY1, data));
 
         CloseableHttpClient client = HttpClients.createDefault();

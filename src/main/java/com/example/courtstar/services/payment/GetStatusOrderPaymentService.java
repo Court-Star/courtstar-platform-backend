@@ -40,8 +40,8 @@ public class GetStatusOrderPaymentService {
         String mac = HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, KEY1, data);
 
         List<NameValuePair> params = new ArrayList<>();
-        params.add(new BasicNameValuePair("appid", APP_ID));
-        params.add(new BasicNameValuePair("apptransid", statusRequestDTO.getAppTransId()));
+        params.add(new BasicNameValuePair("app_id", APP_ID));
+        params.add(new BasicNameValuePair("app_trans_id", statusRequestDTO.getAppTransId()));
         params.add(new BasicNameValuePair("mac", mac));
 
         URIBuilder uri = new URIBuilder(ORDER_STATUS_ENDPOINT);
@@ -52,7 +52,8 @@ public class GetStatusOrderPaymentService {
         post.setEntity(new UrlEncodedFormEntity(params));
 
         CloseableHttpResponse res = client.execute(post);
-        BufferedReader rd = new BufferedReader(new InputStreamReader(res.getEntity().getContent()));
+        BufferedReader rd = new BufferedReader(
+                new InputStreamReader(res.getEntity().getContent()));
         StringBuilder resultJsonStr = new StringBuilder();
         String line;
 
@@ -63,12 +64,12 @@ public class GetStatusOrderPaymentService {
 
         JSONObject result = new JSONObject(resultJsonStr.toString());
         Map<String, Object> finalResult = new HashMap<>();
-        finalResult.put("returncode", result.get("returncode"));
-        finalResult.put("returnmessage", result.get("returnmessage"));
-        finalResult.put("isprocessing", result.get("isprocessing"));
+        finalResult.put("return_code", result.get("return_code"));
+        finalResult.put("return_message", result.get("return_message"));
+        finalResult.put("is_processing", result.get("is_processing"));
         finalResult.put("amount", result.get("amount"));
-        finalResult.put("discountamount", result.get("discountamount"));
-        finalResult.put("zptransid", result.get("zptransid"));
+        finalResult.put("discount_amount", result.get("discount_amount"));
+        finalResult.put("zp_trans_id", result.get("zp_trans_id"));
         return finalResult;
     }
 }
