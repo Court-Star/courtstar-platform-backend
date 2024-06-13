@@ -4,8 +4,8 @@ server:
     context-path: /courtstar
 spring:
   datasource:
-    url: jdbc:sqlserver://courtstarv2.database.windows.net:1433;database=courtstar;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
-    username: adminv2
+    url: jdbc:sqlserver://courtstarv3.database.windows.net:1433;database=courtstarv3;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
+    username: adminv3
     password: Aa@123456
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   mail:
