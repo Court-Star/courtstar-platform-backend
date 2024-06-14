@@ -9,6 +9,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "court")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -16,9 +17,14 @@ import java.util.List;
 public class Court {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Integer id;
+
+    @Column(name = "court_no")
     int courtNo;
+
     @Builder.Default
+    @Column(name = "status")
     boolean status = true;
 
     @ManyToOne

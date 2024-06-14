@@ -12,6 +12,6 @@ import org.mapstruct.MappingTarget;
 public interface AccountMapper {
     Account toAccount(AccountCreationRequest request);
     AccountResponse toAccountResponse(Account account);
-    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "role", ignore = true)
     void updateAccount(@MappingTarget Account account, AccountUpdateRequest request);
 }
