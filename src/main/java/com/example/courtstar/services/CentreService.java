@@ -2,6 +2,7 @@ package com.example.courtstar.services;
 
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.request.CourtRequest;
+import com.example.courtstar.dto.response.CentreActiveResponse;
 import com.example.courtstar.dto.response.CentreNameResponse;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.dto.response.CourtResponse;
@@ -63,8 +64,9 @@ public class CentreService {
         return centreRepository.findAll().stream().map(centreMapper::toCentreResponse).toList();
     }
 
-    public List<CentreResponse> getAllCentresIsActive(boolean isActive) {
-        return centreRepository.findAllByIsDeleteAndStatus(false, isActive).stream().map(centreMapper::toCentreResponse).toList();
+    public List<CentreActiveResponse> getAllCentresIsActive(boolean isActive) {
+        return centreRepository.findAllByIsDeleteAndStatus(false, isActive).stream()
+                .map(centreMapper::toCentreActiveResponse).toList();
     }
 
     public CentreResponse getCentre(int id) {

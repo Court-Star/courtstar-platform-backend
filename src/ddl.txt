@@ -87,7 +87,8 @@ create table centre
   manager_id int foreign key references centre_manager(id),
   revenue money,
   payment_method_id int unique foreign key references payment_method(id),
-  is_delete bit not null
+  is_delete bit not null,
+  link text
 );
 
 create table centre_staff
