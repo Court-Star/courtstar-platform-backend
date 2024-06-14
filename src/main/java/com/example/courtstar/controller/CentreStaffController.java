@@ -24,4 +24,12 @@ public class CentreStaffController {
                 .data(centreStaffs)
                 .build();
     }
+
+    @PutMapping("/move/centre/{staff_id}/{centre_id}")
+    public ApiResponse<Boolean> moveStaff(@PathVariable int staff_id, @PathVariable int centre_id) {
+        Boolean result = centreStaffService.moveToCentre(staff_id,centre_id);
+        return ApiResponse.<Boolean>builder()
+                .data(result)
+                .build();
+    }
 }

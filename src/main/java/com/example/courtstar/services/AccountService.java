@@ -43,7 +43,6 @@ public class AccountService {
      AccountReponsitory accountReponsitory;
      RoleReponsitory roleReponsitory;
      AccountMapper accountMapper;
-     RoleService roleService;
      CentreManagerRepository centreManagerRepository;
 
     private PasswordEncoder passwordEncoder;
@@ -112,21 +111,12 @@ public class AccountService {
         Centre centre = centreRepository.findById(request.getCentreId()).orElse(null);
 
         accountReponsitory.save(account);
-        CentreStaff centreStaff = centreStaffRepository.save(
+        return centreStaffRepository.save(
                 CentreStaff.builder()
                         .account(account)
                         .centre(centre)
                         .build());
 
-        List<CentreStaff> centreStaffs = centre.getCentreStaffs();
-        if(centreStaffs==null){
-            centreStaffs = new ArrayList<>();
-            centre.setCentreStaffs(centreStaffs);
-        }
-        centreStaffs.add(centreStaff);
-        centreRepository.save(centre);
-
-        return centreStaff;
     }
 
     public List<Account> getAllAccounts(){

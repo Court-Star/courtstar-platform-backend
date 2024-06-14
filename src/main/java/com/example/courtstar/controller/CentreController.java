@@ -35,13 +35,13 @@ public class CentreController {
     }
 
 
-//    @PutMapping("/update/{id}")
-//    public ApiResponse<CentreResponse> updateCentre(@PathVariable int id, @RequestBody CentreRequest request){
-//        CentreResponse centreResponse =centreService.updateCentre(id, request);
-//        return ApiResponse.<CentreResponse>builder()
-//                .data(centreResponse)
-//                .build();
-//    }
+    @PutMapping("/update/{id}")
+    public ApiResponse<CentreResponse> updateCentre(@PathVariable int id, @RequestBody CentreRequest request){
+        CentreResponse centreResponse = centreService.updateCentre(id, request);
+        return ApiResponse.<CentreResponse>builder()
+                .data(centreResponse)
+                .build();
+    }
 
     @GetMapping("/getAllCentresOfManager")
     public ApiResponse<Set<CentreNameResponse>> GetAllCentresOfManager(){
