@@ -1,35 +1,29 @@
 package com.example.courtstar.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Entity
 @Data
-@Table(name = "image")
+@Table(name = "payment_method")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Image {
+public class PaymentMethod {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     Integer id;
 
-    @Column(name = "image_no")
-    int imageNo;
+    @Size(max = 30)
+    @Column(name = "name", length = 30)
+    String name;
 
-    @Column(name = "url")
-    String url;
-
-    @ManyToOne
-    @JoinColumn(name = "centre_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonIgnore
-    Centre centre;
+    @Size(max = 30)
+    @Column(name = "number", length = 30)
+    String number;
 
 }
-

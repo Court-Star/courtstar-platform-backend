@@ -8,6 +8,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "centre_manager")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -15,10 +16,13 @@ import java.util.List;
 public class CentreManager {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Integer id;
-    @Column(nullable = true)
+
+    @Column(name = "address")
     String address;
-    @Column(nullable = true)
+
+    @Column(name = "current_balance")
     double currentBalance;
 
     @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)

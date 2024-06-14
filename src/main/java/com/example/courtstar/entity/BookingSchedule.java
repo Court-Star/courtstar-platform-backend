@@ -10,17 +10,25 @@ import java.time.LocalDate;
 @Entity
 @Data
 @AllArgsConstructor
+@Table(name = "booking_schedule")
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class BookingSchedule {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Integer id;
 
+    @Column(name = "date")
     LocalDate date;
+
+    @Column(name = "total_price")
     double totalPrice;
-    boolean status;
+
+    @Column(name = "status")
+    @Builder.Default
+    boolean status = false;
 
     @ManyToOne
 //    @JsonIgnore
@@ -39,14 +47,14 @@ public class BookingSchedule {
     @ManyToOne
 //    @JsonIgnore
     @JoinColumn(name = "slot_id")
-//    @EqualsAndHashCode.Exclude
-//    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     Slot slot;
 
     @ManyToOne
 //    @JsonIgnore
     @JoinColumn(name = "court_id")
-//    @EqualsAndHashCode.Exclude
-//    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
     Court court;
 }

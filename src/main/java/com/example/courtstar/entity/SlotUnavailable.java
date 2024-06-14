@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 @Entity
 @Data
+@Table(name = "slot_unavailable")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -16,8 +17,10 @@ import java.time.LocalDate;
 public class SlotUnavailable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Integer id;
 
+    @Column(name = "date")
     LocalDate date;
 
     @ManyToOne

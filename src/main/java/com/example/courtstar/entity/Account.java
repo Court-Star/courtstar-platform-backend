@@ -44,12 +44,15 @@ public class Account {
     @Column(name = "last_name", length = 50)
     String lastName;
 
-    boolean isDelete=false;
+    @Column(name = "is_delete")
+    @Builder.Default
+    boolean isDelete = false;
 
-    @JsonIgnore
-    String otp;
-    @JsonIgnore
-    LocalDateTime otpGeneratedTime;
+    @ManyToOne
+    @JoinColumn(name = "role_name")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    Role role;
 
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
@@ -57,7 +60,4 @@ public class Account {
     @JsonIgnore
     List<BookingSchedule> bookingSchedules;
 
-    @ManyToMany
-    @JsonIgnore
-    Set<Role> roles;
 }

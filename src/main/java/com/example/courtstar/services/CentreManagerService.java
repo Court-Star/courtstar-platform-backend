@@ -58,8 +58,8 @@ public class CentreManagerService {
 
     public CentreManagerResponse updateInformation(int account_id, CentreManagerRequest request){
         CentreManager manager = centreManagerRepository.findByAccountId(account_id).orElseThrow(null);
-        Role role= manager.getAccount().getRoles().stream().filter(i->i.getName().equals("MANAGER")).findFirst().orElse(null);
-        if(role==null){
+        String role= manager.getAccount().getRole().getName();
+        if(!role.equals("MANAGER")){
             throw new AppException(ErrorCode.ERROR_ROLE);
         }
         centreManagerMapper.updateCentre(manager,request);

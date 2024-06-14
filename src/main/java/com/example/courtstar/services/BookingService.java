@@ -65,12 +65,15 @@ public class BookingService {
         Account account = null;
         Guest guest = null;
         if (name.equals("anonymousUser")) {
-            guest = Guest.builder()
-                    .email(request.getEmail())
-                    .phone(request.getPhone())
-                    .fullName(request.getFullName())
-                    .build();
-            guestRepository.save(guest);
+            guest = guestRepository.findByEmail(name);
+            if (guest == null) {
+                guest = Guest.builder()
+                        .email(request.getEmail())
+                        .phone(request.getPhone())
+                        .fullName(request.getFullName())
+                        .build();
+                guestRepository.save(guest);
+            }
         } else {
             account = accountReponsitory.findByEmail(name).orElseThrow(
                     () -> new AppException(ErrorCode.NOT_FOUND_USER)
@@ -153,7 +156,6 @@ public class BookingService {
         Payment payment = Payment.builder()
                 .date(LocalDate.now())
                 .status(true)
-                .paymentMethod("Paypal")
                 .bookingSchedule(bookingSchedule)
                 .build();
 

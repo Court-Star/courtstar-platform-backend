@@ -8,6 +8,7 @@ import java.time.LocalDate;
 
 @Entity
 @Data
+@Table(name = "payment")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -15,11 +16,14 @@ import java.time.LocalDate;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Integer id;
 
+    @Column(name = "date")
     LocalDate date;
+
+    @Column(name = "status")
     boolean status;
-    String paymentMethod;
 
     @OneToOne
     BookingSchedule bookingSchedule;

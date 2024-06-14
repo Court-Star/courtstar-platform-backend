@@ -17,7 +17,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Configuration
@@ -67,15 +69,19 @@ public class ApplicationInitConfig {
 
 
 
-                var roles = new HashSet<Role>();
-                roles.add(adminRole);
-
                 Account user = Account.builder()
                         .email(ADMIN_EMAIL)
                         .password(passwordEncoder.encode(ADMIN_PASSWORD))
-                        .roles(roles)
+                        .role(adminRole)
                         .build();
+                List<Account> accountList = adminRole.getAccounts();
+                if(accountList == null) {
+                    accountList = new ArrayList<>();
+                    adminRole.setAccounts(accountList);
+                }
+                accountList.add(user);
                 accountReponsitory.save(user);
+                roleReponsitory.save(adminRole);
                 log.warn("admin user has been created with default password: admin, please change it");
             }
             log.info("Application initialization completed .....");

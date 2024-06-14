@@ -53,6 +53,8 @@ public class CentreService {
     private SlotRepository slotRepository;
     @Autowired
     private ImgRepository imgRepository;
+    @Autowired
+    private PaymentMethodRepository paymentMethodRepository;
 
     public CentreResponse createCentre(CentreRequest request) {
         Centre centre = centreMapper.toCentre(request);
@@ -107,11 +109,8 @@ public class CentreService {
         Account account = accountReponsitory.findByEmail(name).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         CentreManager manager = centreManagerRepository.findByAccountId(account.getId())
                 .orElseThrow( () -> new AppException(ErrorCode.NOT_FOUND_USER));
-        Role role= manager.getAccount().getRoles().stream()
-                .filter( i -> i.getName().equals("MANAGER"))
-                .findFirst()
-                .orElse(null);
-        if(role==null){
+        String role= manager.getAccount().getRole().getName();
+        if(!role.equals("MANAGER")){
             throw new RuntimeException();
         }
         Centre centre = centreMapper.toCentre(request);
@@ -123,6 +122,13 @@ public class CentreService {
         centre.setImages(imgList);
         centre.setManager(manager);
         centreRepository.save(centre);
+
+        //Fake payment method
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .build();
+        paymentMethodRepository.save(paymentMethod);
+        centre.setPaymentMethod(paymentMethod);
+        //end fake payment method
 
         List<Centre> centres = manager.getCentres();
         if (centres == null) {
@@ -149,7 +155,7 @@ public class CentreService {
 
         List<Court> courts = new ArrayList<>();
 
-        for(int i=0;i<centre.getNumberOfCourt();i++){
+        for(int i=0;i<centre.getNumberOfCourts();i++){
             Court court = courtMapper.toCourt(request.builder()
                     .courtNo(i+1)
                     .status(true)
