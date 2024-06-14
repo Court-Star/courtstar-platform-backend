@@ -65,6 +65,9 @@ public class Centre {
     @Builder.Default
     double revenue = 0;
 
+    @Column(name = "link")
+    String link;
+
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

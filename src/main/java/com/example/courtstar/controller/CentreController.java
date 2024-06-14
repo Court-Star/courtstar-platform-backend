@@ -2,6 +2,7 @@ package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.CentreRequest;
+import com.example.courtstar.dto.response.CentreActiveResponse;
 import com.example.courtstar.dto.response.CentreNameResponse;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.services.CentreService;
@@ -59,17 +60,17 @@ public class CentreController {
 
 
     @GetMapping("/getAllCentreActive")
-    public ApiResponse<List<CentreResponse>> GetAllCentreActive(){
-        return ApiResponse.<List<CentreResponse>>builder()
+    public ApiResponse<List<CentreActiveResponse>> GetAllCentreActive(){
+        return ApiResponse.<List<CentreActiveResponse>>builder()
                 .data(centreService.getAllCentresIsActive(true))
                 .build();
     }
 
     @GetMapping("/getAllCentreDisable")
-    public ApiResponse<List<CentreResponse>> GetAllCentreDisable(){
+    public ApiResponse<List<CentreActiveResponse>> GetAllCentreDisable(){
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();
-        return ApiResponse.<List<CentreResponse>>builder()
+        return ApiResponse.<List<CentreActiveResponse>>builder()
                 .data(centreService.getAllCentresIsActive(false))
                 .build();
     }
