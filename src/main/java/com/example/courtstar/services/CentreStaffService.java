@@ -1,6 +1,7 @@
 package com.example.courtstar.services;
 
 import com.example.courtstar.entity.CentreStaff;
+import com.example.courtstar.repositories.CentreRepository;
 import com.example.courtstar.repositories.CentreStaffRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +25,20 @@ public class CentreStaffService {
 
     @Autowired
     private CentreStaffRepository centreStaffRepository;
+    @Autowired
+    private CentreRepository centreRepository;
 
     public List<CentreStaff> getCentreStaffOfCentre(int centreId) {
-        return centreStaffRepository.findAllByCentreId(centreId);
+        return centreStaffRepository.findAllByCentreId(centreId)
+                .stream()
+                .filter(centreStaff -> !centreStaff.getAccount().isDelete())
+                .collect(Collectors.toList());
+    }
+
+    public Boolean moveToCentre(int staffId, int centreId) {
+        CentreStaff centreStaff = centreStaffRepository.findById(staffId).orElseThrow(null);
+        centreStaff.setCentre(centreRepository.findById(centreId).orElseThrow(null));
+        centreStaffRepository.save(centreStaff);
+        return true;
     }
 }
