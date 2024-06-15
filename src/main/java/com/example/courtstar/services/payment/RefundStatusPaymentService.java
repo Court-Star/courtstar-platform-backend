@@ -2,7 +2,6 @@ package com.example.courtstar.services.payment;
 
 
 import com.example.courtstar.dto.request.RefundStatusRequest;
-import com.example.courtstar.dto.request.StatusRequest;
 import com.example.courtstar.util.HMACUtil;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;

@@ -18,6 +18,8 @@ public class Payment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     Integer id;
+    @Column(name="id_transaction")
+    String id_transaction;
 
     @Column(name = "date")
     LocalDate date;

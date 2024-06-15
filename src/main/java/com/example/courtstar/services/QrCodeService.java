@@ -1,7 +1,7 @@
 package com.example.courtstar.services;
 
 
-import com.example.courtstar.dto.request.SendMailBookingRequest;
+
 import com.google.zxing.WriterException;
 import jakarta.mail.MessagingException;
 
