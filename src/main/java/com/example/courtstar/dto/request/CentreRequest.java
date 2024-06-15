@@ -15,11 +15,13 @@ import java.util.List;
 public class CentreRequest {
     String name;
     String address;
+    String district;
+    String link;
     LocalTime openTime;
     LocalTime closeTime;
     double pricePerHour;
-    int numberOfCourt;
-    String paymentMethod;
+    int numberOfCourts;
+    String description;
     LocalDate approveDate;
     List<String> images;
 }

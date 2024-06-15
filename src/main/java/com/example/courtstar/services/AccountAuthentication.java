@@ -8,6 +8,7 @@ import com.example.courtstar.dto.response.AuthenticationResponse;
 import com.example.courtstar.dto.response.IntrospectResponse;
 import com.example.courtstar.entity.Account;
 import com.example.courtstar.entity.InvalidatedToken;
+import com.example.courtstar.entity.Role;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.repositories.AccountReponsitory;
@@ -61,18 +62,11 @@ public class AccountAuthentication {
         }
         var token = generateToken(account);
 
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!account.getRoles().isEmpty()){
-            account.getRoles().forEach(role -> {
-                stringJoiner.add(role.getName());
-            });
-        }
-
         return AuthenticationResponse.builder()
                 .token(token)
                 .success(true)
                 .account_id(account.getId())
-                .role(stringJoiner.toString())
+                .role(account.getRole().getName())
                 .build();
     }
     private String generateToken(Account account) throws JOSEException {
@@ -96,13 +90,10 @@ public class AccountAuthentication {
 
     private String buildScope(Account account) {
         StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!account.getRoles().isEmpty()){
-            account.getRoles().forEach(role -> {
-                stringJoiner.add("ROLE_"+role.getName());
-                if(!CollectionUtils.isEmpty(role.getPermissions())){
-                    role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
-                }
-            });
+        Role role = account.getRole();
+        stringJoiner.add("ROLE_"+role.getName());
+        if(!CollectionUtils.isEmpty(role.getPermissions())){
+            role.getPermissions().forEach(permission -> stringJoiner.add(permission.getName()));
         }
         return stringJoiner.toString();
     }
@@ -175,18 +166,11 @@ public class AccountAuthentication {
                 .orElseThrow(()->new AppException(ErrorCode.UNAUTHENTICATED));
         var token = generateToken(user);
 
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        if(!user.getRoles().isEmpty()){
-            user.getRoles().forEach(role -> {
-                stringJoiner.add(role.getName());
-            });
-        }
-
         return AuthenticationResponse.builder()
                 .token(token)
                 .success(true)
                 .account_id(user.getId())
-                .role(stringJoiner.toString())
+                .role(user.getRole().getName())
                 .build();
     }
 }

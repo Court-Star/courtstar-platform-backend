@@ -10,6 +10,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "slot")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -17,9 +18,16 @@ import java.util.List;
 public class Slot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Integer id;
+
+    @Column(name = "slot_no")
     int slotNo;
+
+    @Column(name = "start_time")
     LocalTime startTime;
+
+    @Column(name = "end_time")
     LocalTime endTime;
 
     @ManyToOne

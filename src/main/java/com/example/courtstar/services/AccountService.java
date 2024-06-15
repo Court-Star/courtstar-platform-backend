@@ -43,7 +43,6 @@ public class AccountService {
      AccountReponsitory accountReponsitory;
      RoleReponsitory roleReponsitory;
      AccountMapper accountMapper;
-     RoleService roleService;
      CentreManagerRepository centreManagerRepository;
 
     private PasswordEncoder passwordEncoder;
@@ -51,6 +50,7 @@ public class AccountService {
     private final EmailUtil emailUtil;
     private final CentreStaffRepository centreStaffRepository;
     private final CentreRepository centreRepository;
+    private final OtpRepository otpRepository;
 
     public Account CreateAccount(AccountCreationRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
@@ -59,8 +59,8 @@ public class AccountService {
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         Account account = accountMapper.toAccount(request);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
-        var roles = roleService.findAllById("CUSTOMER");
-        account.setRoles(new HashSet<>(roles));
+        var role = roleReponsitory.findById("CUSTOMER").orElse(null);
+        account.setRole(role);
         return accountReponsitory.save(account);
     }
 
@@ -78,21 +78,16 @@ public class AccountService {
                 .build();
 
         account.setPassword(passwordEncoder.encode(request.getPassword()));
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleReponsitory.findById("CUSTOMER").orElse(null));
-        roles.add(roleReponsitory.findById("MANAGER").orElse(null));
-        roles.add(roleReponsitory.findById("STAFF").orElse(null));
-        account.setRoles(roles);
+        var role = roleReponsitory.findById("MANAGER").orElse(null);
+        account.setRole(role);
 
         accountReponsitory.save(account);
-
-
 
         return centreManagerRepository.save(
                 CentreManager.builder()
                         .account(account)
                         .address(request.getAddress())
-                        .currentBalance(5000000)
+                        .currentBalance(0)
                         .build());
     }
 
@@ -110,29 +105,18 @@ public class AccountService {
                 .build();
 
         account.setPassword(passwordEncoder.encode(request.getPassword()));
-        Set<Role> roles = new HashSet<>();
-        roles.add(roleReponsitory.findById("CUSTOMER").orElse(null));
-        roles.add(roleReponsitory.findById("STAFF").orElse(null));
-        account.setRoles(roles);
+        var role = roleReponsitory.findById("STAFF").orElse(null);
+        account.setRole(role);
 
         Centre centre = centreRepository.findById(request.getCentreId()).orElse(null);
 
         accountReponsitory.save(account);
-        CentreStaff centreStaff = centreStaffRepository.save(
+        return centreStaffRepository.save(
                 CentreStaff.builder()
                         .account(account)
                         .centre(centre)
                         .build());
 
-        List<CentreStaff> centreStaffs = centre.getCentreStaffs();
-        if(centreStaffs==null){
-            centreStaffs = new ArrayList<>();
-            centre.setCentreStaffs(centreStaffs);
-        }
-        centreStaffs.add(centreStaff);
-        centreRepository.save(centre);
-
-        return centreStaff;
     }
 
     public List<Account> getAllAccounts(){
@@ -212,24 +196,28 @@ public class AccountService {
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         Timestamp oldOtp = new Timestamp(0);
-        if (account.getOtpGeneratedTime() != null) {
-            oldOtp = Timestamp.valueOf(account.getOtpGeneratedTime());
+        Otp otp = otpRepository.findByAccountId(account.getId()).orElse(null);
+        if (otp == null) {
+            otp = otpRepository.save(Otp.builder().account(account).build());
+        }
+        if (otp.getOtpGeneratedTime() != null) {
+            oldOtp = Timestamp.valueOf(otp.getOtpGeneratedTime());
         }
         Timestamp current = Timestamp.valueOf(LocalDateTime.now());
         if (oldOtp.getTime()/1000 + 3*60 > current.getTime()/1000 ) {
             result = String.valueOf((oldOtp.getTime()/1000));
         } else {
-            String otp = otpUtil.generateOtp();
+            String otpStr = otpUtil.generateOtp();
             try{
-                emailUtil.sendOtpEmail(email,account.getFirstName(),otp);
+                emailUtil.sendOtpEmail(email,account.getFirstName(),otpStr);
             } catch (MessagingException e) {
                 throw new AppException(ErrorCode.OTP_ERROR);
             }
 
-            account.setOtp(otp);
-            account.setOtpGeneratedTime(LocalDateTime.now());
-            accountReponsitory.save(account);
-            Timestamp newOtp = Timestamp.valueOf(account.getOtpGeneratedTime());
+            otp.setOtp(otpStr);
+            otp.setOtpGeneratedTime(LocalDateTime.now());
+            otpRepository.save(otp);
+            Timestamp newOtp = Timestamp.valueOf(otp.getOtpGeneratedTime());
             result = String.valueOf(newOtp.getTime()/1000);
         }
 
@@ -239,8 +227,9 @@ public class AccountService {
     public boolean VerifyOtp(String email,String otp){
         Account account = accountReponsitory.findByEmail(email)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-        if(!(otp.equals(account.getOtp())
-                && Duration.between(account.getOtpGeneratedTime(), LocalDateTime.now()).toSeconds() < 60)){
+        Otp otpObj = otpRepository.findByAccountId(account.getId()).orElseThrow(null);
+        if(!(otp.equals(otpObj.getOtp())
+                && Duration.between(otpObj.getOtpGeneratedTime(), LocalDateTime.now()).toSeconds() < 60*3)){
             throw new AppException(ErrorCode.OTP_ERROR);
         }
 

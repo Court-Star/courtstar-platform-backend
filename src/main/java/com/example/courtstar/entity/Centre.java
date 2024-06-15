@@ -2,6 +2,7 @@ package com.example.courtstar.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Entity
 @Data
+@Table(name = "centre")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
@@ -18,20 +20,53 @@ import java.util.List;
 public class Centre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id", nullable = false)
     Integer id;
+
+    @Size(max = 50)
+    @Column(name = "name", length = 50)
     String name;
+
+    @Size(max = 100)
+    @Column(name = "address", length = 100)
     String address;
+
+    @Size(max = 30)
+    @Column(name = "district", length = 30)
+    String district;
+
+    @Column(name = "open_time")
     LocalTime openTime;
+
+    @Column(name = "close_time")
     LocalTime closeTime;
+
+    @Column(name = "price_per_hour")
     double pricePerHour;
-    @Builder.Default
-    int slotDuration = 1;
-    int numberOfCourt;
-    String paymentMethod;
 
     @Builder.Default
+    @Column(name = "slot_duration")
+    int slotDuration = 1;
+
+    @Column(name = "number_of_courts")
+    int numberOfCourts;
+
+    @Column(name = "description")
+    String description;
+
+    @Column(name = "status")
+    @Builder.Default
     boolean status = true;
+
+    @Column(name = "approve_date")
     LocalDate approveDate;
+
+    @Column(name = "revenue")
+    @Builder.Default
+    double revenue = 0;
+
+    @Column(name = "link")
+    String link;
 
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
@@ -61,7 +96,11 @@ public class Centre {
     CentreManager manager;
 
     @Builder.Default
+    @Column(name = "is_delete")
     boolean isDelete = false;
+
+    @OneToOne
+    PaymentMethod paymentMethod;
 
 }
 

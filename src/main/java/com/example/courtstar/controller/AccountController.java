@@ -144,18 +144,6 @@ public class AccountController {
     @PostMapping("/reset-password")
     public ApiResponse resetPassword(@RequestBody ResetPasswordRequest request){
         boolean isVerify = accountService.VerifyOtp(request.getEmail(),request.getOtp());
-//        return ApiResponse.builder()
-//                .code(1000)
-//                .message("success")
-//                .build();
-//        if(isVerify){
-//            model.addAttribute("email", email);
-//            return new ModelAndView("Update-Password");
-//        }
-//        else{
-//            return new ModelAndView("otp-error");
-//        }
-
         if (isVerify) {
             if(request.getNewPassword().equals(request.getConfirmPassword())){
                 accountService.UpdatePassword(request.getEmail(),request.getNewPassword());

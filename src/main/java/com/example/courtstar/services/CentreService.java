@@ -2,6 +2,7 @@ package com.example.courtstar.services;
 
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.request.CourtRequest;
+import com.example.courtstar.dto.response.CentreActiveResponse;
 import com.example.courtstar.dto.response.CentreNameResponse;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.dto.response.CourtResponse;
@@ -46,13 +47,13 @@ public class CentreService {
     @Autowired
     CourtRepository courtRepository;
     @Autowired
-    CourtMapper courtMapper;
-    @Autowired
     private CentreManagerRepository centreManagerRepository;
     @Autowired
     private SlotRepository slotRepository;
     @Autowired
     private ImgRepository imgRepository;
+    @Autowired
+    private PaymentMethodRepository paymentMethodRepository;
 
     public CentreResponse createCentre(CentreRequest request) {
         Centre centre = centreMapper.toCentre(request);
@@ -63,8 +64,9 @@ public class CentreService {
         return centreRepository.findAll().stream().map(centreMapper::toCentreResponse).toList();
     }
 
-    public List<CentreResponse> getAllCentresIsActive(boolean isActive) {
-        return centreRepository.findAllByIsDeleteAndStatus(false, isActive).stream().map(centreMapper::toCentreResponse).toList();
+    public List<CentreActiveResponse> getAllCentresIsActive(boolean isActive) {
+        return centreRepository.findAllByIsDeleteAndStatus(false, isActive).stream()
+                .map(centreMapper::toCentreActiveResponse).toList();
     }
 
     public CentreResponse getCentre(int id) {
@@ -105,179 +107,155 @@ public class CentreService {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
         Account account = accountReponsitory.findByEmail(name).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+
         CentreManager manager = centreManagerRepository.findByAccountId(account.getId())
                 .orElseThrow( () -> new AppException(ErrorCode.NOT_FOUND_USER));
-        Role role= manager.getAccount().getRoles().stream()
-                .filter( i -> i.getName().equals("MANAGER"))
-                .findFirst()
-                .orElse(null);
-        if(role==null){
+
+        if (!"MANAGER".equals(manager.getAccount().getRole().getName())) {
             throw new RuntimeException();
         }
+
         Centre centre = centreMapper.toCentre(request);
+        centre.setManager(manager);
+
+        // Giải phóng bộ nhớ cho các đối tượng tạm thời
+        account = null;
 
         List<Slot> slotList = generateSlots(centre);
         centre.setSlots(slotList);
 
         List<Image> imgList = generateImages(request, centre);
         centre.setImages(imgList);
-        centre.setManager(manager);
         centreRepository.save(centre);
 
-        List<Centre> centres = manager.getCentres();
-        if (centres == null) {
-            centres = new ArrayList<>();
-            manager.setCentres(centres);
-        }
-        centres.add(centre);
+        //Fake payment method
+        PaymentMethod paymentMethod = PaymentMethod.builder()
+                .build();
+        paymentMethodRepository.save(paymentMethod);
+        centre.setPaymentMethod(paymentMethod);
+        //end fake payment method
 
-        CourtRequest courtRequest = new CourtRequest();
-        centre.setCourts(addCourt(centre.getId(),courtRequest));
+        List<Court> courts = generateCourts(centre);
+        centre.setCourts(courts);
+
 
         slotRepository.saveAll(slotList);
         imgRepository.saveAll(imgList);
         centreRepository.save(centre);
-        centreManagerRepository.save(manager);
 
         CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
         centreResponse.setManagerId(manager.getId());
+
+        slotList.clear();
+        imgList.clear();
+        courts.clear();
+        centre = null;
+        manager = null;
         return centreResponse;
     }
 
-    private List<Court> addCourt(int idCentre, CourtRequest request){
-        Centre centre = centreRepository.findById(idCentre).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-
+    private List<Court> generateCourts(Centre centre) {
         List<Court> courts = new ArrayList<>();
+        int numberOfCourts = centre.getNumberOfCourts();
 
-        for(int i=0;i<centre.getNumberOfCourt();i++){
-            Court court = courtMapper.toCourt(request.builder()
-                    .courtNo(i+1)
+        for (int i = 1; i <= numberOfCourts; i++) {
+            Court court = Court.builder()
+                    .courtNo(i)
                     .status(true)
-                    .build());
-            court.setCentre(centre);
-            courts.add(courtRepository.save(court));
+                    .centre(centre)
+                    .build();
+            courts.add(court);
         }
-        centre.setCourts(courts);
-        return centreRepository.save(centre).getCourts();
+        return courtRepository.saveAll(courts);
     }
 
     private List<Image> generateImages(CentreRequest request, Centre centre) {
         AtomicInteger imageNo = new AtomicInteger(1);
-        List<Image> imgList = request.getImages().stream().map(url -> {
-            Image image = new Image();
-            image.setUrl(url);
-            image.setCentre(centre);
-            image.setImageNo(imageNo.getAndIncrement());
-            return image;
-        }).collect(Collectors.toCollection(() -> new ArrayList<>()));
-
-        return imgList;
+        return request.getImages().stream()
+                .map(url -> Image.builder()
+                        .url(url)
+                        .centre(centre)
+                        .imageNo(imageNo.getAndIncrement())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private List<Slot> generateSlots(Centre centre) {
         List<Slot> slots = new ArrayList<>();
-        int slotNo = 1;
         LocalTime currentTime = centre.getOpenTime();
         LocalTime closeTime = centre.getCloseTime();
         int slotDuration = centre.getSlotDuration();
+        int slotNo = 1;
 
-        while (currentTime.plusHours(slotDuration).isBefore(closeTime) || currentTime.plusHours(slotDuration).equals(closeTime)) {
-            Slot slot = Slot.builder()
-                    .slotNo(slotNo)
+        while (!currentTime.isAfter(closeTime.minusHours(slotDuration))) {
+            slots.add(Slot.builder()
+                    .slotNo(slotNo++)
                     .startTime(currentTime)
                     .endTime(currentTime.plusHours(slotDuration))
                     .centre(centre)
-                    .build();
-            slots.add(slot);
-
+                    .build());
             currentTime = currentTime.plusHours(slotDuration);
-            slotNo++;
         }
 
         return slots;
     }
 
-//    public CentreResponse updateCentre(int centreId, CentreRequest request) {
-//        // Lấy ngữ cảnh bảo mật và lấy tên của người dùng hiện đang xác thực
-//        var context = SecurityContextHolder.getContext();
-//        String name = context.getAuthentication().getName();
-//
-//        // Tìm tài khoản liên quan đến email của người dùng đã xác thực
-//        Account account = accountReponsitory.findByEmail(name)
-//                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER));
-//
-//        // Tìm quản lý liên quan đến tài khoản
-//        CentreManager manager = centreManagerRepository.findByAccountId(account.getId())
-//                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER));
-//
-//        // Kiểm tra xem tài khoản có vai trò "MANAGER" hay không
-//        Role role = manager.getAccount().getRoles().stream()
-//                .filter(i -> i.getName().equals("MANAGER"))
-//                .findFirst()
-//                .orElse(null);
-//
-//        if (role == null) {
-//            throw new RuntimeException();
-//        }
-//
-//        // Tìm trung tâm cần cập nhật
-//        Centre centre = centreRepository.findById(centreId)
-//                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_CENTRE));
-//
-//        // Cập nhật chi tiết trung tâm bằng dữ liệu từ yêu cầu
-//        centre.setName(request.getName());
-//        centre.setAddress(request.getAddress());
-//        centre.setOpenTime(request.getOpenTime());
-//        centre.setCloseTime(request.getCloseTime());
-//        centre.setPricePerHour(request.getPricePerHour());
-//        centre.setNumberOfCourt(request.getNumberOfCourt());
-//        centre.setPaymentMethod(request.getPaymentMethod());
-//        centre.setApproveDate(request.getApproveDate());
-//        centre.setManager(manager);
-//
-//        // Quản lý danh sách hình ảnh hiện có
-//        updateImages(centre, request.getImages());
-//
-//        // Tạo danh sách slot mới cho trung tâm
-//        List<Slot> slotList = generateSlots(centre);
-//        centre.getSlots().clear();
-//        centre.getSlots().addAll(slotList);
-//
-//        // Lưu chi tiết trung tâm đã cập nhật
-//        centreRepository.save(centre);
-//
-//        // Lưu các slot mới
-//        slotRepository.saveAll(slotList);
-//
-//        // Tạo và lưu các sân cho trung tâm đã cập nhật
-//        CourtRequest courtRequest = new CourtRequest();
-//        centre.setCourts(addCourt(centre.getId(), courtRequest));
-//
-//        // Lưu chi tiết trung tâm và quản lý đã cập nhật
-//        centreRepository.save(centre);
-//        centreManagerRepository.save(manager);
-//
-//        // Chuyển trung tâm đã cập nhật thành đối tượng phản hồi và trả về
-//        CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
-//        centreResponse.setManagerId(manager.getId());
-//        return centreResponse;
-//    }
-//
-//    private void updateImages(Centre centre, List<String> newImages) {
-//        List<Image> currentImages = centre.getImages();
-//        currentImages.clear();
-//
-//        AtomicInteger imageNo = new AtomicInteger(1);
-//        List<Image> imgList = newImages.stream().map(url -> {
-//            Image image = new Image();
-//            image.setUrl(url);
-//            image.setCentre(centre);
-//            image.setImageNo(imageNo.getAndIncrement());
-//            return image;
-//        }).collect(Collectors.toCollection(() -> new ArrayList<>()));
-//
-//        currentImages.addAll(imgList);
-//    }
+    public CentreResponse updateCentre(int centreId, CentreRequest request) {
+        // Lấy ngữ cảnh bảo mật và lấy tên của người dùng hiện đang xác thực
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
 
+        // Tìm tài khoản liên quan đến email của người dùng đã xác thực
+        Account account = accountReponsitory.findByEmail(name)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER));
+
+        // Tìm quản lý liên quan đến tài khoản
+        CentreManager manager = centreManagerRepository.findByAccountId(account.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER));
+
+        // Kiểm tra xem tài khoản có vai trò "MANAGER" hay không
+        if (!"MANAGER".equals(manager.getAccount().getRole().getName())) {
+            throw new RuntimeException();
+        }
+
+        // Tìm trung tâm cần cập nhật
+        Centre centre = centreRepository.findById(centreId)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_CENTRE));
+
+        account = null;
+        centreMapper.updateCentre(centre, request);
+
+        // Tạo danh sách slot mới cho trung tâm
+        List<Slot> slotList = generateSlots(centre);
+        centre.getSlots().clear();
+        centre.getSlots().addAll(slotList);
+
+        List<Image> imgList = generateImages(request, centre);
+        centre.getImages().clear();
+        centre.getImages().addAll(imgList);
+
+        List<Court> courts = generateCourts(centre);
+        centre.getCourts().clear();
+        centre.getCourts().addAll(courts);
+
+        // Lưu chi tiết trung tâm đã cập nhật
+        centreRepository.save(centre);
+
+        // Lưu các slot mới
+        slotRepository.saveAll(slotList);
+        imgRepository.saveAll(imgList);
+
+        // Giải phóng bộ nhớ các đối tượng tạm thời
+        slotList.clear();
+        imgList.clear();
+        courts.clear();
+
+        // Chuyển trung tâm đã cập nhật thành đối tượng phản hồi và trả về
+        CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
+        centreResponse.setManagerId(manager.getId());
+        manager = null;
+        centre = null;
+        return centreResponse;
+    }
 
 }

@@ -1,26 +1,39 @@
-create database courtstar
+create database courtstarv3
 
-use courtstar
+use courtstarv3
 
 create table guest
 (
   id int identity(1, 1) primary key,
-  email varchar(80),
-  fullName nvarchar(80),
+  email varchar(80) not null,
+  full_name nvarchar(80),
   phone char(10)
 )
+
+create table role
+(
+    name varchar(15) primary key,
+    description varchar(255)
+);
 
 create table account
 (
   id int identity(1, 1) primary key,
-  email varchar(80),
+  email varchar(80) not null,
   password text,
   first_name nvarchar(30),
   last_name nvarchar(50),
   phone char(10),
   is_delete bit not null,
+  role_name varchar(15) foreign key references role(name)
+);
+
+create table otp
+(
+  id int identity(1, 1) primary key,
   otp char(6),
   otp_generated_time datetime,
+  account_id int unique foreign key references account(id)
 );
 
 create table invalidated_token
@@ -35,22 +48,9 @@ create table permission
     description varchar(255)
 );
 
-create table role
-(
-    name varchar(255) primary key,
-    description varchar(255)
-);
-
-create table account_roles
-(
-    account_id int not null foreign key references account(id),
-    roles_name varchar(255) not null foreign key references role(name),
-    primary key (account_id, roles_name),
-);
-
 create table role_permissions
 (
-    role_name varchar(255) not null foreign key references role(name),
+    role_name varchar(15) not null foreign key references role(name),
     permissions_name varchar(255) not null foreign key references permission(name),
     primary key (role_name, permissions_name),
 );
@@ -58,9 +58,16 @@ create table role_permissions
 create table centre_manager
 (
   id int identity(1,1) primary key,
-  address nvarchar(100),
+  address nvarchar(255),
   current_balance money,
   account_id int unique foreign key references account(id)
+);
+
+create table payment_method
+(
+	id int identity(1, 1) primary key,
+	name varchar(30),
+	number varchar(30),
 );
 
 create table centre
@@ -68,16 +75,20 @@ create table centre
   id int identity(1, 1) primary key,
   name nvarchar(50),
   address nvarchar(100),
+  district varchar(30),
   open_time time,
   close_time time,
   price_per_hour money,
   slot_duration int,
-  number_of_court int,
-  payment_method text,
+  number_of_courts int,
+  description nvarchar(255),
   status bit,
   approve_date date,
   manager_id int foreign key references centre_manager(id),
+  revenue money,
+  payment_method_id int unique foreign key references payment_method(id),
   is_delete bit not null,
+  link text
 );
 
 create table centre_staff
@@ -127,7 +138,7 @@ create table booking_schedule
 create table feedback
 (
   id int identity(1,1) primary key,
-  content text,
+  content nvarchar(255),
   create_date date,
   account_id int foreign key references account(id),
   centre_id int foreign key references centre(id)
@@ -146,8 +157,17 @@ create table payment
   id int identity(1,1) primary key,
   date date,
   status bit,
-  payment_method text,
   booking_schedule_id int unique foreign key references booking_schedule(id)
+);
+
+create table notification
+(
+  id int identity(1,1) primary key,
+  date date,
+  type varchar(20),
+  content varchar(255),
+  status bit,
+  account_id int foreign key references account(id)
 );
 
 
@@ -173,16 +193,6 @@ INSERT INTO role (name, description) VALUES ('CUSTOMER', 'Customer role');
 -- INSERT INTO role_permissions (role_id, permission_id) VALUES ('CUSTOMER', 'READ_PRIVILEGE');
 
 -- Create accounts and associate roles, pass 123
-INSERT INTO account (email, password, phone, first_name, last_name, is_delete, otp, otp_generated_time) VALUES ('thanh@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567890', 'Thanh', 'Nguyen', 0, NULL, NULL);
-INSERT INTO account (email, password, phone, first_name, last_name, is_delete, otp, otp_generated_time) VALUES ('manager@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567891', 'Manager', 'User', 0, NULL, NULL);
-INSERT INTO account (email, password, phone, first_name, last_name, is_delete, otp, otp_generated_time) VALUES ('customer@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567892', 'Customer', 'User', 0, NULL, NULL);
-
--- Assuming you have a join table for account and role
-INSERT INTO account_roles (account_id, roles_name) VALUES ((SELECT id FROM account WHERE email = 'thanh@gmail.com'), 'ADMIN');
-INSERT INTO account_roles (account_id, roles_name) VALUES ((SELECT id FROM account WHERE email = 'thanh@gmail.com'), 'MANAGER');
-INSERT INTO account_roles (account_id, roles_name) VALUES ((SELECT id FROM account WHERE email = 'thanh@gmail.com'), 'STAFF');
-INSERT INTO account_roles (account_id, roles_name) VALUES ((SELECT id FROM account WHERE email = 'thanh@gmail.com'), 'CUSTOMER');
-INSERT INTO account_roles (account_id, roles_name) VALUES ((SELECT id FROM account WHERE email = 'manager@gmail.com'), 'MANAGER');
-INSERT INTO account_roles (account_id, roles_name) VALUES ((SELECT id FROM account WHERE email = 'manager@gmail.com'), 'STAFF');
-INSERT INTO account_roles (account_id, roles_name) VALUES ((SELECT id FROM account WHERE email = 'manager@gmail.com'), 'CUSTOMER');
-INSERT INTO account_roles (account_id, roles_name) VALUES ((SELECT id FROM account WHERE email = 'customer@gmail.com'), 'CUSTOMER');
+INSERT INTO account (email, password, phone, first_name, last_name, is_delete, role_name) VALUES ('thanh@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567890', 'Thanh', 'Nguyen', 0, 'ADMIN');
+INSERT INTO account (email, password, phone, first_name, last_name, is_delete, role_name) VALUES ('manager@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567891', 'Manager', 'User', 0, 'MANAGER');
+INSERT INTO account (email, password, phone, first_name, last_name, is_delete, role_name) VALUES ('customer@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567892', 'Customer', 'User', 0, 'CUSTOMER');

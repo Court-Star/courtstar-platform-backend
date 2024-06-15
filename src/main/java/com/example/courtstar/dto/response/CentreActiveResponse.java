@@ -17,27 +17,19 @@ import java.util.concurrent.ThreadLocalRandom;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
-public class CentreResponse {
+public class CentreActiveResponse {
     int id;
-    int managerId;
     String name;
     String address;
     String district;
-    String link;
     LocalTime openTime;
     LocalTime closeTime;
     double pricePerHour;
-    int slotDuration;
     int numberOfCourts;
-    String description;
     boolean status;
     boolean isDelete;
     LocalDate approveDate;
-    double revenue;
-    List<Court> courts;
     List<Image> images;
-    List<Slot> slots;
-//    List<CentreStaff> centreStaffs;
 
     @Builder.Default
     int rating = ThreadLocalRandom.current().nextInt(1, 6);
