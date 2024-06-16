@@ -71,22 +71,32 @@ public class Centre {
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     List<Court> courts;
 
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     List<Slot> slots;
 
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     List<Image> images;
 
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     List<CentreStaff> centreStaffs;
+
+    @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    List<Feedback> feedbacks;
 
     @ManyToOne
     @JsonIgnore
