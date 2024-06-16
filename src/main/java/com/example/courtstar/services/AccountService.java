@@ -1,5 +1,6 @@
 package com.example.courtstar.services;
 
+import com.example.courtstar.constant.PredefinedNotificationType;
 import com.example.courtstar.dto.request.AccountCreationRequest;
 import com.example.courtstar.dto.request.AccountUpdateRequest;
 import com.example.courtstar.dto.request.CentreManagerRequest;
@@ -51,6 +52,7 @@ public class AccountService {
     private final CentreStaffRepository centreStaffRepository;
     private final CentreRepository centreRepository;
     private final OtpRepository otpRepository;
+    private final NotificationRepository notificationRepository;
 
     public Account CreateAccount(AccountCreationRequest request) {
         if(accountReponsitory.existsByEmail(request.getEmail())){
@@ -61,7 +63,16 @@ public class AccountService {
         account.setPassword(passwordEncoder.encode(request.getPassword()));
         var role = roleReponsitory.findById("CUSTOMER").orElse(null);
         account.setRole(role);
-        return accountReponsitory.save(account);
+        Account accountSave = accountReponsitory.save(account);
+
+        notificationRepository.save(Notification.builder()
+                .type(PredefinedNotificationType.REGISTERED)
+                .date(LocalDateTime.now())
+                .content(PredefinedNotificationType.REGISTERED_CONTENT)
+                .account(accountSave)
+                .build());
+
+        return accountSave;
     }
 
     public CentreManager CreateManagerAccount(CentreManagerRequest request) {
@@ -82,6 +93,13 @@ public class AccountService {
         account.setRole(role);
 
         accountReponsitory.save(account);
+
+        notificationRepository.save(Notification.builder()
+                .type(PredefinedNotificationType.REGISTERED)
+                .date(LocalDateTime.now())
+                .content(PredefinedNotificationType.REGISTERED_CONTENT)
+                .account(account)
+                .build());
 
         return centreManagerRepository.save(
                 CentreManager.builder()
@@ -111,6 +129,14 @@ public class AccountService {
         Centre centre = centreRepository.findById(request.getCentreId()).orElse(null);
 
         accountReponsitory.save(account);
+
+        notificationRepository.save(Notification.builder()
+                .type(PredefinedNotificationType.REGISTERED)
+                .date(LocalDateTime.now())
+                .content(PredefinedNotificationType.REGISTERED_CONTENT)
+                .account(account)
+                .build());
+
         return centreStaffRepository.save(
                 CentreStaff.builder()
                         .account(account)
