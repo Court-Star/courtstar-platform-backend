@@ -106,6 +106,7 @@ public class CentreService {
     public CentreResponse addCentre(CentreRequest request){
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
+        System.out.println(request.getNumberOfCourts());
         Account account = accountReponsitory.findByEmail(name).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
 
         CentreManager manager = centreManagerRepository.findByAccountId(account.getId())

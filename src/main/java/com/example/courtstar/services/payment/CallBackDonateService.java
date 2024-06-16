@@ -1,6 +1,7 @@
 package com.example.courtstar.services.payment;
 
 import com.example.courtstar.entity.Centre;
+import com.example.courtstar.entity.CentreManager;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.repositories.CentreManagerRepository;
@@ -12,7 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -22,16 +22,12 @@ import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
 
 
-
 @Service
-public class CallBackPaymentService {
+public class CallBackDonateService {
     @Value("${payment.zalopay.KEY2}")
     private String KEY2;
     private Mac HmacSHA256;
-    @Autowired
-    private QrCodeService qrCodeService;
-    @Autowired
-    private CentreRepository centreRepository;
+
     @Autowired
     private CentreManagerRepository centreManagerRepository;
 
@@ -64,21 +60,13 @@ public class CallBackPaymentService {
                 //
                 JSONArray jsonArray = new JSONArray(data.getString("item"));
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
-                int bookingId = jsonObject.getInt("Booking_id");
-                int centreId = jsonObject.getInt("Centre_id");
-                qrCodeService.generateQrCode(bookingId);
+                int id_manager_centre = jsonObject.getInt("id_manager_centre");
 
-
-                Centre centre =centreRepository.findById(centreId).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-                Double payMoney = centre.getRevenue()+data.getLong("amount");
-                centre.setRevenue(payMoney);
-                centreRepository.save(centre);
-
-                Double totalPayMoney = centre.getManager().getCurrentBalance()+data.getLong("amount")*0.95;
-                centre.getManager().setCurrentBalance(totalPayMoney);
-                centreManagerRepository.save(centre.getManager());
-
-
+                CentreManager centreManager = centreManagerRepository.findById(id_manager_centre).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+                System.out.println(centreManager);
+                Long amount = (long) (centreManager.getCurrentBalance()+data.getLong("amount"));
+                centreManager.setCurrentBalance(amount);
+                centreManagerRepository.save(centreManager);
                 //
                 result.put("return_code", 1);
                 result.put("return_message", "success");

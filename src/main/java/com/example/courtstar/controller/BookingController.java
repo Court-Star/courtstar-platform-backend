@@ -6,6 +6,7 @@ import com.example.courtstar.entity.BookingSchedule;
 import com.example.courtstar.services.BookingService;
 import com.google.zxing.WriterException;
 import jakarta.mail.MessagingException;
+import org.json.JSONException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class BookingController {
     BookingService bookingService;
 
     @PostMapping
-    public ApiResponse<BookingSchedule> booking(@RequestBody BookingRequest request) throws MessagingException, IOException, WriterException {
+    public ApiResponse<BookingSchedule> booking(@RequestBody BookingRequest request) throws MessagingException, IOException, WriterException, JSONException {
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(bookingService.booking(request))
                 .build();

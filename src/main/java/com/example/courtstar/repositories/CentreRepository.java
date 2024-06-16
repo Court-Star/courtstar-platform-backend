@@ -10,4 +10,5 @@ import java.util.List;
 @Repository
 public interface CentreRepository extends JpaRepository<Centre, Integer> {
     List<Centre> findAllByIsDeleteAndStatus(boolean isDelete, boolean status);
+
 }

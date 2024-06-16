@@ -4,10 +4,9 @@ server:
     context-path: /courtstar
 spring:
   datasource:
-    url: jdbc:sqlserver://courtstarv3.database.windows.net:1433;database=courtstarv3;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
-    username: adminv3
-    password: Aa@123456
-    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:mysql://localhost:3306/courtstarv5
+    username: root
+    password: 12345
   mail:
     host: smtp.gmail.com
     port: 587
@@ -53,10 +52,10 @@ jwt:
 
 payment:
   zalopay:
-    APP_ID: "2554"
-    KEY1: "sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn"
-    KEY2: "trMrHtvjo6myautxDUiAcYsVtaeQ8nhf"
-    ORDER_CREATE_ENDPOINT: "https://sandbox.zalopay.com.vn/v001/tpe/createorder"
+    APP_ID: "2553"
+    KEY1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL"
+    KEY2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz"
+    ORDER_CREATE_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/create"
     ORDER_STATUS_ENDPOINT: "https://sandbox.zalopay.com.vn/v001/tpe/getstatusbyapptransid"
     REFUND_PAYMENT_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/refund"
     REFUND_STATUS_PAYMENT_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/query_refund"

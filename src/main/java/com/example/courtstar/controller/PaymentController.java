@@ -1,13 +1,11 @@
 package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.*;
-import com.example.courtstar.services.QrCodeService;
 import com.example.courtstar.services.payment.*;
-import com.google.zxing.WriterException;
-import jakarta.mail.MessagingException;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,26 +20,42 @@ import java.util.Map;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/payment")
-public class Payment {
+public class PaymentController {
     @Autowired
     private CallBackPaymentService callBackPaymentService;
     @Autowired
     private CreateOrderService service;
+    @Autowired
+    private CreateDonateService donateService;
     @Autowired
     private RefundPaymentService refundPaymentService;
     @Autowired
     private RefundStatusPaymentService refundStatusService;
     @Autowired
     private GetStatusOrderPaymentService orderPaymentService;
+    @Autowired
+    private CallBackDonateService callBackDonateService;
 
-    @PostMapping("/callback")
-    public ResponseEntity<String> callback(@RequestBody CallBackPayment paymentDTO)
+    @PostMapping("/callbackBooking")
+    public ResponseEntity<ApiResponse> callback(@RequestBody String jsonSt)
             throws JSONException, NoSuchAlgorithmException, InvalidKeyException, org.json.JSONException {
         JSONObject result = new JSONObject();
-        return new ResponseEntity<>(this.callBackPaymentService
-                .doCallBack(result, paymentDTO.getJsonString()).toString(), HttpStatus.OK);
-
+        Object callBack =this.callBackPaymentService.doCallBack(result,jsonSt);
+        return new ResponseEntity<>(ApiResponse.builder()
+                .data(callBack)
+                .build(), HttpStatus.OK);
     }
+
+    @PostMapping("/callbackDonate")
+    public ResponseEntity<ApiResponse> callbackDonate(@RequestBody String jsonSt)
+            throws JSONException, NoSuchAlgorithmException, InvalidKeyException, org.json.JSONException {
+        JSONObject result = new JSONObject();
+        Object callBack =this.callBackDonateService.doCallBack(result,jsonSt);
+        return new ResponseEntity<>(ApiResponse.builder()
+                .data(callBack)
+                .build(), HttpStatus.OK);
+    }
+
 
 
 
@@ -50,6 +64,14 @@ public class Payment {
         Map<String, Object> resultOrder = this.service.createOrder(request);
         return new ResponseEntity<>(resultOrder, HttpStatus.OK);
     }
+
+    @PostMapping("/Donate-admin")
+    public ResponseEntity<Map<String, Object>> donateAdmin(@RequestBody DonateForAdmin request) throws org.json.JSONException, IOException {
+        Map<String, Object> resultOrder = this.donateService.createOrder(request);
+        return new ResponseEntity<>(resultOrder, HttpStatus.OK);
+    }
+
+
 
 
 
