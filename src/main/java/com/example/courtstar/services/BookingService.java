@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -43,9 +44,6 @@ public class BookingService {
     private SlotRepository slotRepository;
 
     @Autowired
-    private SlotUnavailableRepository slotUnavailableRepository;
-
-    @Autowired
     private BookingScheduleRepository bookingScheduleRepository;
 
     @Autowired
@@ -61,14 +59,14 @@ public class BookingService {
     private CreateOrderService createOrderService;
 
 
-    public Map<String, Object> booking(BookingRequest request) throws MessagingException, IOException, WriterException, JSONException {
+    public Map<String, Object> booking(BookingRequest request) throws IOException, JSONException {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
         Account account = null;
         Guest guest = null;
         if (name.equals("anonymousUser")) {
-            guest = guestRepository.findByEmail(name);
+            guest = guestRepository.findByEmail(request.getEmail());
             if (guest == null) {
                 guest = Guest.builder()
                         .email(request.getEmail())
@@ -92,17 +90,11 @@ public class BookingService {
                 .findFirst()
                 .orElseThrow(null);
 
-
-        slotUnavailableRepository.save(SlotUnavailable.builder()
-                .date(request.getDate())
-                .court(court)
-                .slot(slot)
-                .build());
-
         BookingSchedule bookingSchedule = bookingScheduleRepository.save(BookingSchedule.builder()
                 .date(request.getDate())
                 .totalPrice(centre.getPricePerHour())
                 .status(false)
+                .isSuccess(false)
                 .account(account)
                 .guest(guest)
                 .slot(slot)
@@ -111,17 +103,11 @@ public class BookingService {
 
         Payment payment = Payment.builder()
                 .date(LocalDate.now())
-                .status(true)
+                .status(false)
                 .bookingSchedule(bookingSchedule)
                 .build();
 
         paymentRepository.save(payment);
-
-        System.out.println("================");
-        System.out.println(centre.getManager().getId());
-        System.out.println("================");
-
-
 
         OrderRequest orderRequest = OrderRequest.builder()
                 .bookingSchedule(bookingSchedule)
@@ -129,14 +115,15 @@ public class BookingService {
                 .payment(payment)
                 .build();
 
-        //payment
-
 
         return createOrderService.createOrder(orderRequest);
     }
 
     public List<BookingSchedule> getBookingSchedules(int centreId) {
-        return bookingScheduleRepository.findAllByCentreId(centreId);
+        List<BookingSchedule> allSchedules = bookingScheduleRepository.findAllByCentreId(centreId);
+        return allSchedules.stream()
+                .filter(BookingSchedule::isSuccess) // Assuming isSuccess is a boolean getter method
+                .collect(Collectors.toList());
     }
 
 }

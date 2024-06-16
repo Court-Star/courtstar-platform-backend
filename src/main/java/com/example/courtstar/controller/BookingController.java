@@ -22,7 +22,7 @@ public class BookingController {
     BookingService bookingService;
 
     @PostMapping
-    public ApiResponse<BookingSchedule> booking(@RequestBody BookingRequest request) throws MessagingException, IOException, WriterException, JSONException {
+    public ApiResponse<BookingSchedule> booking(@RequestBody BookingRequest request) throws IOException, JSONException {
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(bookingService.booking(request))
                 .build();

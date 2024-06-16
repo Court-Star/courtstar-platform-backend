@@ -36,7 +36,7 @@ public class PaymentController {
     @Autowired
     private CallBackDonateService callBackDonateService;
 
-    @PostMapping("/callbackBooking")
+    @PostMapping("/booking-callback")
     public ResponseEntity<ApiResponse> callback(@RequestBody String jsonSt)
             throws JSONException, NoSuchAlgorithmException, InvalidKeyException, org.json.JSONException {
         JSONObject result = new JSONObject();
@@ -46,7 +46,7 @@ public class PaymentController {
                 .build(), HttpStatus.OK);
     }
 
-    @PostMapping("/callbackDonate")
+    @PostMapping("/donate-callback")
     public ResponseEntity<ApiResponse> callbackDonate(@RequestBody String jsonSt)
             throws JSONException, NoSuchAlgorithmException, InvalidKeyException, org.json.JSONException {
         JSONObject result = new JSONObject();
@@ -65,7 +65,7 @@ public class PaymentController {
         return new ResponseEntity<>(resultOrder, HttpStatus.OK);
     }
 
-    @PostMapping("/Donate-admin")
+    @PostMapping("/donate-admin")
     public ResponseEntity<Map<String, Object>> donateAdmin(@RequestBody DonateForAdmin request) throws org.json.JSONException, IOException {
         Map<String, Object> resultOrder = this.donateService.createOrder(request);
         return new ResponseEntity<>(resultOrder, HttpStatus.OK);

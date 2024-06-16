@@ -60,8 +60,9 @@ public class CreateOrderService {
 
        List<Map<String, Object>> item = new ArrayList<>();
        item.add(new HashMap<String, Object>() {{
-            put("Booking_id", orderRequest.getBookingSchedule().getId());
-            put("Centre_id", orderRequest.getCentre().getId());
+            put("bookingId", orderRequest.getBookingSchedule().getId());
+            put("paymentId", orderRequest.getPayment().getId());
+            put("centreId", orderRequest.getCentre().getId());
         }});
 
         JSONArray itemArray = new JSONArray();
@@ -79,12 +80,12 @@ public class CreateOrderService {
             put("bank_code","");
             put("item",itemArray.toString());
             put("embed_data", new JSONObject(embeddata).toString());
-            put("callback_url",orderRequest.getCallback_url()+""); // URL callback
+            put("callback_url",orderRequest.getCallbackUrl()+""); // URL callback
         }};
 
         order.put("description", "CourtStar - Booking Court " + order.get("app_trans_id"));
         String transaction_id =  order.get("app_trans_id") + "";
-        orderRequest.getPayment().setId_transaction(transaction_id);
+        orderRequest.getPayment().setTransactionCode(transaction_id);
         paymentRepository.save(orderRequest.getPayment());
         String data = order.get("app_id") + "|" + order.get("app_trans_id") + "|" + order.get("app_user") + "|" + order.get("amount")
                 + "|" + order.get("app_time") + "|" + order.get("embed_data") + "|" + order.get("item");
