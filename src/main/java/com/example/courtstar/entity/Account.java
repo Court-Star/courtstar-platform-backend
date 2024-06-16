@@ -65,4 +65,10 @@ public class Account {
     @ToString.Exclude
     @JsonIgnore
     List<Notification> notifications;
+
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    List<Feedback> feedbacks;
 }

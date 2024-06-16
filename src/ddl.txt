@@ -141,6 +141,7 @@ create table feedback
   id int identity(1,1) primary key,
   content nvarchar(255),
   create_date date,
+  rate int,
   account_id int foreign key references account(id),
   centre_id int foreign key references centre(id)
 );
