@@ -133,6 +133,7 @@ create table booking_schedule
   guest_id int foreign key references guest(id),
   slot_id int foreign key references slot(id),
   court_id int foreign key references court(id),
+  is_success bit
 );
 
 create table feedback
@@ -155,6 +156,7 @@ create table image
 create table payment
 (
   id int identity(1,1) primary key,
+  transaction_code varchar(255),
   date date,
   status bit,
   booking_schedule_id int unique foreign key references booking_schedule(id)

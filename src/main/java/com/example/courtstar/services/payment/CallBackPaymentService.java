@@ -1,10 +1,9 @@
 package com.example.courtstar.services.payment;
 
-import com.example.courtstar.entity.Centre;
+import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
-import com.example.courtstar.repositories.CentreManagerRepository;
-import com.example.courtstar.repositories.CentreRepository;
+import com.example.courtstar.repositories.*;
 import com.example.courtstar.services.QrCodeService;
 import jakarta.xml.bind.DatatypeConverter;
 import org.json.JSONArray;
@@ -37,6 +36,12 @@ public class CallBackPaymentService {
 
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private BookingScheduleRepository bookingScheduleRepository;
+    @Autowired
+    private SlotUnavailableRepository slotUnavailableRepository;
 
     public Object doCallBack(JSONObject result, String jsonStr) throws JSONException, NoSuchAlgorithmException, InvalidKeyException {
         HmacSHA256  = Mac.getInstance("HmacSHA256");
@@ -64,8 +69,24 @@ public class CallBackPaymentService {
                 //
                 JSONArray jsonArray = new JSONArray(data.getString("item"));
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
-                int bookingId = jsonObject.getInt("Booking_id");
-                int centreId = jsonObject.getInt("Centre_id");
+                int bookingId = jsonObject.getInt("bookingId");
+                int paymentId = jsonObject.getInt("paymentId");
+                int centreId = jsonObject.getInt("centreId");
+
+                Payment payment = paymentRepository.findById(paymentId).orElseThrow(null);
+                payment.setStatus(true);
+                paymentRepository.save(payment);
+
+                BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingId).orElseThrow(null);
+                bookingSchedule.setSuccess(true);
+                bookingScheduleRepository.save(bookingSchedule);
+
+                slotUnavailableRepository.save(SlotUnavailable.builder()
+                        .date(bookingSchedule.getDate())
+                        .court(bookingSchedule.getCourt())
+                        .slot(bookingSchedule.getSlot())
+                        .build());
+
                 qrCodeService.generateQrCode(bookingId);
 
 

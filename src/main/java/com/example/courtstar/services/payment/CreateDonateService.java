@@ -52,7 +52,7 @@ public class CreateDonateService {
 
     public Map<String, Object> createOrder(DonateForAdmin orderRequest) throws IOException, JSONException {
         final Map embeddata = new HashMap(){{
-            put("redirecturl", "http://localhost:3000/payment/result");//truyen url trang web muon tra ve klhi thanh toan xong
+            put("redirecturl", "http://localhost:3000/myCentre/balance");//truyen url trang web muon tra ve klhi thanh toan xong
         }};
 
        List<Map<String, Object>> item = new ArrayList<>();
@@ -75,7 +75,7 @@ public class CreateDonateService {
             put("bank_code","");
             put("item",itemArray.toString());
             put("embed_data", new JSONObject(embeddata).toString());
-            put("callback_url",orderRequest.getCallback_url()+""); // URL callback
+            put("callback_url",orderRequest.getCallbackUrl()+""); // URL callback
         }};
 
         order.put("description", "CourtStar - Booking Court " + order.get("app_trans_id"));
