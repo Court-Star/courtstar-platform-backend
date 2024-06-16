@@ -22,6 +22,7 @@ public enum ErrorCode {
     NOT_FOUND_CENTRE(1012,"not found centre",HttpStatus.NOT_FOUND),
     CENTRE_DISABLE(1013,"centre disabled",HttpStatus.BAD_REQUEST),
     NOT_FOUND_COURT(1014,"not found court",HttpStatus.NOT_FOUND),
+    NOT_FOUND_NOTIFICATION(1015,"not found any notification",HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode httpStatusCode) {

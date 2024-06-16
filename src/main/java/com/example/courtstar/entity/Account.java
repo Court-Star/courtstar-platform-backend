@@ -60,4 +60,9 @@ public class Account {
     @JsonIgnore
     List<BookingSchedule> bookingSchedules;
 
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, orphanRemoval = true)
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    @JsonIgnore
+    List<Notification> notifications;
 }
