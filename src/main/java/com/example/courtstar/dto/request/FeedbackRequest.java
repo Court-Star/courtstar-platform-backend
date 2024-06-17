@@ -16,4 +16,5 @@ public class FeedbackRequest {
     LocalDateTime createDate = LocalDateTime.now();
     int rate;
     int centreId;
+    int bookingId;
 }

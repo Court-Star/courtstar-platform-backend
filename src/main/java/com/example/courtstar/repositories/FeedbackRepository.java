@@ -10,4 +10,5 @@ import java.util.Optional;
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
     Optional<List<Feedback>> findAllByCentreId(int centreId);
+    Optional<Feedback> findByBookingScheduleId(int bookingScheduleId);
 }

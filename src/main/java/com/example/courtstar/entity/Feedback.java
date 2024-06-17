@@ -42,4 +42,8 @@ public class Feedback {
     @ToString.Exclude
     @JsonIgnore
     Centre centre;
+
+    @OneToOne
+    @JsonIgnore
+    BookingSchedule bookingSchedule;
 }
