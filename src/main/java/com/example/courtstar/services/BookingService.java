@@ -2,9 +2,11 @@ package com.example.courtstar.services;
 
 import com.example.courtstar.dto.request.BookingRequest;
 import com.example.courtstar.dto.request.OrderRequest;
+import com.example.courtstar.dto.response.BookingScheduleResponse;
 import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
+import com.example.courtstar.mapper.BookingScheduleMapper;
 import com.example.courtstar.repositories.*;
 import com.example.courtstar.services.payment.CreateOrderService;
 import com.google.zxing.WriterException;
@@ -57,6 +59,10 @@ public class BookingService {
 
     @Autowired
     private CreateOrderService createOrderService;
+    @Autowired
+    private FeedbackRepository feedbackRepository;
+    @Autowired
+    private BookingScheduleMapper bookingScheduleMapper;
 
 
     public Map<String, Object> booking(BookingRequest request) throws IOException, JSONException {
@@ -123,6 +129,28 @@ public class BookingService {
         List<BookingSchedule> allSchedules = bookingScheduleRepository.findAllByCentreId(centreId);
         return allSchedules.stream()
                 .filter(BookingSchedule::isSuccess) // Assuming isSuccess is a boolean getter method
+                .collect(Collectors.toList());
+    }
+
+    public List<BookingScheduleResponse> getBookingSchedulesOfAccount() {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        Account account = accountReponsitory.findByEmail(name).orElseThrow(
+                () -> new AppException(ErrorCode.NOT_FOUND_USER)
+        );
+        List<BookingSchedule> allSchedules = bookingScheduleRepository.findAllByAccountId(account.getId());
+        return allSchedules.stream()
+                .filter(BookingSchedule::isSuccess) // Assuming isSuccess is a boolean getter method
+                .map(bookingSchedule -> {
+                    Centre centre = bookingSchedule.getSlot().getCentre();
+                    Feedback feedback = feedbackRepository.findByBookingScheduleId(bookingSchedule.getId()).orElse(null);
+                    int rate = feedback!=null ? feedback.getRate() :  0;
+                    BookingScheduleResponse bookingScheduleResponse = bookingScheduleMapper.toBookingScheduleResponse(bookingSchedule);
+                    bookingScheduleResponse.setCentreName(centre.getName());
+                    bookingScheduleResponse.setCentreAddress(centre.getAddress());
+                    bookingScheduleResponse.setRate(rate);
+                    return bookingScheduleResponse;
+                })
                 .collect(Collectors.toList());
     }
 

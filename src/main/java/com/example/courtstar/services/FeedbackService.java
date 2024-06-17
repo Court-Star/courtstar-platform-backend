@@ -8,6 +8,7 @@ import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.FeedbackMapper;
 import com.example.courtstar.repositories.AccountReponsitory;
+import com.example.courtstar.repositories.BookingScheduleRepository;
 import com.example.courtstar.repositories.CentreRepository;
 import com.example.courtstar.repositories.FeedbackRepository;
 import lombok.AccessLevel;
@@ -34,6 +35,7 @@ public class FeedbackService {
     private final FeedbackMapper feedbackMapper;
     private final AccountReponsitory accountReponsitory;
     private final CentreRepository centreRepository;
+    private final BookingScheduleRepository bookingScheduleRepository;
 
     public Feedback createFeedback(FeedbackRequest request) {
         var context = SecurityContextHolder.getContext();
@@ -45,6 +47,8 @@ public class FeedbackService {
         Feedback feedback = feedbackMapper.toFeedback(request);
         feedback.setAccount(account);
         feedback.setCentre(centreRepository.findById(request.getCentreId())
+                .orElseThrow(null));
+        feedback.setBookingSchedule(bookingScheduleRepository.findById(request.getBookingId())
                 .orElseThrow(null));
 
         return feedbackRepository.save(feedback);
