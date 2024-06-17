@@ -117,6 +117,7 @@ public class CentreService {
         }
 
         Centre centre = centreMapper.toCentre(request);
+        centre.setPricePerHour(Double.parseDouble(request.getPricePerHour().replace(".", "")));
         centre.setManager(manager);
 
         // Giải phóng bộ nhớ cho các đối tượng tạm thời

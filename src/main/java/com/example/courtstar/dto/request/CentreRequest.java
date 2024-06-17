@@ -19,7 +19,7 @@ public class CentreRequest {
     String link;
     LocalTime openTime;
     LocalTime closeTime;
-    double pricePerHour;
+    String pricePerHour;
     int numberOfCourts;
     String description;
     LocalDate approveDate;
