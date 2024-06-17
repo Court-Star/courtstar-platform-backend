@@ -12,7 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 public class FeedbackRequest {
     String content;
-    LocalDateTime createDate;
+    @Builder.Default
+    LocalDateTime createDate = LocalDateTime.now();
     int rate;
     int centreId;
 }
