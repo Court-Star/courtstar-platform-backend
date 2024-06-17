@@ -146,6 +146,7 @@ public class BookingService {
                     Feedback feedback = feedbackRepository.findByBookingScheduleId(bookingSchedule.getId()).orElse(null);
                     int rate = feedback!=null ? feedback.getRate() :  0;
                     BookingScheduleResponse bookingScheduleResponse = bookingScheduleMapper.toBookingScheduleResponse(bookingSchedule);
+                    bookingScheduleResponse.setCentreId(centre.getId());
                     bookingScheduleResponse.setCentreName(centre.getName());
                     bookingScheduleResponse.setCentreAddress(centre.getAddress());
                     bookingScheduleResponse.setRate(rate);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -23,26 +24,23 @@ public class BookingController {
     BookingService bookingService;
 
     @PostMapping
-    public ApiResponse<BookingSchedule> booking(@RequestBody BookingRequest request) throws IOException, JSONException {
-        ApiResponse apiResponse = ApiResponse.builder()
+    public ApiResponse<Map<String, Object>> booking(@RequestBody BookingRequest request) throws IOException, JSONException {
+        return ApiResponse.<Map<String, Object>>builder()
                 .data(bookingService.booking(request))
                 .build();
-        return apiResponse;
     }
 
     @GetMapping("/{centreId}")
     public ApiResponse<List<BookingSchedule>> getBookingSchedules(@PathVariable int centreId){
-        ApiResponse apiResponse = ApiResponse.builder()
+        return ApiResponse.<List<BookingSchedule>>builder()
                 .data(bookingService.getBookingSchedules(centreId))
                 .build();
-        return apiResponse;
     }
 
     @GetMapping()
     public ApiResponse<List<BookingScheduleResponse>> getBookingSchedulesOfAccount(){
-        ApiResponse apiResponse = ApiResponse.builder()
+        return ApiResponse.<List<BookingScheduleResponse>>builder()
                 .data(bookingService.getBookingSchedulesOfAccount())
                 .build();
-        return apiResponse;
     }
 }
