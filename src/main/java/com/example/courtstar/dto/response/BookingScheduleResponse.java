@@ -15,6 +15,7 @@ import java.time.LocalDate;
 public class BookingScheduleResponse {
 
     Integer id;
+    Integer centreId;
     LocalDate date;
     double totalPrice;
     Slot slot;
