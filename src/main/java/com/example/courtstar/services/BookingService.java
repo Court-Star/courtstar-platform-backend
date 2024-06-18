@@ -150,6 +150,7 @@ public class BookingService {
                     bookingScheduleResponse.setCentreName(centre.getName());
                     bookingScheduleResponse.setCentreAddress(centre.getAddress());
                     bookingScheduleResponse.setRate(rate);
+                    bookingScheduleResponse.setCentreImg(centre.getImages().get(0).getUrl());
                     return bookingScheduleResponse;
                 })
                 .collect(Collectors.toList());

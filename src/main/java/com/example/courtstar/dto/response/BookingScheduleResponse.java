@@ -22,5 +22,6 @@ public class BookingScheduleResponse {
     Court court;
     String centreName;
     String centreAddress;
+    String centreImg;
     int rate;
 }
