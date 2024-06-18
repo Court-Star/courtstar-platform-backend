@@ -23,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -225,7 +226,16 @@ public class CentreService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_CENTRE));
 
         account = null;
-        centreMapper.updateCentre(centre, request);
+        centre.setName(request.getName());
+        centre.setAddress(request.getAddress());
+        centre.setDistrict(request.getDistrict());
+        centre.setLink(request.getLink());
+        centre.setOpenTime(request.getOpenTime());
+        centre.setCloseTime(request.getCloseTime());
+        centre.setPricePerHour(Double.parseDouble(request.getPricePerHour().replace(".", "")));
+        centre.setNumberOfCourts(request.getNumberOfCourts());
+        centre.setDescription(request.getDescription());
+        centre.setApproveDate(request.getApproveDate());
 
         // Tạo danh sách slot mới cho trung tâm
         List<Slot> slotList = generateSlots(centre);
