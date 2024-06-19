@@ -4,6 +4,7 @@ import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.dto.response.CourtResponse;
+import com.example.courtstar.entity.Court;
 import com.example.courtstar.mapper.CentreMapper;
 import com.example.courtstar.services.CentreService;
 import com.example.courtstar.services.CourtService;
@@ -35,4 +36,17 @@ public class CourtController {
                 .build();
     }
 
+    @PostMapping("/{centreId}/{courtNo}")
+    public ApiResponse<CourtResponse> editCourt(@PathVariable int centreId, @PathVariable int courtNo) {
+        return ApiResponse.<CourtResponse>builder()
+                .data(courtService.editCourtById(centreId,courtNo))
+                .build();
+    }
+
+    @GetMapping("/{centreId}")
+    public ApiResponse<List<Court>> getCourtByCentreId(@PathVariable int centreId) {
+        return ApiResponse.<List<Court>>builder()
+                .data(courtService.getCourtByCentreId(centreId))
+                .build();
+    }
 }

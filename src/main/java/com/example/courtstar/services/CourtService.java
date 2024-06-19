@@ -4,10 +4,7 @@ import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.request.CourtRequest;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.dto.response.CourtResponse;
-import com.example.courtstar.entity.Account;
-import com.example.courtstar.entity.Centre;
-import com.example.courtstar.entity.CentreManager;
-import com.example.courtstar.entity.Court;
+import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.CentreMapper;
@@ -54,6 +51,23 @@ public class CourtService {
 
         return courtMapper.toCourtResponse(courtRepository.findById(court.getId())
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_COURT)));
+    }
+
+    public CourtResponse editCourtById(int centreId, int courtNo) throws AppException {
+        List<Court> courts = courtRepository.findAllByCourtNo(courtNo);
+        Court court = courts.stream()
+                .filter(c -> c.getCentre().getId().equals(centreId))
+                .findFirst()
+                .orElseThrow(null);
+        court.setStatus(!court.isStatus());
+        courtRepository.save(court);
+
+        return courtMapper.toCourtResponse(courtRepository.findById(court.getId())
+                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_COURT)));
+    }
+
+    public List<Court> getCourtByCentreId(int centreId) throws AppException {
+        return courtRepository.findAllByCentreId(centreId);
     }
 
     public CourtResponse disableCourtById(int id) throws AppException {
