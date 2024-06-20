@@ -30,7 +30,5 @@ public class CentreActiveResponse {
     boolean isDelete;
     LocalDate approveDate;
     List<Image> images;
-
-    @Builder.Default
-    int rating = ThreadLocalRandom.current().nextInt(1, 6);
+    double rating;
 }

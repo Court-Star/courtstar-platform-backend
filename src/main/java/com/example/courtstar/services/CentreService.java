@@ -67,12 +67,39 @@ public class CentreService {
 
     public List<CentreActiveResponse> getAllCentresIsActive(boolean isActive) {
         return centreRepository.findAllByIsDeleteAndStatus(false, isActive).stream()
-                .map(centreMapper::toCentreActiveResponse).toList();
+                .map(
+                    centre -> {
+                        CentreActiveResponse centreActiveResponse = centreMapper.toCentreActiveResponse(centre);
+                        double averageRate = calculateAverageRate(centre);
+                        centreActiveResponse.setRating(averageRate);
+                        return centreActiveResponse;
+                    }
+                )
+                .toList();
     }
 
     public CentreResponse getCentre(int id) {
-        return centreMapper.toCentreResponse(centreRepository.findById(id)
-                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE)));
+        Centre centre = centreRepository.findById(id)
+                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
+
+        CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
+        double averageRate = calculateAverageRate(centre);
+        centreResponse.setRating(averageRate);
+
+        return centreResponse;
+    }
+
+    private double calculateAverageRate(Centre centre) {
+        List<Feedback> feedbacks = centre.getFeedbacks();
+        if (feedbacks == null || feedbacks.isEmpty()) {
+            return 0.0;
+        }
+
+        double sumRate = feedbacks.stream()
+                .mapToDouble(Feedback::getRate)
+                .sum();
+
+        return sumRate / feedbacks.size();
     }
 
     public Set<CentreNameResponse> getAllCentresOfManager(String email){
