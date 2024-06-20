@@ -112,10 +112,10 @@ public class AccountController {
                 .build();
     }
 
-    @PutMapping("/{id}")
-    public ApiResponse<AccountResponse> updateAccountById(@PathVariable int id, @RequestBody @Valid AccountUpdateRequest request){
+    @PutMapping
+    public ApiResponse<AccountResponse> updateAccountById(@RequestBody @Valid AccountUpdateRequest request){
         return ApiResponse.<AccountResponse>builder()
-                .data(accountService.updateAccount(id,request))
+                .data(accountService.updateAccount(request))
                 .build();
     }
 
