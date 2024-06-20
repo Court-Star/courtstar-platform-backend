@@ -178,8 +178,10 @@ public class AccountService {
     }
 
     //@PreAuthorize("hasRole('ADMIN')")
-    public AccountResponse updateAccount(int id,AccountUpdateRequest request){
-        Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+    public AccountResponse updateAccount(AccountUpdateRequest request){
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        Account account = accountReponsitory.findByEmail(name).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         accountMapper.updateAccount(account,request);
         PasswordEncoder passwordEncoder = new BCryptPasswordEncoder(10);
         account.setPassword(passwordEncoder.encode(request.getPassword()));
