@@ -37,6 +37,21 @@ public class CentreManagerService {
     @Autowired
     private AccountMapper accountMapper;
 
+    public List<CentreManagerResponse> getAllManager() {
+        List<CentreManager> managers = centreManagerRepository.findAll();
+        return managers.stream()
+                .map(
+                        manager -> {
+                            AccountResponse accountResponse = accountMapper.toAccountResponse(manager.getAccount());
+                            return CentreManagerResponse.builder()
+                                    .account(accountResponse)
+                                    .address(manager.getAddress())
+                                    .currentBalance(manager.getCurrentBalance())
+                                    .build();
+                        }
+                ).toList();
+    }
+
     public CentreManagerResponse getManagerInfo() {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
