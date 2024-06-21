@@ -72,8 +72,7 @@ public class CentreService {
                 .map(
                     centre -> {
                         CentreActiveResponse centreActiveResponse = centreMapper.toCentreActiveResponse(centre);
-                        double averageRate = calculateAverageRate(centre);
-                        centreActiveResponse.setRating(averageRate);
+                        centreActiveResponse.setCoreImg(centre.getImages().get(0).getUrl());
                         return centreActiveResponse;
                     }
                 )
@@ -83,25 +82,7 @@ public class CentreService {
     public CentreResponse getCentre(int id) {
         Centre centre = centreRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-
-        CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
-        double averageRate = calculateAverageRate(centre);
-        centreResponse.setRating(averageRate);
-
-        return centreResponse;
-    }
-
-    private double calculateAverageRate(Centre centre) {
-        List<Feedback> feedbacks = centre.getFeedbacks();
-        if (feedbacks == null || feedbacks.isEmpty()) {
-            return 0.0;
-        }
-
-        double sumRate = feedbacks.stream()
-                .mapToDouble(Feedback::getRate)
-                .sum();
-
-        return sumRate / feedbacks.size();
+        return centreMapper.toCentreResponse(centre);
     }
 
     public Set<CentreNameResponse> getAllCentresOfManager(String email){

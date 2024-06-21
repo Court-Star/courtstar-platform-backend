@@ -39,5 +39,5 @@ public class CentreResponse {
     List<Slot> slots;
 //    List<CentreStaff> centreStaffs;
 
-    double rating;
+    double currentRate;
 }

@@ -26,9 +26,6 @@ public class CentreActiveResponse {
     LocalTime closeTime;
     double pricePerHour;
     int numberOfCourts;
-    boolean status;
-    boolean isDelete;
-    LocalDate approveDate;
-    List<Image> images;
-    double rating;
+    String coreImg;
+    double currentRate;
 }
