@@ -55,6 +55,8 @@ public class CentreService {
     private ImgRepository imgRepository;
     @Autowired
     private PaymentMethodRepository paymentMethodRepository;
+    @Autowired
+    private CentreStaffRepository centreStaffRepository;
 
     public CentreResponse createCentre(CentreRequest request) {
         Centre centre = centreMapper.toCentre(request);
@@ -66,12 +68,11 @@ public class CentreService {
     }
 
     public List<CentreActiveResponse> getAllCentresIsActive(boolean isActive) {
-        return centreRepository.findAllByIsDeleteAndStatus(false, isActive).stream()
+        return centreRepository.findAllByDeletedAndStatus(false, isActive).stream()
                 .map(
                     centre -> {
                         CentreActiveResponse centreActiveResponse = centreMapper.toCentreActiveResponse(centre);
-                        double averageRate = calculateAverageRate(centre);
-                        centreActiveResponse.setRating(averageRate);
+                        centreActiveResponse.setCoreImg(centre.getImages().get(0).getUrl());
                         return centreActiveResponse;
                     }
                 )
@@ -81,32 +82,14 @@ public class CentreService {
     public CentreResponse getCentre(int id) {
         Centre centre = centreRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-
-        CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
-        double averageRate = calculateAverageRate(centre);
-        centreResponse.setRating(averageRate);
-
-        return centreResponse;
-    }
-
-    private double calculateAverageRate(Centre centre) {
-        List<Feedback> feedbacks = centre.getFeedbacks();
-        if (feedbacks == null || feedbacks.isEmpty()) {
-            return 0.0;
-        }
-
-        double sumRate = feedbacks.stream()
-                .mapToDouble(Feedback::getRate)
-                .sum();
-
-        return sumRate / feedbacks.size();
+        return centreMapper.toCentreResponse(centre);
     }
 
     public Set<CentreNameResponse> getAllCentresOfManager(String email){
         Account account = accountReponsitory.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         CentreManager centreManager = centreManagerRepository.findByAccountId(account.getId()).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         Set<CentreNameResponse> centreResponses = centreManager.getCentres().stream()
-                .filter(centre -> !centre.isDelete())
+                .filter(centre -> !centre.isDeleted())
                 .map(centre -> {
                     CentreNameResponse centreResponse = CentreNameResponse.builder()
                             .id(centre.getId())
@@ -115,6 +98,17 @@ public class CentreService {
                     return centreResponse;
                 }).collect(Collectors.toSet());
         return centreResponses;
+    }
+
+    public CentreNameResponse getCentreOfStaff(String email){
+        Account account = accountReponsitory.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        CentreStaff staff = centreStaffRepository.findByAccountId(account.getId())
+                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        Centre centre = staff.getCentre();
+        return CentreNameResponse.builder()
+                .id(centre.getId())
+                .name(centre.getName())
+                .build();
     }
 
     public Boolean isActive(int id, boolean active) {
@@ -126,7 +120,7 @@ public class CentreService {
 
     public Boolean delete(int id) {
         Centre centre = centreRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-        centre.setDelete(true);
+        centre.setDeleted(true);
         centreRepository.save(centre);
         return true;
     }

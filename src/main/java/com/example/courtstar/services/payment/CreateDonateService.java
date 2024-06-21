@@ -2,9 +2,16 @@ package com.example.courtstar.services.payment;
 
 import com.example.courtstar.dto.request.DonateForAdmin;
 import com.example.courtstar.dto.request.OrderRequest;
+import com.example.courtstar.entity.Account;
+import com.example.courtstar.entity.CentreManager;
+import com.example.courtstar.exception.AppException;
+import com.example.courtstar.exception.ErrorCode;
+import com.example.courtstar.repositories.AccountReponsitory;
+import com.example.courtstar.repositories.CentreManagerRepository;
 import com.example.courtstar.repositories.PaymentRepository;
 import com.example.courtstar.util.HMACUtil;
 import lombok.Data;
+import org.apache.catalina.Manager;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -17,6 +24,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -41,6 +49,10 @@ public class CreateDonateService {
     private String ORDER_CREATE_ENDPOINT;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private AccountReponsitory accountReponsitory;
+    @Autowired
+    private CentreManagerRepository centreManagerRepository;
 
     private String getCurrentTimeString(String format) {
 
@@ -51,13 +63,22 @@ public class CreateDonateService {
     }
 
     public Map<String, Object> createOrder(DonateForAdmin orderRequest) throws IOException, JSONException {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        Account account = accountReponsitory.findByEmail(name).orElseThrow(
+                () -> new AppException(ErrorCode.NOT_FOUND_USER)
+        );
+        CentreManager manager = centreManagerRepository.findByAccountId(account.getId())
+                .orElseThrow(
+                        () -> new AppException(ErrorCode.NOT_FOUND_USER)
+                );
         final Map embeddata = new HashMap(){{
             put("redirecturl", "http://localhost:3000/myCentre/balance");//truyen url trang web muon tra ve klhi thanh toan xong
         }};
 
        List<Map<String, Object>> item = new ArrayList<>();
        item.add(new HashMap<String, Object>() {{
-            put("id_manager_centre", orderRequest.getId_manager_centre());
+            put("id_manager_centre", manager.getId());
         }});
 
         JSONArray itemArray = new JSONArray();
@@ -71,7 +92,7 @@ public class CreateDonateService {
             put("app_trans_id", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime());
             put("app_time", System.currentTimeMillis());
             put("app_user", "CourtStar");
-            put("amount", orderRequest.getAmount());
+            put("amount", Long.parseLong(orderRequest.getAmount().replace(".", "")));
             put("bank_code","");
             put("item",itemArray.toString());
             put("embed_data", new JSONObject(embeddata).toString());

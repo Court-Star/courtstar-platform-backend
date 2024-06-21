@@ -28,7 +28,8 @@ public class SecurityConfig {
     private CustomJwtDecoder customJwtDecoder;
     private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect"
             ,"/auth/logout","/auth/refresh","/account/reset-password","/booking","/payment/order-status"
-            ,"/payment/donate-callback","/payment/booking-callback","/tranfermoney/authenticateWithdrawalOrder/{id}"};
+            ,"/payment/donate-callback","/payment/booking-callback","/payment/order-info"
+            ,"/tranfermoney/authenticateWithdrawalOrder/{id}"};
     private final String[] PUBLIC_URLS_GET = {"/centre/getAllCentreActive", "/centre/getCentre/{id}","/court/{centreId}/{courtNo}"
             ,"/feedback/{id}","/tranfermoney/getAllSuccess"};
     private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};

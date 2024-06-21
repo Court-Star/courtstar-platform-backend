@@ -44,9 +44,9 @@ public class Account {
     @Column(name = "last_name", length = 50)
     String lastName;
 
-    @Column(name = "is_delete")
+    @Column(name = "deleted")
     @Builder.Default
-    boolean isDelete = false;
+    boolean deleted = false;
 
     @ManyToOne
     @JoinColumn(name = "role_name")

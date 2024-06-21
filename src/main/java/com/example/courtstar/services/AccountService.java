@@ -160,7 +160,7 @@ public class AccountService {
     public AccountResponse deleteAccountById(int id){
          if(accountReponsitory.existsById(id)){
              Account account = accountReponsitory.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
-             account.setDelete(true);
+             account.setDeleted(true);
              account=accountReponsitory.save(account);
              return accountMapper.toAccountResponse(account);
          }else {
@@ -216,7 +216,7 @@ public class AccountService {
 
     //@PreAuthorize("hasRole('ADMIN')")
     public List<AccountResponse> getAllAccountsBanned(){
-         return accountReponsitory.findAllByIsDelete(true).stream().map(accountMapper::toAccountResponse).toList();
+         return accountReponsitory.findAllByDeleted(true).stream().map(accountMapper::toAccountResponse).toList();
     }
 
     public String generateOtp(String email){

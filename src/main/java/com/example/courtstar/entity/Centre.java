@@ -65,6 +65,10 @@ public class Centre {
     @Builder.Default
     double revenue = 0;
 
+    @Column(name = "current_rate")
+    @Builder.Default
+    double currentRate = 0;
+
     @Column(name = "link")
     String link;
 
@@ -106,8 +110,8 @@ public class Centre {
     CentreManager manager;
 
     @Builder.Default
-    @Column(name = "is_delete")
-    boolean isDelete = false;
+    @Column(name = "deleted")
+    boolean deleted = false;
 
     @OneToOne
     PaymentMethod paymentMethod;

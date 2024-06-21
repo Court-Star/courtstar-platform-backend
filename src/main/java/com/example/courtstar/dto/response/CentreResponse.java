@@ -31,7 +31,7 @@ public class CentreResponse {
     int numberOfCourts;
     String description;
     boolean status;
-    boolean isDelete;
+    boolean deleted;
     LocalDate approveDate;
     double revenue;
     List<Court> courts;
@@ -39,5 +39,5 @@ public class CentreResponse {
     List<Slot> slots;
 //    List<CentreStaff> centreStaffs;
 
-    double rating;
+    double currentRate;
 }

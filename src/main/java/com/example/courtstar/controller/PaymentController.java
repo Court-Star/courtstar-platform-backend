@@ -1,6 +1,7 @@
 package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.*;
+import com.example.courtstar.dto.response.BookingScheduleResponse;
 import com.example.courtstar.services.payment.*;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -80,6 +81,14 @@ public class PaymentController {
 
         return this.orderPaymentService.statusOrder(statusRequestDTO);
     }
+
+
+    @PostMapping("/order-info")
+    public BookingScheduleResponse getOrderInfo(@RequestBody StatusRequest statusRequestDTO) throws org.json.JSONException, URISyntaxException, IOException {
+
+        return this.orderPaymentService.getOrderInfo(statusRequestDTO);
+    }
+
 
 
 
