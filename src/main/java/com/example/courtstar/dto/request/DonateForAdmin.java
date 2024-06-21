@@ -13,9 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 @Builder
 
 public class DonateForAdmin {
-    private Long amount;
-    private String description;
-    private String id_manager_centre;
+    private String amount;
 
     @Builder.Default
     private String callbackUrl="https://616a-2402-800-63b8-9e93-5c65-832c-299f-8633.ngrok-free.app/courtstar/payment/donate-callback";

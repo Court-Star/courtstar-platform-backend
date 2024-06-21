@@ -30,9 +30,9 @@ public class BookingSchedule {
     @Builder.Default
     boolean status = false;
 
-    @Column(name = "is_success")
+    @Column(name = "success")
     @Builder.Default
-    boolean isSuccess = false;
+    boolean success = false;
 
     @ManyToOne
 //    @JsonIgnore

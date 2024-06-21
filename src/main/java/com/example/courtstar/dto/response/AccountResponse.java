@@ -18,5 +18,5 @@ public class AccountResponse {
     String firstName;
     String lastName;
     Role role;
-    boolean isDelete;
+    boolean deleted;
 }

@@ -68,7 +68,7 @@ public class CentreService {
     }
 
     public List<CentreActiveResponse> getAllCentresIsActive(boolean isActive) {
-        return centreRepository.findAllByIsDeleteAndStatus(false, isActive).stream()
+        return centreRepository.findAllByDeletedAndStatus(false, isActive).stream()
                 .map(
                     centre -> {
                         CentreActiveResponse centreActiveResponse = centreMapper.toCentreActiveResponse(centre);
@@ -89,7 +89,7 @@ public class CentreService {
         Account account = accountReponsitory.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         CentreManager centreManager = centreManagerRepository.findByAccountId(account.getId()).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
         Set<CentreNameResponse> centreResponses = centreManager.getCentres().stream()
-                .filter(centre -> !centre.isDelete())
+                .filter(centre -> !centre.isDeleted())
                 .map(centre -> {
                     CentreNameResponse centreResponse = CentreNameResponse.builder()
                             .id(centre.getId())
@@ -120,7 +120,7 @@ public class CentreService {
 
     public Boolean delete(int id) {
         Centre centre = centreRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-        centre.setDelete(true);
+        centre.setDeleted(true);
         centreRepository.save(centre);
         return true;
     }

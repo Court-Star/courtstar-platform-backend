@@ -31,7 +31,7 @@ public class CentreStaffService {
     public List<CentreStaff> getCentreStaffOfCentre(int centreId) {
         return centreStaffRepository.findAllByCentreId(centreId)
                 .stream()
-                .filter(centreStaff -> !centreStaff.getAccount().isDelete())
+                .filter(centreStaff -> !centreStaff.getAccount().isDeleted())
                 .collect(Collectors.toList());
     }
 
