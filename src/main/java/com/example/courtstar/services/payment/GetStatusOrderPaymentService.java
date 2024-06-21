@@ -1,6 +1,13 @@
 package com.example.courtstar.services.payment;
 
+import com.example.courtstar.dto.request.OrderRequest;
 import com.example.courtstar.dto.request.StatusRequest;
+import com.example.courtstar.dto.response.BookingScheduleResponse;
+import com.example.courtstar.entity.BookingSchedule;
+import com.example.courtstar.entity.Centre;
+import com.example.courtstar.entity.Payment;
+import com.example.courtstar.mapper.BookingScheduleMapper;
+import com.example.courtstar.repositories.PaymentRepository;
 import com.example.courtstar.util.HMACUtil;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -12,6 +19,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +34,11 @@ import java.util.Map;
 
 @Service
 public class GetStatusOrderPaymentService {
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private BookingScheduleMapper bookingScheduleMapper;
+
     @Value("${payment.zalopay.APP_ID}")
     private String APP_ID;
     @Value("${payment.zalopay.KEY1}")
@@ -70,5 +83,20 @@ public class GetStatusOrderPaymentService {
         finalResult.put("discount_amount", result.get("discount_amount"));
         finalResult.put("zp_trans_id", result.get("zp_trans_id"));
         return finalResult;
+    }
+
+    public BookingScheduleResponse getOrderInfo(StatusRequest orderRequest) {
+        String appTransIs = orderRequest.getAppTransId();
+        Payment payment = paymentRepository.findByTransactionCode(appTransIs).orElse(null);
+        if (payment == null) {
+            return null;
+        }
+        BookingSchedule bookingSchedule = payment.getBookingSchedule();
+        Centre centre = bookingSchedule.getSlot().getCentre();
+        BookingScheduleResponse bookingScheduleResponse = bookingScheduleMapper.toBookingScheduleResponse(bookingSchedule);
+        bookingScheduleResponse.setCentreId(centre.getId());
+        bookingScheduleResponse.setCentreName(centre.getName());
+        bookingScheduleResponse.setCentreAddress(centre.getAddress());
+        return bookingScheduleResponse;
     }
 }

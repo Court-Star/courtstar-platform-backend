@@ -1,6 +1,8 @@
 package com.example.courtstar.dto.response;
 
+import com.example.courtstar.entity.Account;
 import com.example.courtstar.entity.Court;
+import com.example.courtstar.entity.Guest;
 import com.example.courtstar.entity.Slot;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +22,8 @@ public class BookingScheduleResponse {
     double totalPrice;
     Slot slot;
     Court court;
+    Account account;
+    Guest guest;
     String centreName;
     String centreAddress;
     String centreImg;
