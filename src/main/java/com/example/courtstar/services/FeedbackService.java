@@ -3,6 +3,7 @@ package com.example.courtstar.services;
 import com.example.courtstar.dto.request.FeedbackRequest;
 import com.example.courtstar.dto.response.FeedbackResponse;
 import com.example.courtstar.entity.Account;
+import com.example.courtstar.entity.Centre;
 import com.example.courtstar.entity.Feedback;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
@@ -37,6 +38,19 @@ public class FeedbackService {
     private final CentreRepository centreRepository;
     private final BookingScheduleRepository bookingScheduleRepository;
 
+    private double calculateAverageRate(Centre centre) {
+        List<Feedback> feedbacks = centre.getFeedbacks();
+        if (feedbacks == null || feedbacks.isEmpty()) {
+            return 0.0;
+        }
+
+        double sumRate = feedbacks.stream()
+                .mapToDouble(Feedback::getRate)
+                .sum();
+
+        return sumRate / feedbacks.size();
+    }
+
     public Feedback createFeedback(FeedbackRequest request) {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
@@ -44,14 +58,22 @@ public class FeedbackService {
                 ()->new AppException(ErrorCode.NOT_FOUND_USER)
         );
 
+        Centre centre = centreRepository.findById(request.getCentreId())
+                .orElseThrow(null);
+
         Feedback feedback = feedbackMapper.toFeedback(request);
         feedback.setAccount(account);
-        feedback.setCentre(centreRepository.findById(request.getCentreId())
-                .orElseThrow(null));
+        feedback.setCentre(centre);
         feedback.setBookingSchedule(bookingScheduleRepository.findById(request.getBookingId())
                 .orElseThrow(null));
 
-        return feedbackRepository.save(feedback);
+        Feedback feedback1 = feedbackRepository.save(feedback);
+
+        double avgRate = calculateAverageRate(centre);
+        centre.setCurrentRate(avgRate);
+        centreRepository.save(centre);
+
+        return feedback1;
     }
 
     public List<FeedbackResponse> getFeedbackOfCentre(int centreId) {

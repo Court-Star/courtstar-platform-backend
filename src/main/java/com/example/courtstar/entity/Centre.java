@@ -65,6 +65,10 @@ public class Centre {
     @Builder.Default
     double revenue = 0;
 
+    @Column(name = "current_rate")
+    @Builder.Default
+    double currentRate = 0;
+
     @Column(name = "link")
     String link;
 
