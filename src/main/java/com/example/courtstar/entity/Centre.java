@@ -110,8 +110,8 @@ public class Centre {
     CentreManager manager;
 
     @Builder.Default
-    @Column(name = "is_delete")
-    boolean isDelete = false;
+    @Column(name = "deleted")
+    boolean deleted = false;
 
     @OneToOne
     PaymentMethod paymentMethod;

@@ -100,7 +100,7 @@ public class BookingService {
                 .date(request.getDate())
                 .totalPrice(centre.getPricePerHour())
                 .status(false)
-                .isSuccess(false)
+                .success(false)
                 .account(account)
                 .guest(guest)
                 .slot(slot)

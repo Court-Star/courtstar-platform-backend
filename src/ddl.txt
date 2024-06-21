@@ -24,7 +24,7 @@ create table account
   first_name nvarchar(30),
   last_name nvarchar(50),
   phone char(10),
-  is_delete bit not null,
+  deleted bit not null,
   role_name varchar(15) foreign key references role(name)
 );
 
@@ -87,7 +87,7 @@ create table centre
   manager_id int foreign key references centre_manager(id),
   revenue money,
   payment_method_id int unique foreign key references payment_method(id),
-  is_delete bit not null,
+  deleted bit not null,
   link text
 );
 
@@ -133,7 +133,7 @@ create table booking_schedule
   guest_id int foreign key references guest(id),
   slot_id int foreign key references slot(id),
   court_id int foreign key references court(id),
-  is_success bit
+  success bit
 );
 
 create table feedback
@@ -197,6 +197,6 @@ INSERT INTO role (name, description) VALUES ('CUSTOMER', 'Customer role');
 -- INSERT INTO role_permissions (role_id, permission_id) VALUES ('CUSTOMER', 'READ_PRIVILEGE');
 
 -- Create accounts and associate roles, pass 123
-INSERT INTO account (email, password, phone, first_name, last_name, is_delete, role_name) VALUES ('thanh@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567890', 'Thanh', 'Nguyen', 0, 'ADMIN');
-INSERT INTO account (email, password, phone, first_name, last_name, is_delete, role_name) VALUES ('manager@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567891', 'Manager', 'User', 0, 'MANAGER');
-INSERT INTO account (email, password, phone, first_name, last_name, is_delete, role_name) VALUES ('customer@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567892', 'Customer', 'User', 0, 'CUSTOMER');
+INSERT INTO account (email, password, phone, first_name, last_name, deleted, role_name) VALUES ('thanh@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567890', 'Thanh', 'Nguyen', 0, 'ADMIN');
+INSERT INTO account (email, password, phone, first_name, last_name, deleted, role_name) VALUES ('manager@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567891', 'Manager', 'User', 0, 'MANAGER');
+INSERT INTO account (email, password, phone, first_name, last_name, deleted, role_name) VALUES ('customer@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567892', 'Customer', 'User', 0, 'CUSTOMER');

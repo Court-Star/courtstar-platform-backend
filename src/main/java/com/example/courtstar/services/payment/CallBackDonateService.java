@@ -64,7 +64,7 @@ public class CallBackDonateService {
 
                 CentreManager centreManager = centreManagerRepository.findById(id_manager_centre).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
                 System.out.println(centreManager);
-                Long amount = (long) (centreManager.getCurrentBalance()+data.getLong("amount"));
+                double amount = centreManager.getCurrentBalance()+data.getDouble("amount");
                 centreManager.setCurrentBalance(amount);
                 centreManagerRepository.save(centreManager);
                 //

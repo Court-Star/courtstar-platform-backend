@@ -12,5 +12,5 @@ public interface AccountReponsitory extends JpaRepository<Account, Integer> {
     Optional<Account> findByEmail(String email);
     boolean existsByEmail(String email);
     Account findByEmailAndPassword(String email, String password);
-    List<Account> findAllByIsDelete(boolean status);
+    List<Account> findAllByDeleted(boolean status);
 }
