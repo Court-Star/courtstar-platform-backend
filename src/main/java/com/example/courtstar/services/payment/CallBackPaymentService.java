@@ -91,11 +91,11 @@ public class CallBackPaymentService {
 
 
                 Centre centre =centreRepository.findById(centreId).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-                double payMoney = centre.getRevenue()+data.getDouble("amount");
+                Double payMoney = centre.getRevenue()+data.getLong("amount");
                 centre.setRevenue(payMoney);
                 centreRepository.save(centre);
 
-                double totalPayMoney = centre.getManager().getCurrentBalance()+data.getDouble("amount")*0.95;
+                Double totalPayMoney = centre.getManager().getCurrentBalance()+data.getLong("amount")*0.95;
                 centre.getManager().setCurrentBalance(totalPayMoney);
                 centreManagerRepository.save(centre.getManager());
 

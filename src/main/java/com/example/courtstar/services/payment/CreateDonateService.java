@@ -92,7 +92,7 @@ public class CreateDonateService {
             put("app_trans_id", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime());
             put("app_time", System.currentTimeMillis());
             put("app_user", "CourtStar");
-            put("amount", Double.parseDouble(orderRequest.getAmount().replace(".", "")));
+            put("amount", Long.parseLong(orderRequest.getAmount().replace(".", "")));
             put("bank_code","");
             put("item",itemArray.toString());
             put("embed_data", new JSONObject(embeddata).toString());

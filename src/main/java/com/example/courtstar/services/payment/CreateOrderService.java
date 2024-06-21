@@ -76,7 +76,7 @@ public class CreateOrderService {
             put("app_trans_id", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime());
             put("app_time", System.currentTimeMillis());
             put("app_user", "CourtStar");
-            put("amount", orderRequest.getBookingSchedule().getTotalPrice());
+            put("amount", (long)orderRequest.getBookingSchedule().getTotalPrice());;
             put("bank_code","");
             put("item",itemArray.toString());
             put("embed_data", new JSONObject(embeddata).toString());
