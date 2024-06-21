@@ -52,6 +52,14 @@ public class CentreController {
                 .data(centreService.getAllCentresOfManager(email)).build();
     }
 
+    @GetMapping("/getCentreOfStaff")
+    public ApiResponse<CentreNameResponse> GetCentreOfStaff(){
+        var context = SecurityContextHolder.getContext();
+        String email = context.getAuthentication().getName();
+        return ApiResponse.<CentreNameResponse>builder()
+                .data(centreService.getCentreOfStaff(email)).build();
+    }
+
     @GetMapping("/getCentre/{id}")
     public ApiResponse<CentreResponse> GetCentre(@PathVariable int id){
         return ApiResponse

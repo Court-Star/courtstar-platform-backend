@@ -55,6 +55,8 @@ public class CentreService {
     private ImgRepository imgRepository;
     @Autowired
     private PaymentMethodRepository paymentMethodRepository;
+    @Autowired
+    private CentreStaffRepository centreStaffRepository;
 
     public CentreResponse createCentre(CentreRequest request) {
         Centre centre = centreMapper.toCentre(request);
@@ -115,6 +117,17 @@ public class CentreService {
                     return centreResponse;
                 }).collect(Collectors.toSet());
         return centreResponses;
+    }
+
+    public CentreNameResponse getCentreOfStaff(String email){
+        Account account = accountReponsitory.findByEmail(email).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        CentreStaff staff = centreStaffRepository.findByAccountId(account.getId())
+                .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+        Centre centre = staff.getCentre();
+        return CentreNameResponse.builder()
+                .id(centre.getId())
+                .name(centre.getName())
+                .build();
     }
 
     public Boolean isActive(int id, boolean active) {
