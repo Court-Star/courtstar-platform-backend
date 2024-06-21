@@ -32,5 +32,10 @@ public class CentreManager {
 
     @OneToOne
     Account account;
+    @OneToMany(mappedBy = "centreManager")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    List<TransferMoney> transferMonies;
+
 }
 
