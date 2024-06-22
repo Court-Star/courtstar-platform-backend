@@ -11,5 +11,9 @@ import lombok.experimental.FieldDefaults;
 public class CentreManagerResponse {
     String address;
     double currentBalance;
+    double totalRevenue;
+    double todayIncome;
+    double percent;
+    double pending;
     AccountResponse account;
 }
