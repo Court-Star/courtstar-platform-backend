@@ -88,7 +88,8 @@ create table centre
   revenue money,
   payment_method_id int unique foreign key references payment_method(id),
   deleted bit not null,
-  link text
+  link text,
+  current_rate float
 );
 
 create table centre_staff
