@@ -19,6 +19,6 @@ public class OrderRequest{
     private Centre centre;
 
     @Builder.Default
-    private String callbackUrl="https://7d2f-118-69-182-149.ngrok-free.app/courtstar/payment/booking-callback";;
+    private String callbackUrl="https://2dde-27-78-223-62.ngrok-free.app/courtstar/payment/booking-callback";;
 
 }
