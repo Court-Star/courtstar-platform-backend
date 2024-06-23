@@ -3,6 +3,8 @@ package com.example.courtstar.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Map;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,7 +15,8 @@ public class CentreManagerResponse {
     double currentBalance;
     double totalRevenue;
     double todayIncome;
-    double percent;
+    long todayBookings;
+    Map<String, Double> percent;
     double pending;
     AccountResponse account;
 }
