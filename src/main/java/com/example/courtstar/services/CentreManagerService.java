@@ -40,6 +40,8 @@ public class CentreManagerService {
     private AccountMapper accountMapper;
     @Autowired
     private BookingScheduleRepository bookingScheduleRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     public List<CentreManagerResponse> getAllManager() {
         List<CentreManager> managers = centreManagerRepository.findAll();
@@ -68,9 +70,17 @@ public class CentreManagerService {
                 .currentBalance(manager.getCurrentBalance())
                 .totalRevenue(getTotalRevenue(manager))
                 .todayIncome(getRevenueToday(manager))
-                .percent(getPercentageRevenueChangeFromYesterday(manager))
+                .todayBookings(getBookingToday(manager))
+                .percent(getPercentageChangesMap(manager))
                 .pending(getFutureRevenueTotal(manager))
                 .build();
+    }
+
+    private Map<String, Double> getPercentageChangesMap(CentreManager manager) {
+        Map<String, Double> percentageChanges = new HashMap<>();
+        percentageChanges.put("income", getPercentageRevenueChangeFromYesterday(manager));
+        percentageChanges.put("booking", getPercentageBookingChangeFromYesterday(manager));
+        return percentageChanges;
     }
 
     private double getTotalRevenue(CentreManager manager) {
@@ -100,9 +110,22 @@ public class CentreManagerService {
                 .sum();
     }
 
+    private long getBookingToday(CentreManager manager) {
+        LocalDate today = LocalDate.now();
+        return manager.getCentres().stream()
+                .flatMap(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId()).stream())
+                .filter(
+                    schedule -> {
+                        Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
+                                .orElseThrow(null);
+                        return payment.isStatus() && payment.getDate().isEqual(today);
+                    }
+                )
+                .count();
+    }
+
     private double getPercentageRevenueChangeFromYesterday(CentreManager manager) {
         LocalDate yesterday = LocalDate.now().minusDays(1);
-        LocalDate today = LocalDate.now();
 
         double revenueYesterday = manager.getCentres().stream()
                 .flatMapToDouble(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
@@ -119,6 +142,29 @@ public class CentreManagerService {
         double revenueToday = getRevenueToday(manager);
 
         return ((revenueToday - revenueYesterday) / revenueYesterday) * 100;
+    }
+
+    private double getPercentageBookingChangeFromYesterday(CentreManager manager) {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+
+        double bookingYesterday = manager.getCentres().stream()
+                .flatMap(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId()).stream())
+                .filter(
+                        schedule -> {
+                            Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
+                                    .orElseThrow(null);
+                            return payment.isStatus() && payment.getDate().isEqual(yesterday);
+                        }
+                )
+                .count();
+
+        if (bookingYesterday == 0) {
+            return 0;
+        }
+
+        double bookingToday = getBookingToday(manager);
+
+        return ((bookingToday - bookingYesterday) / bookingYesterday) * 100;
     }
 
     private double getFutureRevenueTotal(CentreManager manager) {
