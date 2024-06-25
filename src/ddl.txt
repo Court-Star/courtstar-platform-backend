@@ -8,7 +8,7 @@ create table guest
   email varchar(80) not null,
   full_name nvarchar(80),
   phone char(10),
-  create_date date
+  created_date date
 )
 
 create table role
@@ -27,7 +27,7 @@ create table account
   phone char(10),
   deleted bit not null,
   role_name varchar(15) foreign key references role(name),
-  create_date date
+  created_date date
 );
 
 create table otp
@@ -64,6 +64,18 @@ create table centre_manager
   current_balance money,
   account_id int unique foreign key references account(id)
 );
+
+create table transfer_money
+(
+    id int identity(1,1) primary key,
+    amount float not null,
+    date_authenticate datetime,
+    date_create_withdrawal_order datetime,
+    name_banking varchar(255),
+    number_banking varchar(255),
+    status bit not null,
+    manager_id int foreign key references centre_manager(id)
+)
 
 create table centre
 (

@@ -69,14 +69,30 @@ public class CentreService {
         return centreRepository.findAll()
                 .stream()
                 .filter(centre -> centre.getApproveDate() != null)
-                .map(centreMapper::toCentreResponse).toList();
+                .map(
+                        centre -> {
+                            CentreResponse response = centreMapper.toCentreResponse(centre);
+                            response.setManagerId(centre.getManager().getId());
+                            response.setManagerEmail(centre.getManager().getAccount().getEmail());
+                            return response;
+                        }
+                )
+                .toList();
     }
 
     public List<CentreResponse> getCentrePending() {
         return centreRepository.findAll()
                 .stream()
                 .filter(centre -> centre.getApproveDate() == null)
-                .map(centreMapper::toCentreResponse).toList();
+                .map(
+                        centre -> {
+                            CentreResponse response = centreMapper.toCentreResponse(centre);
+                            response.setManagerId(centre.getManager().getId());
+                            response.setManagerEmail(centre.getManager().getAccount().getEmail());
+                            return response;
+                        }
+                )
+                .toList();
     }
 
     public List<CentreActiveResponse> getAllCentresIsActive(boolean isActive) {
