@@ -56,7 +56,7 @@ public class Centre {
 
     @Column(name = "status")
     @Builder.Default
-    boolean status = true;
+    boolean status = false;
 
     @Column(name = "approve_date")
     LocalDate approveDate;

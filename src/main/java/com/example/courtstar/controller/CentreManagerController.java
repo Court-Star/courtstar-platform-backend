@@ -7,12 +7,22 @@ import com.example.courtstar.services.CentreManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/manager")
 public class CentreManagerController {
     @Autowired
     private CentreManagerService centreManagerService;
+
+    @GetMapping
+    public ApiResponse<List<CentreManagerResponse>> getAllManager() {
+        List<CentreManagerResponse> centreManagers = centreManagerService.getAllManager();
+        return ApiResponse.<List<CentreManagerResponse>>builder()
+                .data(centreManagers)
+                .build();
+    }
 
     @GetMapping("/info")
     public ApiResponse<CentreManagerResponse> getManager() {

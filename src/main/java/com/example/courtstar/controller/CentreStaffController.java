@@ -17,6 +17,14 @@ public class CentreStaffController {
     @Autowired
     private CentreStaffService centreStaffService;
 
+    @GetMapping
+    public ApiResponse<List<CentreStaff>> getAllStaff() {
+        List<CentreStaff> centreStaffs = centreStaffService.getAllStaff();
+        return ApiResponse.<List<CentreStaff>>builder()
+                .data(centreStaffs)
+                .build();
+    }
+
     @GetMapping("/centre/{id}")
     public ApiResponse<List<CentreStaff>> getStaff(@PathVariable int id) {
         List<CentreStaff> centreStaffs = centreStaffService.getCentreStaffOfCentre(id);

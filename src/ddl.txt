@@ -7,7 +7,8 @@ create table guest
   id int identity(1, 1) primary key,
   email varchar(80) not null,
   full_name nvarchar(80),
-  phone char(10)
+  phone char(10),
+  create_date date
 )
 
 create table role
@@ -25,7 +26,8 @@ create table account
   last_name nvarchar(50),
   phone char(10),
   deleted bit not null,
-  role_name varchar(15) foreign key references role(name)
+  role_name varchar(15) foreign key references role(name),
+  create_date date
 );
 
 create table otp
@@ -88,7 +90,8 @@ create table centre
   revenue money,
   payment_method_id int unique foreign key references payment_method(id),
   deleted bit not null,
-  link text
+  link text,
+  current_rate float
 );
 
 create table centre_staff

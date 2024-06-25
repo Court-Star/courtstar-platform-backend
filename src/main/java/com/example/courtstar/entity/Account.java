@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +48,10 @@ public class Account {
     @Column(name = "deleted")
     @Builder.Default
     boolean deleted = false;
+
+    @Column(name = "created_date")
+    @Builder.Default
+    LocalDate createdDate = LocalDate.now();
 
     @ManyToOne
     @JoinColumn(name = "role_name")

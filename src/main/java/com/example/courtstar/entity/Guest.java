@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -32,6 +33,10 @@ public class Guest {
     @Size(max = 10)
     @Column(name = "phone", length = 10)
     String phone;
+
+    @Column(name = "created_date")
+    @Builder.Default
+    LocalDate createdDate = LocalDate.now();
 
     @OneToMany(mappedBy = "guest", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
