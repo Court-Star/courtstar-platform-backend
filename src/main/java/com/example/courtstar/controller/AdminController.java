@@ -20,4 +20,11 @@ public class AdminController {
                 .data(adminService.getPlatformInfo())
                 .build();
     }
+
+    @PostMapping("/centre/approve/{id}")
+    public ApiResponse<Boolean> approveCentre(@PathVariable int id){
+        return ApiResponse.<Boolean>builder()
+                .data(adminService.approveCentre(id))
+                .build();
+    }
 }

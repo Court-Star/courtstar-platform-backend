@@ -22,6 +22,5 @@ public class CentreRequest {
     String pricePerHour;
     int numberOfCourts;
     String description;
-    LocalDate approveDate;
     List<String> images;
 }
