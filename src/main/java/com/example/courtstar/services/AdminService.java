@@ -31,6 +31,16 @@ public class AdminService {
     private final GuestRepository guestRepository;
     private final BookingScheduleRepository bookingScheduleRepository;
 
+    public Boolean approveCentre(int centreId) {
+        Centre centre = centreRepository.findById(centreId).orElseThrow(
+                () -> new IllegalArgumentException("Centre not found")
+        );
+        centre.setStatus(true);
+        centre.setApproveDate(LocalDate.now());
+        centreRepository.save(centre);
+        return true;
+    }
+
     public PlatformResponse getPlatformInfo() {
         return PlatformResponse.builder()
                 .totalRevenue(getTotalRevenue()*0.05)

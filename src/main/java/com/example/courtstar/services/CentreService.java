@@ -1,5 +1,6 @@
 package com.example.courtstar.services;
 
+import com.example.courtstar.constant.PredefinedNotificationType;
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.request.CourtRequest;
 import com.example.courtstar.dto.response.CentreActiveResponse;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +59,8 @@ public class CentreService {
     private PaymentMethodRepository paymentMethodRepository;
     @Autowired
     private CentreStaffRepository centreStaffRepository;
+    @Autowired
+    private NotificationRepository notificationRepository;
 
     public CentreResponse createCentre(CentreRequest request) {
         Centre centre = centreMapper.toCentre(request);
@@ -167,6 +171,13 @@ public class CentreService {
         imgRepository.saveAll(imgList);
         centreRepository.save(centre);
 
+        notificationRepository.save(Notification.builder()
+                .type(PredefinedNotificationType.ADD_CENTRE)
+                .date(LocalDateTime.now())
+                .content(PredefinedNotificationType.ADD_CENTRE_CONTENT)
+                .account(accountReponsitory.findByEmail("Admin@gmail.com").orElse(null))
+                .build());
+
         CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
         centreResponse.setManagerId(manager.getId());
 
@@ -256,7 +267,6 @@ public class CentreService {
         centre.setPricePerHour(Double.parseDouble(request.getPricePerHour().replace(".", "")));
         centre.setNumberOfCourts(request.getNumberOfCourts());
         centre.setDescription(request.getDescription());
-        centre.setApproveDate(request.getApproveDate());
 
         // Tạo danh sách slot mới cho trung tâm
         List<Slot> slotList = generateSlots(centre);
