@@ -83,7 +83,7 @@ public class CentreService {
     public List<CentreResponse> getCentrePending() {
         return centreRepository.findAll()
                 .stream()
-                .filter(centre -> centre.getApproveDate() == null)
+                .filter(centre -> centre.getApproveDate() == null && !centre.isDeleted())
                 .map(
                         centre -> {
                             CentreResponse response = centreMapper.toCentreResponse(centre);
