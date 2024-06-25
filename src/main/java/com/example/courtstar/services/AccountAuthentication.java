@@ -65,7 +65,6 @@ public class AccountAuthentication {
         return AuthenticationResponse.builder()
                 .token(token)
                 .success(true)
-                .account_id(account.getId())
                 .role(account.getRole().getName())
                 .build();
     }
@@ -169,7 +168,6 @@ public class AccountAuthentication {
         return AuthenticationResponse.builder()
                 .token(token)
                 .success(true)
-                .account_id(user.getId())
                 .role(user.getRole().getName())
                 .build();
     }
