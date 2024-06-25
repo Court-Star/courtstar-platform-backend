@@ -68,7 +68,7 @@ public class AdminService {
     public PlatformResponse getPlatformInfo() {
         return PlatformResponse.builder()
                 .totalRevenue(getTotalRevenue()*0.05)
-                .totalCentre(centreRepository.findAll().size())
+                .totalCentre(centreRepository.findAll().stream().filter(centre -> centre.getApproveDate() != null).toList().size())
                 .totalUser(accountReponsitory.findAll().size() + guestRepository.findAll().size())
                 .revenues(getRevenuePerDay())
                 .users(getUserPerDay())
@@ -109,8 +109,9 @@ public class AdminService {
                 ));
     }
 
-    private  Map<LocalDate, Long> getCentrePerDay() {
+    private Map<LocalDate, Long> getCentrePerDay() {
         return centreRepository.findAll().stream()
+                .filter(centre -> centre.getApproveDate() != null)
                 .collect(Collectors.groupingBy(
                         Centre::getApproveDate,
                         Collectors.counting()

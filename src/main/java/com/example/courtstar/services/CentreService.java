@@ -68,7 +68,17 @@ public class CentreService {
     }
 
     public List<CentreResponse> getAllCentres() {
-        return centreRepository.findAll().stream().map(centreMapper::toCentreResponse).toList();
+        return centreRepository.findAll()
+                .stream()
+                .filter(centre -> centre.getApproveDate() != null)
+                .map(centreMapper::toCentreResponse).toList();
+    }
+
+    public List<CentreResponse> getCentrePending() {
+        return centreRepository.findAll()
+                .stream()
+                .filter(centre -> centre.getApproveDate() == null)
+                .map(centreMapper::toCentreResponse).toList();
     }
 
     public List<CentreActiveResponse> getAllCentresIsActive(boolean isActive) {
