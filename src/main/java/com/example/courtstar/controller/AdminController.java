@@ -27,4 +27,11 @@ public class AdminController {
                 .data(adminService.approveCentre(id))
                 .build();
     }
+
+    @PostMapping("/centre/deny/{id}")
+    public ApiResponse<Boolean> denyCentre(@PathVariable int id){
+        return ApiResponse.<Boolean>builder()
+                .data(adminService.deniedCentre(id))
+                .build();
+    }
 }
