@@ -43,7 +43,7 @@ public class TransferMoneyService {
         transferMonies.add(transferMoney);
         centreManager.setTransferMonies(transferMonies);
         centreManagerRepository.save(centreManager);
-        transferMoney.setCentreManager(centreManager);
+        transferMoney.setManager(centreManager);
         return transferMoneyMapper.toTranferMoneyReponse(transferMoneyRepository.save(transferMoney));
     }
 
@@ -53,7 +53,7 @@ public class TransferMoneyService {
         if(transferMoney.isStatus()==true){
             throw new AppException(ErrorCode.TRANFER_MONEY_SUCCESS);
         }
-        CentreManager centreManager = centreManagerRepository.getById(transferMoney.getCentreManager().getId());
+        CentreManager centreManager = centreManagerRepository.getById(transferMoney.getManager().getId());
         if(centreManager.getCurrentBalance()-transferMoney.getAmount()<2000000){
             transferMoney.setStatus(false);
             throw new AppException(ErrorCode.NOT_ENOUGHT_MONEY);

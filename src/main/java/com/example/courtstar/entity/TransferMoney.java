@@ -24,10 +24,11 @@ public class TransferMoney {
     boolean status;
     LocalDateTime dateCreateWithdrawalOrder;
     LocalDateTime dateAuthenticate;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "manager_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    CentreManager centreManager;
+    CentreManager manager;
 }

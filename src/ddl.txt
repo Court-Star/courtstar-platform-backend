@@ -65,13 +65,6 @@ create table centre_manager
   account_id int unique foreign key references account(id)
 );
 
-create table payment_method
-(
-	id int identity(1, 1) primary key,
-	name varchar(30),
-	number varchar(30),
-);
-
 create table centre
 (
   id int identity(1, 1) primary key,
@@ -88,9 +81,7 @@ create table centre
   approve_date date,
   manager_id int foreign key references centre_manager(id),
   revenue money,
-  payment_method_id int unique foreign key references payment_method(id),
   deleted bit not null,
-  link text,
   current_rate float
 );
 

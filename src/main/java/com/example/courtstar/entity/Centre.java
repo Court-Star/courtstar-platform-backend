@@ -69,9 +69,6 @@ public class Centre {
     @Builder.Default
     double currentRate = 0;
 
-    @Column(name = "link")
-    String link;
-
     @OneToMany(mappedBy = "centre", cascade = CascadeType.ALL, orphanRemoval = true)
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -112,9 +109,6 @@ public class Centre {
     @Builder.Default
     @Column(name = "deleted")
     boolean deleted = false;
-
-    @OneToOne
-    PaymentMethod paymentMethod;
 
 }
 

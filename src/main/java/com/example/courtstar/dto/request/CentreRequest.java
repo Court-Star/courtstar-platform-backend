@@ -16,7 +16,6 @@ public class CentreRequest {
     String name;
     String address;
     String district;
-    String link;
     LocalTime openTime;
     LocalTime closeTime;
     String pricePerHour;

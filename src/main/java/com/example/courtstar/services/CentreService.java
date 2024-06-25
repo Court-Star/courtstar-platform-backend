@@ -56,8 +56,6 @@ public class CentreService {
     @Autowired
     private ImgRepository imgRepository;
     @Autowired
-    private PaymentMethodRepository paymentMethodRepository;
-    @Autowired
     private CentreStaffRepository centreStaffRepository;
     @Autowired
     private NotificationRepository notificationRepository;
@@ -166,13 +164,6 @@ public class CentreService {
         centre.setImages(imgList);
         centreRepository.save(centre);
 
-        //Fake payment method
-        PaymentMethod paymentMethod = PaymentMethod.builder()
-                .build();
-        paymentMethodRepository.save(paymentMethod);
-        centre.setPaymentMethod(paymentMethod);
-        //end fake payment method
-
         List<Court> courts = generateCourts(centre);
         centre.setCourts(courts);
 
@@ -271,7 +262,6 @@ public class CentreService {
         centre.setName(request.getName());
         centre.setAddress(request.getAddress());
         centre.setDistrict(request.getDistrict());
-        centre.setLink(request.getLink());
         centre.setOpenTime(request.getOpenTime());
         centre.setCloseTime(request.getCloseTime());
         centre.setPricePerHour(Double.parseDouble(request.getPricePerHour().replace(".", "")));

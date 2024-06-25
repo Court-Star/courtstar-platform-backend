@@ -1,5 +1,6 @@
 package com.example.courtstar.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -32,9 +33,11 @@ public class CentreManager {
 
     @OneToOne
     Account account;
-    @OneToMany(mappedBy = "centreManager")
+
+    @OneToMany(mappedBy = "manager")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
+    @JsonIgnore
     List<TransferMoney> transferMonies;
 
 }
