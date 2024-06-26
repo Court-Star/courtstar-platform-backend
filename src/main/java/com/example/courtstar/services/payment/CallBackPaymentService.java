@@ -75,6 +75,7 @@ public class CallBackPaymentService {
 
                 Payment payment = paymentRepository.findById(paymentId).orElseThrow(null);
                 payment.setStatus(true);
+                payment.setZpTransId(data.getString("zp_trans_id"));
                 paymentRepository.save(payment);
 
                 BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingId).orElseThrow(null);
@@ -87,7 +88,7 @@ public class CallBackPaymentService {
                         .slot(bookingSchedule.getSlot())
                         .build());
 
-                qrCodeService.generateQrCode(bookingId);
+                qrCodeService.generateQrCode(bookingId, payment.getTransactionCode());
 
 
                 Centre centre =centreRepository.findById(centreId).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));

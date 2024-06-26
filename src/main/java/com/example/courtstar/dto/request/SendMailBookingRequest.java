@@ -22,4 +22,5 @@ public class SendMailBookingRequest {
     int courtNo;
     double price;
     Slot slot;
+    String appTransId;
 }

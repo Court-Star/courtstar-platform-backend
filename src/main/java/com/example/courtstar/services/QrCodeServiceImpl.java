@@ -31,7 +31,7 @@ public class QrCodeServiceImpl implements QrCodeService {
 
 
     @Override
-    public String generateQrCode(int bookingScheduleId) throws IOException, WriterException, MessagingException {
+    public String generateQrCode(int bookingScheduleId, String appTransId) throws IOException, WriterException, MessagingException {
 
         BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingScheduleId).orElse(null);
         if (bookingSchedule == null) {
@@ -53,6 +53,7 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .courtNo(bookingSchedule.getCourt().getCourtNo())
                     .price(bookingSchedule.getTotalPrice())
                     .slot(bookingSchedule.getSlot())
+                    .appTransId(appTransId)
                     .build();
         } else {
             Account account = bookingSchedule.getAccount();
@@ -67,6 +68,7 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .courtNo(bookingSchedule.getCourt().getCourtNo())
                     .price(bookingSchedule.getTotalPrice())
                     .slot(bookingSchedule.getSlot())
+                    .appTransId(appTransId)
                     .build();
         }
 

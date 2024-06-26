@@ -92,15 +92,15 @@ public class PaymentController {
 
 
 
-    @PostMapping("/refund-payment")
+    @PostMapping("/refund")
     public ResponseEntity<Map<String, Object>> sendRefundRequest(@RequestBody RefundRequest refundRequestDTO) throws org.json.JSONException, IOException {
 
         Map<String, Object> result = this.refundPaymentService.sendRefund(refundRequestDTO);
-        return new ResponseEntity<>(new HashMap<>(), HttpStatus.OK);
+        return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
 
-    @PostMapping("/get-refund-status")
+    @PostMapping("/refund-status")
     public ResponseEntity<Map<String, Object>> getStatusRefund(@RequestBody RefundStatusRequest refundStatusDTO) throws org.json.JSONException, IOException, URISyntaxException {
 
         Map<String, Object> result =  this.refundStatusService.getStatusRefund(refundStatusDTO);

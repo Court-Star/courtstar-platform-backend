@@ -2,6 +2,10 @@ server:
   port: 8080
   servlet:
     context-path: /courtstar
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 spring:
   datasource:
     url: jdbc:sqlserver://courtstar.database.windows.net:1433;database=courtstarv4;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
@@ -23,12 +27,13 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-    thymeleaf:
-      prefix: classpath:/templates/
-      suffix: .html
-      mode: HTML
-      encoding: UTF-8
-      cache: false
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+    mode: HTML
+    encoding: UTF-8
+    cache: false
+    template-resolver-order: 1
   jpa:
     hibernate:
       ddl-auto: update
