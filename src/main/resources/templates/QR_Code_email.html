@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Your Booking Schedule</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -62,6 +64,8 @@
         <li><span class="label">Price:</span><span class="value" th:text="${price}">[Price]</span></li>
         <li><span class="label">Slot:</span><span class="value" th:text="${slot.slotNo + ' (' + slot.startTime + ' - ' + slot.endTime + ')'}">[Slot]</span></li>
     </ul>
+    <span>Or you can see your booking at:</span>
+    <a th:href="@{'http://localhost:3000/payment/result?apptransid=' + ${appTransId} + '&status=1'}">Booking Schedule</a>
     <p>Scan the following QR code to check in:</p>
     <div class="qr-code">
         <img th:src="'cid:' + ${qrCodeContentId}" alt="QR Code"/>

@@ -165,6 +165,7 @@ create table payment
 (
   id int identity(1,1) primary key,
   transaction_code varchar(255),
+  zp_trans_id varchar(255),
   date date,
   status bit,
   booking_schedule_id int unique foreign key references booking_schedule(id)

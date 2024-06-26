@@ -1,6 +1,11 @@
 package com.example.courtstar.services.payment;
 
 import com.example.courtstar.dto.request.RefundRequest;
+import com.example.courtstar.entity.BookingSchedule;
+import com.example.courtstar.entity.Payment;
+import com.example.courtstar.repositories.BookingScheduleRepository;
+import com.example.courtstar.repositories.PaymentRepository;
+import com.example.courtstar.repositories.SlotUnavailableRepository;
 import com.example.courtstar.util.HMACUtil;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -11,6 +16,7 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +28,12 @@ import java.util.*;
 
 @Service
 public class RefundPaymentService {
+    @Autowired
+    private BookingScheduleRepository bookingScheduleRepository;
+    @Autowired
+    private PaymentRepository paymentRepository;
+    @Autowired
+    private SlotUnavailableRepository slotUnavailableRepository;
     @Value("${payment.zalopay.APP_ID}")
     private String APP_ID;
     @Value("${payment.zalopay.KEY1}")
@@ -39,13 +51,16 @@ public class RefundPaymentService {
 
     public Map<String, Object> sendRefund(RefundRequest refundRequestDTO) throws JSONException, IOException {
 
+        Payment payment = paymentRepository.findByBookingScheduleId(refundRequestDTO.getBookingId()).orElseThrow(null);
+        BookingSchedule bookingSchedule = payment.getBookingSchedule();
+
         Map<String, Object> order = new HashMap<>(){{
             put("app_id", APP_ID);
-            put("zp_trans_id", refundRequestDTO.getZpTransId());
+            put("zp_trans_id", payment.getZpTransId());
             put("m_refund_id", getCurrentTimeString("yyMMdd") +"_"+ APP_ID +"_"+
                     System.currentTimeMillis() + "" + (111 + new Random().nextInt(888)));
             put("timestamp", System.currentTimeMillis());
-            put("amount", refundRequestDTO.getAmount());
+            put("amount", bookingSchedule.getTotalPrice());
             put("description", refundRequestDTO.getDescription());
         }};
 
@@ -79,6 +94,19 @@ public class RefundPaymentService {
             String key = (String) it.next();
             finalResult.put(key, jsonResult.get(key));
         }
+
+        slotUnavailableRepository.delete(
+                slotUnavailableRepository.findByDateAndCourtIdAndSlotId
+                    (bookingSchedule.getDate()
+                            , bookingSchedule.getCourt().getId()
+                            , bookingSchedule.getSlot().getId())
+                .orElseThrow(null)
+        );
+
+        payment.setStatus(false);
+        bookingSchedule.setSuccess(false);
+        paymentRepository.save(payment);
+        bookingScheduleRepository.save(bookingSchedule);
 
         return finalResult;
     }

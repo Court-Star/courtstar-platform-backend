@@ -43,6 +43,7 @@ public class EmailBookingUtil {
         context.setVariable("date", request.getDate());
         context.setVariable("price", request.getPrice());
         context.setVariable("slot", request.getSlot());
+        context.setVariable("appTransId", request.getAppTransId());
 
         String qrCodeContentId = "qrcode";
         context.setVariable("qrCodeContentId", qrCodeContentId);
@@ -50,7 +51,7 @@ public class EmailBookingUtil {
         String htmlContent = templateEngine.process("QR_Code_email", context);
 
         MimeMessage mimeMessage = mailSender.createMimeMessage();
-        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
         mimeMessageHelper.setFrom("minhoan305@gmail.com");
         mimeMessageHelper.setTo(request.getEmail());
