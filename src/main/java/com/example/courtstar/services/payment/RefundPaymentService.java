@@ -60,7 +60,7 @@ public class RefundPaymentService {
             put("m_refund_id", getCurrentTimeString("yyMMdd") +"_"+ APP_ID +"_"+
                     System.currentTimeMillis() + "" + (111 + new Random().nextInt(888)));
             put("timestamp", System.currentTimeMillis());
-            put("amount", bookingSchedule.getTotalPrice());
+            put("amount", (long)(bookingSchedule.getTotalPrice()));
             put("description", refundRequestDTO.getDescription());
         }};
 

@@ -29,4 +29,5 @@ public class BookingScheduleResponse {
     String centreImg;
     int rate;
     boolean status;
+    boolean success;
 }
