@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -284,37 +285,54 @@ public class CentreService {
         centre.setNumberOfCourts(request.getNumberOfCourts());
         centre.setDescription(request.getDescription());
 
-        // Tạo danh sách slot mới cho trung tâm
-        List<Slot> slotList = generateSlots(centre);
-        centre.getSlots().clear();
-        centre.getSlots().addAll(slotList);
+        //update new slot range
+        updateSlots(centre);
 
+        //update new image
         List<Image> imgList = generateImages(request, centre);
         centre.getImages().clear();
         centre.getImages().addAll(imgList);
 
-        List<Court> courts = generateCourts(centre);
-        centre.getCourts().clear();
-        centre.getCourts().addAll(courts);
-
-        // Lưu chi tiết trung tâm đã cập nhật
         centreRepository.save(centre);
 
-        // Lưu các slot mới
-        slotRepository.saveAll(slotList);
         imgRepository.saveAll(imgList);
-
-        // Giải phóng bộ nhớ các đối tượng tạm thời
-        slotList.clear();
         imgList.clear();
-        courts.clear();
 
-        // Chuyển trung tâm đã cập nhật thành đối tượng phản hồi và trả về
         CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
         centreResponse.setManagerId(manager.getId());
         manager = null;
         centre = null;
         return centreResponse;
+    }
+
+    private void updateSlots(Centre centre) {
+        List<Slot> currentSlots = centre.getSlots();
+        List<Slot> newSlots = generateSlots(centre);
+
+        currentSlots.forEach(
+                slot -> {
+                    if (!newSlots.contains(slot)) {
+                        slot.setStatus(false);
+                        slot.setSlotNo(0);
+                    }
+                }
+        );
+
+        // Update or add new slot
+        for (Slot newSlot : newSlots) {
+            if (!currentSlots.contains(newSlot)) {
+                currentSlots.add(newSlot);
+            }
+        }
+
+        // Sort and update slotNo
+        currentSlots.stream()
+                .filter(Slot::isStatus)
+                .sorted(Comparator.comparing(Slot::getStartTime))
+                .forEachOrdered(slot -> {
+                    int index = currentSlots.indexOf(slot);
+                    slot.setSlotNo(index + 1);
+                });
     }
 
 }
