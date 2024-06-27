@@ -118,6 +118,7 @@ create table slot
   slot_no int,
   start_time time,
   end_time time,
+  status bit,
   centre_id int foreign key references centre(id),
 );
 
