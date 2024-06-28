@@ -290,8 +290,7 @@ public class CentreService {
 
         //update new image
         List<Image> imgList = generateImages(request, centre);
-        centre.getImages().clear();
-        centre.getImages().addAll(imgList);
+        centre.setImages(imgList);
 
         centreRepository.save(centre);
 
