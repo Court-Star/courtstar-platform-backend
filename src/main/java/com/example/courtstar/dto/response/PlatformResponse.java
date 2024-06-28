@@ -16,7 +16,6 @@ public class PlatformResponse {
     int totalCentre;
     int totalUser;
     Map<LocalDate, Long> users;
-    Map<LocalDate, Long> guests;
     Map<LocalDate, Long> centres;
     Map<LocalDate, Double> revenues;
 }
