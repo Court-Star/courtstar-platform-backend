@@ -37,11 +37,9 @@ public class CourtService {
     CourtRepository courtRepository;
     @Autowired
     CourtMapper courtMapper;
+    @Autowired
+    private CentreRepository centreRepository;
 
-    public CourtResponse createCourt(CourtRequest courtRequest) throws AppException {
-        Court court = courtMapper.toCourt(courtRequest);
-        return courtMapper.toCourtResponse(courtRepository.save(court));
-    }
     public CourtResponse getCourtById(int centreId, int courtNo) throws AppException {
         List<Court> courts = courtRepository.findAllByCourtNo(courtNo);
         Court court = courts.stream()
@@ -67,6 +65,20 @@ public class CourtService {
     }
 
     public List<Court> getCourtByCentreId(int centreId) throws AppException {
+        return courtRepository.findAllByCentreId(centreId);
+    }
+
+    public List<Court> addCourtByCentreId(int centreId) throws AppException {
+        Centre centre = centreRepository.findById(centreId).orElseThrow(null);
+        List<Court> courts = centre.getCourts();
+        centre.setNumberOfCourts(centre.getNumberOfCourts() + 1);
+        Court court = Court.builder()
+                .courtNo(centre.getNumberOfCourts())
+                .centre(centre)
+                .status(true)
+                .build();
+        courts.add(court);
+        centreRepository.save(centre);
         return courtRepository.findAllByCentreId(centreId);
     }
 

@@ -49,4 +49,12 @@ public class CourtController {
                 .data(courtService.getCourtByCentreId(centreId))
                 .build();
     }
+
+    @PostMapping("/{centreId}")
+    public ApiResponse<List<Court>> addCourtByCentreId(@PathVariable int centreId) {
+        return ApiResponse.<List<Court>>builder()
+                .data(courtService.addCourtByCentreId(centreId))
+                .build();
+    }
+
 }
