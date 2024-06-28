@@ -30,9 +30,9 @@ public class SecurityConfig {
             ,"/auth/logout","/auth/refresh","/account/reset-password","/booking","/payment/order-status"
             ,"/payment/donate-callback","/payment/booking-callback","/payment/order-info"
             ,"/payment/refund","/payment/refund-status"
-            ,"/tranfermoney/authenticateWithdrawalOrder/{id}"};
+            ,"/tranfermoney/authenticateWithdrawalOrder/{id}","/paymentvnpay/create-order"};
     private final String[] PUBLIC_URLS_GET = {"/centre/getAllCentreActive", "/centre/getCentre/{id}","/court/{centreId}/{courtNo}"
-            ,"/feedback/{id}","/tranfermoney/getAllSuccess"};
+            ,"/feedback/{id}","/tranfermoney/getAllSuccess","/paymentvnpay/callback"};
     private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {

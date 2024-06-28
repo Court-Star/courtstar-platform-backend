@@ -1,7 +1,12 @@
-package com.example.courtstar.services.payment;
+package com.example.courtstar.services.paymentZalopay;
 
-import com.example.courtstar.dto.request.OrderRequest;
-import com.example.courtstar.entity.Payment;
+import com.example.courtstar.dto.request.DonateForAdmin;
+import com.example.courtstar.entity.Account;
+import com.example.courtstar.entity.CentreManager;
+import com.example.courtstar.exception.AppException;
+import com.example.courtstar.exception.ErrorCode;
+import com.example.courtstar.repositories.AccountReponsitory;
+import com.example.courtstar.repositories.CentreManagerRepository;
 import com.example.courtstar.repositories.PaymentRepository;
 import com.example.courtstar.util.HMACUtil;
 import lombok.Data;
@@ -14,9 +19,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject; // https://mvnrepository.com/artifact/org.json/json
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -27,7 +33,7 @@ import java.util.*;
 
 @Data
 @Service
-public class CreateOrderService {
+public class CreateDonateService {
     @Value("${payment.zalopay.APP_ID}")
     private String APP_ID;
 
@@ -41,6 +47,10 @@ public class CreateOrderService {
     private String ORDER_CREATE_ENDPOINT;
     @Autowired
     private PaymentRepository paymentRepository;
+    @Autowired
+    private AccountReponsitory accountReponsitory;
+    @Autowired
+    private CentreManagerRepository centreManagerRepository;
 
     private String getCurrentTimeString(String format) {
 
@@ -50,19 +60,23 @@ public class CreateOrderService {
         return fmt.format(cal.getTimeInMillis());
     }
 
-    public Map<String, Object> createOrder(OrderRequest orderRequest) throws IOException, JSONException {
-
-
-
+    public Map<String, Object> createOrder(DonateForAdmin orderRequest) throws IOException, JSONException {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        Account account = accountReponsitory.findByEmail(name).orElseThrow(
+                () -> new AppException(ErrorCode.NOT_FOUND_USER)
+        );
+        CentreManager manager = centreManagerRepository.findByAccountId(account.getId())
+                .orElseThrow(
+                        () -> new AppException(ErrorCode.NOT_FOUND_USER)
+                );
         final Map embeddata = new HashMap(){{
-            put("redirecturl", "http://localhost:3000/payment/result");//truyen url trang web muon tra ve klhi thanh toan xong
+            put("redirecturl", "http://localhost:3000/myCentre/balance");//truyen url trang web muon tra ve klhi thanh toan xong
         }};
 
        List<Map<String, Object>> item = new ArrayList<>();
        item.add(new HashMap<String, Object>() {{
-            put("bookingId", orderRequest.getBookingSchedule().getId());
-            put("paymentId", orderRequest.getPayment().getId());
-            put("centreId", orderRequest.getCentre().getId());
+            put("id_manager_centre", manager.getId());
         }});
 
         JSONArray itemArray = new JSONArray();
@@ -76,7 +90,7 @@ public class CreateOrderService {
             put("app_trans_id", getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime());
             put("app_time", System.currentTimeMillis());
             put("app_user", "CourtStar");
-            put("amount", (long)orderRequest.getBookingSchedule().getTotalPrice());;
+            put("amount", Long.parseLong(orderRequest.getAmount().replace(".", "")));
             put("bank_code","");
             put("item",itemArray.toString());
             put("embed_data", new JSONObject(embeddata).toString());
@@ -84,9 +98,8 @@ public class CreateOrderService {
         }};
 
         order.put("description", "CourtStar - Booking Court " + order.get("app_trans_id"));
-        String transaction_id =  order.get("app_trans_id") + "";
-        orderRequest.getPayment().setTransactionCode(transaction_id);
-        paymentRepository.save(orderRequest.getPayment());
+
+
         String data = order.get("app_id") + "|" + order.get("app_trans_id") + "|" + order.get("app_user") + "|" + order.get("amount")
                 + "|" + order.get("app_time") + "|" + order.get("embed_data") + "|" + order.get("item");
         order.put("mac", HMACUtil.HMacHexStringEncode(HMACUtil.HMACSHA256, KEY1, data));

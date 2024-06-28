@@ -65,5 +65,21 @@ payment:
     ORDER_STATUS_ENDPOINT: "https://sandbox.zalopay.com.vn/v001/tpe/getstatusbyapptransid"
     REFUND_PAYMENT_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/refund"
     REFUND_STATUS_PAYMENT_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/query_refund"
+  vnpay:
+    VNP_PAY_URL : "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
+    VNP_RETURN_URL : "http://localhost:8080/courtstar/paymentvnpay/callback"
+    VNP_TMN_CODE : "6P4HZ4D4"
+    SECRET_KEY : "HECUONEHZKNXYLSVMCEALUHGSRLLJZPV"
+    VNP_API_URL : "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"
+    VNP_VERSION : "2.1.0"
+    VNP_COMMAND_ORDER : "pay"
+    VNP_COMMAND_STATUS : "querydr"
+    ORDER_TYPE : "other"
+    VNP_CURRENCY_CODE : "VND"
+    VNP_LOCALE : "vn"
+    VNP_IP_ADDR : "192.168.1.252"
+    VNP_BANK_CODE : "NCB"
+    VNP_RESPONSE_CODE : "00"
+    VNP_TRANSACTION_STATUS: "00"
 
 
