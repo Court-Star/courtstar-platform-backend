@@ -111,7 +111,20 @@ public class CentreService {
     public CentreResponse getCentre(int id) {
         Centre centre = centreRepository.findById(id)
                 .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-        return centreMapper.toCentreResponse(centre);
+        CentreResponse response = centreMapper.toCentreResponse(centre);
+        response.setCourts(
+                centre.getCourts().stream()
+                        .filter(Court::isStatus)
+                        .sorted(Comparator.comparingInt(Court::getCourtNo))
+                        .toList()
+        );
+        response.setSlots(
+                centre.getSlots().stream()
+                        .filter(Slot::isStatus)
+                        .sorted(Comparator.comparingInt(Slot::getSlotNo))
+                        .toList()
+        );
+        return response;
     }
 
     public Set<CentreNameResponse> getAllCentresOfManager(String email){
@@ -282,20 +295,19 @@ public class CentreService {
         centre.setOpenTime(request.getOpenTime());
         centre.setCloseTime(request.getCloseTime());
         centre.setPricePerHour(Double.parseDouble(request.getPricePerHour().replace(".", "")));
-        centre.setNumberOfCourts(request.getNumberOfCourts());
         centre.setDescription(request.getDescription());
 
         //update new slot range
         updateSlots(centre);
 
         //update new image
-        List<Image> imgList = generateImages(request, centre);
-        centre.setImages(imgList);
+        List<Image> oldImages = centre.getImages();
+        oldImages.clear();
+
+        List<Image> newImages = generateImages(request, centre);
+        oldImages.addAll(newImages);
 
         centreRepository.save(centre);
-
-        imgRepository.saveAll(imgList);
-        imgList.clear();
 
         CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
         centreResponse.setManagerId(manager.getId());
@@ -321,17 +333,20 @@ public class CentreService {
         for (Slot newSlot : newSlots) {
             if (!currentSlots.contains(newSlot)) {
                 currentSlots.add(newSlot);
+            } else {
+                int index = currentSlots.indexOf(newSlot);
+                currentSlots.get(index).setStatus(true);
             }
         }
 
         // Sort and update slotNo
+        AtomicInteger slotNo = new AtomicInteger(1);
+
         currentSlots.stream()
                 .filter(Slot::isStatus)
                 .sorted(Comparator.comparing(Slot::getStartTime))
-                .forEachOrdered(slot -> {
-                    int index = currentSlots.indexOf(slot);
-                    slot.setSlotNo(index + 1);
-                });
+                .forEachOrdered(slot -> slot.setSlotNo(slotNo.getAndIncrement()));
+
     }
 
 }
