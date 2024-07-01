@@ -65,6 +65,16 @@ create table centre_manager
   account_id int unique foreign key references account(id)
 );
 
+create table top_up
+(
+    id int identity(1,1) primary key,
+    transaction_code varchar(255),
+    zp_trans_id varchar(255),
+    date date,
+    status bit,
+    manager_id int foreign key references centre_manager(id),
+)
+
 create table transfer_money
 (
     id int identity(1,1) primary key,
