@@ -31,6 +31,9 @@ public class Payment {
     @Column(name = "status")
     boolean status;
 
+    @Column(name = "amount")
+    double amount;
+
     @OneToOne
     BookingSchedule bookingSchedule;
 }
