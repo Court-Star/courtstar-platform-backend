@@ -180,6 +180,7 @@ create table payment
   zp_trans_id varchar(255),
   date date,
   status bit,
+  amount float,
   booking_schedule_id int unique foreign key references booking_schedule(id)
 );
 

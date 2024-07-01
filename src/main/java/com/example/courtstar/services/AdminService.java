@@ -31,6 +31,7 @@ public class AdminService {
     private final BookingScheduleRepository bookingScheduleRepository;
     private final NotificationRepository notificationRepository;
     private final CentreManagerRepository centreManagerRepository;
+    private final PaymentRepository paymentRepository;
 
     public Boolean approveCentre(int centreId) {
         Centre centre = centreRepository.findById(centreId).orElseThrow(
@@ -85,10 +86,13 @@ public class AdminService {
     private Map<LocalDate, Double> getRevenuePerDay() {
         return centreRepository.findAll().stream()
                 .flatMap(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
-                        .stream().filter(BookingSchedule::isSuccess))
+                        .stream().map(
+                                bookingSchedule -> paymentRepository.findByBookingScheduleId(bookingSchedule.getId())
+                                        .orElseThrow(null)
+                        )).filter(Payment::isStatus)
                 .collect(Collectors.groupingBy(
-                        BookingSchedule::getDate, // Group by date
-                        Collectors.summingDouble(BookingSchedule::getTotalPrice) // Sum the revenue for each date
+                        Payment::getDate, // Group by date
+                        Collectors.summingDouble(Payment::getAmount) // Sum the revenue for each date
                 ));
     }
 

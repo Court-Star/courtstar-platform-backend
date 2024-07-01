@@ -101,7 +101,7 @@ public class CentreManagerService {
 
     private double getRevenueToday(CentreManager manager) {
         LocalDate today = LocalDate.now();
-        return manager.getCentres().stream()
+        double revenueToday = manager.getCentres().stream()
                 .flatMapToDouble(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
                         .stream()
                         .filter(
@@ -114,6 +114,7 @@ public class CentreManagerService {
                         .mapToDouble(BookingSchedule::getTotalPrice)
                 )
                 .sum();
+        return revenueToday * 0.95;
     }
 
     private long getBookingToday(CentreManager manager) {
@@ -143,7 +144,7 @@ public class CentreManagerService {
                         })
                         .mapToDouble(BookingSchedule::getTotalPrice)
                 )
-                .sum();
+                .sum() * 0.95;
 
         if (revenueYesterday == 0) {
             return 0; // If there was no revenue yesterday, return 0% change
