@@ -72,7 +72,7 @@ public class CentreManagerService {
                 .todayIncome(getRevenueToday(manager))
                 .todayBookings(getBookingToday(manager))
                 .percent(getPercentageChangesMap(manager))
-                .pending(getFutureRevenueTotal(manager))
+                .pending(getPendingTotal(manager))
                 .build();
     }
 
@@ -104,7 +104,13 @@ public class CentreManagerService {
         return manager.getCentres().stream()
                 .flatMapToDouble(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
                         .stream()
-                        .filter(schedule -> schedule.getDate().isEqual(today) && schedule.isSuccess())
+                        .filter(
+                                schedule -> {
+                                    Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
+                                            .orElseThrow(null);
+                                    return payment.isStatus() && payment.getDate().isEqual(today);
+                                }
+                        )
                         .mapToDouble(BookingSchedule::getTotalPrice)
                 )
                 .sum();
@@ -130,7 +136,11 @@ public class CentreManagerService {
         double revenueYesterday = manager.getCentres().stream()
                 .flatMapToDouble(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
                         .stream()
-                        .filter(schedule -> schedule.getDate().isEqual(yesterday) && schedule.isSuccess())
+                        .filter(schedule -> {
+                            Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
+                                    .orElseThrow(null);
+                            return payment.isStatus() && payment.getDate().isEqual(yesterday);
+                        })
                         .mapToDouble(BookingSchedule::getTotalPrice)
                 )
                 .sum();
@@ -167,15 +177,11 @@ public class CentreManagerService {
         return ((bookingToday - bookingYesterday) / bookingYesterday) * 100;
     }
 
-    private double getFutureRevenueTotal(CentreManager manager) {
-        LocalDate today = LocalDate.now();
-        return manager.getCentres().stream()
-                .flatMapToDouble(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
-                        .stream()
-                        .filter(schedule -> schedule.getDate().isAfter(today) && schedule.isSuccess())
-                        .mapToDouble(BookingSchedule::getTotalPrice)
-                )
-                .sum();
+    private double getPendingTotal(CentreManager manager) {
+        return manager.getTransferMonies().stream()
+                        .filter(money -> !money.isStatus())
+                        .mapToDouble(TransferMoney::getAmount)
+                        .sum();
     }
 
     public CentreManager addInformation(CentreManagerRequest request) {
