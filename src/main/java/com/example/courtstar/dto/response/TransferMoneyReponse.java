@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TranferMoneyReponse {
+public class TransferMoneyReponse {
     String nameBanking;
     String numberBanking;
     double amount;

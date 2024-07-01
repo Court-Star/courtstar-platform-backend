@@ -1,14 +1,16 @@
 package com.example.courtstar.services;
 
 import com.example.courtstar.dto.request.AuthWithdrawalOrderRequest;
-import com.example.courtstar.dto.request.TranferMoneyRequest;
+import com.example.courtstar.dto.request.TransferMoneyRequest;
 import com.example.courtstar.dto.response.AuthWithdrawalOrderResponse;
-import com.example.courtstar.dto.response.TranferMoneyReponse;
+import com.example.courtstar.dto.response.TransferMoneyReponse;
+import com.example.courtstar.entity.Account;
 import com.example.courtstar.entity.CentreManager;
 import com.example.courtstar.entity.TransferMoney;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.TransferMoneyMapper;
+import com.example.courtstar.repositories.AccountReponsitory;
 import com.example.courtstar.repositories.CentreManagerRepository;
 import com.example.courtstar.repositories.TransferMoneyRepository;
 import lombok.AccessLevel;
@@ -17,6 +19,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -32,13 +35,15 @@ public class TransferMoneyService {
     TransferMoneyMapper transferMoneyMapper;
     TransferMoneyRepository transferMoneyRepository;
     CentreManagerRepository centreManagerRepository;
-    public TranferMoneyReponse createTranferMoney(int idManagerCentre,TranferMoneyRequest request) {
-        CentreManager centreManager = centreManagerRepository.findById(idManagerCentre).orElse(null);
+    AccountReponsitory accountReponsitory;
+
+    public TransferMoneyReponse createTransferMoney(int id, TransferMoneyRequest request) {
+        CentreManager centreManager = centreManagerRepository.findById(id).orElse(null);
         if(centreManager.getCurrentBalance()-request.getAmount()<2000000){
             throw new AppException(ErrorCode.NOT_ENOUGHT_MONEY);
         }
         TransferMoney transferMoney = transferMoneyMapper.toTransferMoney(request);
-        System.out.println(transferMoney);
+
         List<TransferMoney> transferMonies = new ArrayList<>();
         transferMonies.add(transferMoney);
         centreManager.setTransferMonies(transferMonies);
@@ -47,13 +52,14 @@ public class TransferMoneyService {
         return transferMoneyMapper.toTranferMoneyReponse(transferMoneyRepository.save(transferMoney));
     }
 
-    public AuthWithdrawalOrderResponse authenticateTranferMoney(AuthWithdrawalOrderRequest request, int idTransfer) {
+    public AuthWithdrawalOrderResponse authenticateTransferMoney(AuthWithdrawalOrderRequest request, int idTransfer) {
 
         TransferMoney transferMoney = transferMoneyRepository.findById(idTransfer).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_TRANSFER_MONEY));
         if(transferMoney.isStatus()==true){
             throw new AppException(ErrorCode.TRANFER_MONEY_SUCCESS);
         }
-        CentreManager centreManager = centreManagerRepository.getById(transferMoney.getManager().getId());
+        CentreManager centreManager = centreManagerRepository.findById(transferMoney.getManager().getId())
+                .orElseThrow(null);
         if(centreManager.getCurrentBalance()-transferMoney.getAmount()<2000000){
             transferMoney.setStatus(false);
             throw new AppException(ErrorCode.NOT_ENOUGHT_MONEY);
@@ -65,13 +71,21 @@ public class TransferMoneyService {
         return transferMoneyMapper.toAuthWithdrawalOrderResponse(transferMoneyRepository.save(transferMoney));
     }
 
-    public List<TransferMoney> getAllTranferMoney() {
-        return  transferMoneyRepository.findAll();
+    public List<TransferMoney> getAllTransferMoney() {
+        var context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+
+        Account account = accountReponsitory.findByEmail(name)
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER));
+
+        CentreManager manager = centreManagerRepository.findByAccountId(account.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER));
+        return  transferMoneyRepository.findAllByManagerId(manager.getId());
     }
-    public List<TransferMoney> getListTranferSuccess() {
+    public List<TransferMoney> getListTransferSuccess() {
         return transferMoneyRepository.findAllByStatus(true);
     }
-    public List<TransferMoney> getListTranferNotSuccess() {
+    public List<TransferMoney> getListTransferNotSuccess() {
         return transferMoneyRepository.findAllByStatus(false);
     }
 }

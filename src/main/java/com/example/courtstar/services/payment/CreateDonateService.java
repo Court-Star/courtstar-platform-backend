@@ -4,11 +4,13 @@ import com.example.courtstar.dto.request.DonateForAdmin;
 import com.example.courtstar.dto.request.OrderRequest;
 import com.example.courtstar.entity.Account;
 import com.example.courtstar.entity.CentreManager;
+import com.example.courtstar.entity.TopUp;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.repositories.AccountReponsitory;
 import com.example.courtstar.repositories.CentreManagerRepository;
 import com.example.courtstar.repositories.PaymentRepository;
+import com.example.courtstar.repositories.TopUpRepository;
 import com.example.courtstar.util.HMACUtil;
 import lombok.Data;
 import org.apache.catalina.Manager;
@@ -31,6 +33,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.*;
 
 @Data
@@ -53,6 +56,8 @@ public class CreateDonateService {
     private AccountReponsitory accountReponsitory;
     @Autowired
     private CentreManagerRepository centreManagerRepository;
+    @Autowired
+    private TopUpRepository topUpRepository;
 
     private String getCurrentTimeString(String format) {
 
@@ -72,6 +77,15 @@ public class CreateDonateService {
                 .orElseThrow(
                         () -> new AppException(ErrorCode.NOT_FOUND_USER)
                 );
+
+        TopUp topUp = topUpRepository.save(
+                TopUp.builder()
+                        .date(LocalDate.now())
+                        .status(false)
+                        .manager(manager)
+                        .build()
+        );
+
         final Map embeddata = new HashMap(){{
             put("redirecturl", "http://localhost:3000/myCentre/balance");//truyen url trang web muon tra ve klhi thanh toan xong
         }};
@@ -79,6 +93,7 @@ public class CreateDonateService {
        List<Map<String, Object>> item = new ArrayList<>();
        item.add(new HashMap<String, Object>() {{
             put("id_manager_centre", manager.getId());
+            put("id_topup", topUp.getId());
         }});
 
         JSONArray itemArray = new JSONArray();
@@ -101,6 +116,13 @@ public class CreateDonateService {
 
         order.put("description", "CourtStar - Booking Court " + order.get("app_trans_id"));
 
+        List<TopUp> topUps = manager.getTopUps();
+        if (topUps == null) {
+            topUps = new ArrayList<>();
+        }
+        topUp.setTransactionCode(order.get("app_trans_id") + "");
+        topUps.add(topUp);
+        centreManagerRepository.save(manager);
 
         String data = order.get("app_id") + "|" + order.get("app_trans_id") + "|" + order.get("app_user") + "|" + order.get("amount")
                 + "|" + order.get("app_time") + "|" + order.get("embed_data") + "|" + order.get("item");

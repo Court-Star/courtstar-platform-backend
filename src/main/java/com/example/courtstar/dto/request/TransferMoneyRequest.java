@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class TranferMoneyRequest {
+public class TransferMoneyRequest {
     private String nameBanking;
     private String numberBanking;
     private double amount;
+    @Builder.Default
     private LocalDateTime dateCreateWithdrawalOrder = LocalDateTime.now();
 }
