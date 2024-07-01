@@ -31,6 +31,9 @@ public class TopUp {
     @Column(name = "status")
     boolean status;
 
+    @Column(name = "amount")
+    double amount;
+
     @ManyToOne
     @JsonIgnore
     @JoinColumn(name = "manager_id")

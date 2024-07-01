@@ -72,6 +72,7 @@ create table top_up
     zp_trans_id varchar(255),
     date date,
     status bit,
+    amount float,
     manager_id int foreign key references centre_manager(id),
 )
 

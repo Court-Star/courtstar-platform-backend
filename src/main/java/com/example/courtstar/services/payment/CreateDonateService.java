@@ -121,6 +121,7 @@ public class CreateDonateService {
             topUps = new ArrayList<>();
         }
         topUp.setTransactionCode(order.get("app_trans_id") + "");
+        topUp.setAmount(Double.parseDouble(orderRequest.getAmount().replace(".", "")));
         topUps.add(topUp);
         centreManagerRepository.save(manager);
 
