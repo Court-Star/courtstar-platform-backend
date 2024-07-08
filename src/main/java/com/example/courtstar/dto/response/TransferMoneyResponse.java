@@ -18,5 +18,6 @@ public class TransferMoneyResponse {
     boolean status;
     LocalDateTime dateCreateWithdrawalOrder;
     LocalDateTime dateAuthenticate;
+    String cardHolderName;
     String managerEmail;
 }
