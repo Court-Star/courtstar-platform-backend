@@ -3,7 +3,7 @@ package com.example.courtstar.services;
 import com.example.courtstar.dto.request.AuthWithdrawalOrderRequest;
 import com.example.courtstar.dto.request.TransferMoneyRequest;
 import com.example.courtstar.dto.response.AuthWithdrawalOrderResponse;
-import com.example.courtstar.dto.response.TransferMoneyReponse;
+import com.example.courtstar.dto.response.TransferMoneyResponse;
 import com.example.courtstar.entity.Account;
 import com.example.courtstar.entity.CentreManager;
 import com.example.courtstar.entity.TransferMoney;
@@ -37,7 +37,7 @@ public class TransferMoneyService {
     CentreManagerRepository centreManagerRepository;
     AccountReponsitory accountReponsitory;
 
-    public TransferMoneyReponse createTransferMoney(int id, TransferMoneyRequest request) {
+    public TransferMoneyResponse createTransferMoney(int id, TransferMoneyRequest request) {
         CentreManager centreManager = centreManagerRepository.findById(id).orElse(null);
         if(centreManager.getCurrentBalance()-request.getAmount()<2000000){
             throw new AppException(ErrorCode.NOT_ENOUGHT_MONEY);
@@ -49,7 +49,7 @@ public class TransferMoneyService {
         centreManager.setTransferMonies(transferMonies);
         centreManagerRepository.save(centreManager);
         transferMoney.setManager(centreManager);
-        return transferMoneyMapper.toTranferMoneyReponse(transferMoneyRepository.save(transferMoney));
+        return transferMoneyMapper.toTransferMoneyResponse(transferMoneyRepository.save(transferMoney));
     }
 
     public AuthWithdrawalOrderResponse authenticateTransferMoney(AuthWithdrawalOrderRequest request, int idTransfer) {
@@ -83,8 +83,18 @@ public class TransferMoneyService {
         return  transferMoneyRepository.findAllByManagerId(manager.getId());
     }
 
-    public List<TransferMoney> getAllTransferMoney() {
-        return transferMoneyRepository.findAll();
+    public List<TransferMoneyResponse> getAllTransferMoney() {
+        return transferMoneyRepository.findAll().stream()
+                .map(
+                        transferMoney -> {
+                            TransferMoneyResponse response =
+                                    transferMoneyMapper.toTransferMoneyResponse(transferMoney);
+                            response.setManagerEmail(transferMoney.getManager()
+                                    .getAccount().getEmail());
+                            return response;
+                        }
+                )
+                .toList();
     }
 
     public List<TransferMoney> getListTransferSuccess() {

@@ -10,10 +10,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TransferMoneyReponse {
+public class TransferMoneyResponse {
+    int id;
     String nameBanking;
     String numberBanking;
     double amount;
     boolean status;
     LocalDateTime dateCreateWithdrawalOrder;
+    LocalDateTime dateAuthenticate;
+    String managerEmail;
 }

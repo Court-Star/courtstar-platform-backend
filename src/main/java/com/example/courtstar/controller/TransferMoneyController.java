@@ -4,7 +4,7 @@ import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.AuthWithdrawalOrderRequest;
 import com.example.courtstar.dto.request.TransferMoneyRequest;
 import com.example.courtstar.dto.response.AuthWithdrawalOrderResponse;
-import com.example.courtstar.dto.response.TransferMoneyReponse;
+import com.example.courtstar.dto.response.TransferMoneyResponse;
 import com.example.courtstar.entity.TransferMoney;
 import com.example.courtstar.services.TransferMoneyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +19,8 @@ public class TransferMoneyController {
     @Autowired
     TransferMoneyService transferMoneyService;
     @PostMapping("/create-withdrawal/{id}")
-    public ApiResponse<TransferMoneyReponse> createTransferMoney(@PathVariable int id, @RequestBody TransferMoneyRequest request) {
-        return  ApiResponse.<TransferMoneyReponse>builder()
+    public ApiResponse<TransferMoneyResponse> createTransferMoney(@PathVariable int id, @RequestBody TransferMoneyRequest request) {
+        return  ApiResponse.<TransferMoneyResponse>builder()
                 .data(transferMoneyService.createTransferMoney(id,request)).build();
     }
     @PostMapping("/authenticate-withdrawal-order/{id}")
@@ -37,8 +37,8 @@ public class TransferMoneyController {
     }
 
     @GetMapping("/all")
-    public ApiResponse<List<TransferMoney>> getAllWithdrawalOrder(){
-        return ApiResponse.<List<TransferMoney>>builder()
+    public ApiResponse<List<TransferMoneyResponse>> getAllWithdrawalOrder(){
+        return ApiResponse.<List<TransferMoneyResponse>>builder()
                 .data(transferMoneyService.getAllTransferMoney())
                 .build();
     }
