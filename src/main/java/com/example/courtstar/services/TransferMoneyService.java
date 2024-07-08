@@ -71,7 +71,7 @@ public class TransferMoneyService {
         return transferMoneyMapper.toAuthWithdrawalOrderResponse(transferMoneyRepository.save(transferMoney));
     }
 
-    public List<TransferMoney> getAllTransferMoney() {
+    public List<TransferMoney> getAllTransferMoneyOfManager() {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
@@ -82,6 +82,11 @@ public class TransferMoneyService {
                 .orElseThrow(() -> new AppException(ErrorCode.NOT_FOUND_USER));
         return  transferMoneyRepository.findAllByManagerId(manager.getId());
     }
+
+    public List<TransferMoney> getAllTransferMoney() {
+        return transferMoneyRepository.findAll();
+    }
+
     public List<TransferMoney> getListTransferSuccess() {
         return transferMoneyRepository.findAllByStatus(true);
     }

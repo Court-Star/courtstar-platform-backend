@@ -29,6 +29,13 @@ public class TransferMoneyController {
                 .data(transferMoneyService.authenticateTransferMoney(request,id))
                 .build();
     }
+    @GetMapping("/manager/all")
+    public ApiResponse<List<TransferMoney>> getAllWithdrawalOrderOfManager(){
+        return ApiResponse.<List<TransferMoney>>builder()
+                .data(transferMoneyService.getAllTransferMoneyOfManager())
+                .build();
+    }
+
     @GetMapping("/all")
     public ApiResponse<List<TransferMoney>> getAllWithdrawalOrder(){
         return ApiResponse.<List<TransferMoney>>builder()
