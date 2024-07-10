@@ -24,11 +24,19 @@ public class TransferMoneyController {
                 .data(transferMoneyService.createTransferMoney(id,request)).build();
     }
     @PostMapping("/authenticate-withdrawal-order/{id}")
-    public ApiResponse<AuthWithdrawalOrderResponse> authenticateWithdrawalOrder(@PathVariable int id, @RequestBody AuthWithdrawalOrderRequest request){
+    public ApiResponse<AuthWithdrawalOrderResponse> authenticateWithdrawalOrder(@PathVariable int id){
         return ApiResponse.<AuthWithdrawalOrderResponse>builder()
-                .data(transferMoneyService.authenticateTransferMoney(request,id))
+                .data(transferMoneyService.authenticateTransferMoney(id))
                 .build();
     }
+
+    @PostMapping("/authenticate-deny-withdrawal-order/{id}")
+    public ApiResponse<AuthWithdrawalOrderResponse> authenticateDenyWithdrawalOrder(@PathVariable int id){
+        return ApiResponse.<AuthWithdrawalOrderResponse>builder()
+                .data(transferMoneyService.authenticateDenyTransferMoney(id))
+                .build();
+    }
+
     @GetMapping("/manager/all")
     public ApiResponse<List<TransferMoney>> getAllWithdrawalOrderOfManager(){
         return ApiResponse.<List<TransferMoney>>builder()
