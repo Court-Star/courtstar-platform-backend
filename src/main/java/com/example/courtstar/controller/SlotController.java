@@ -17,8 +17,8 @@ public class SlotController {
     private SlotService slotService;
 
     @PostMapping("/disable")
-    public ApiResponse<SlotUnavailable> disabledSlot(@RequestBody BookingRequest request){
-        return ApiResponse.<SlotUnavailable>builder()
+    public ApiResponse<Boolean> disabledSlot(@RequestBody BookingRequest request){
+        return ApiResponse.<Boolean>builder()
                 .data(slotService.disableSlot(request))
                 .build();
     }
