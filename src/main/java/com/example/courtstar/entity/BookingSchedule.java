@@ -6,6 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -48,12 +49,9 @@ public class BookingSchedule {
     @ToString.Exclude
     Guest guest;
 
-    @ManyToOne
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 //    @JsonIgnore
-    @JoinColumn(name = "slot_id")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    Slot slot;
+    List<Slot> slots;
 
     @ManyToOne
 //    @JsonIgnore

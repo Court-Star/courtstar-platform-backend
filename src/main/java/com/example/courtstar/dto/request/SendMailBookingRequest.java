@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -21,6 +22,6 @@ public class SendMailBookingRequest {
     LocalDate date;
     int courtNo;
     double price;
-    Slot slot;
+    List<Slot> slots;
     String appTransId;
 }

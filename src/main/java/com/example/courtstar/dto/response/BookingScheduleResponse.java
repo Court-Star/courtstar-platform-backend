@@ -8,6 +8,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +21,7 @@ public class BookingScheduleResponse {
     Integer centreId;
     LocalDate date;
     double totalPrice;
-    Slot slot;
+    List<Slot> slots;
     Court court;
     Account account;
     Guest guest;

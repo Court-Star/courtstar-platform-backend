@@ -52,7 +52,7 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .date(bookingSchedule.getDate())
                     .courtNo(bookingSchedule.getCourt().getCourtNo())
                     .price(bookingSchedule.getTotalPrice())
-                    .slot(bookingSchedule.getSlot())
+                    .slots(bookingSchedule.getSlots())
                     .appTransId(appTransId)
                     .build();
         } else {
@@ -67,7 +67,7 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .date(bookingSchedule.getDate())
                     .courtNo(bookingSchedule.getCourt().getCourtNo())
                     .price(bookingSchedule.getTotalPrice())
-                    .slot(bookingSchedule.getSlot())
+                    .slots(bookingSchedule.getSlots())
                     .appTransId(appTransId)
                     .build();
         }

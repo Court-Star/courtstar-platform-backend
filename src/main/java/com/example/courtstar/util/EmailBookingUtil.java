@@ -42,7 +42,7 @@ public class EmailBookingUtil {
         context.setVariable("centreAddress", request.getCentreAddress());
         context.setVariable("date", request.getDate());
         context.setVariable("price", request.getPrice());
-        context.setVariable("slot", request.getSlot());
+        context.setVariable("slot", request.getSlots());
         context.setVariable("appTransId", request.getAppTransId());
 
         String qrCodeContentId = "qrcode";

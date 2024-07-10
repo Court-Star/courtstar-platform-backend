@@ -82,11 +82,16 @@ public class CallBackPaymentService {
                 bookingSchedule.setSuccess(true);
                 bookingScheduleRepository.save(bookingSchedule);
 
-                slotUnavailableRepository.save(SlotUnavailable.builder()
-                        .date(bookingSchedule.getDate())
-                        .court(bookingSchedule.getCourt())
-                        .slot(bookingSchedule.getSlot())
-                        .build());
+                bookingSchedule.getSlots()
+                                .forEach(
+                                        slot -> {
+                                            slotUnavailableRepository.save(SlotUnavailable.builder()
+                                                    .date(bookingSchedule.getDate())
+                                                    .court(bookingSchedule.getCourt())
+                                                    .slot(slot)
+                                                    .build());
+                                        }
+                                );
 
                 qrCodeService.generateQrCode(bookingId, payment.getTransactionCode());
 

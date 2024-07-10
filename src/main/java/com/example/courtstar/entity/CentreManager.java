@@ -39,11 +39,5 @@ public class CentreManager {
     @ToString.Exclude
     @JsonIgnore
     List<TransferMoney> transferMonies;
-
-    @OneToMany(mappedBy = "manager")
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonIgnore
-    List<TopUp> topUps;
 }
 

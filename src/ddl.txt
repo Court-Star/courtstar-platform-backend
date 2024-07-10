@@ -1,6 +1,6 @@
-create database courtstarv3
+create database courtstarv4
 
-use courtstarv3
+use courtstarv4
 
 create table guest
 (
@@ -64,17 +64,6 @@ create table centre_manager
   current_balance money,
   account_id int unique foreign key references account(id)
 );
-
-create table top_up
-(
-    id int identity(1,1) primary key,
-    transaction_code varchar(255),
-    zp_trans_id varchar(255),
-    date date,
-    status bit,
-    amount float,
-    manager_id int foreign key references centre_manager(id),
-)
 
 create table transfer_money
 (
@@ -149,7 +138,6 @@ create table booking_schedule
   status bit,
   account_id int foreign key references account(id),
   guest_id int foreign key references guest(id),
-  slot_id int foreign key references slot(id),
   court_id int foreign key references court(id),
   success bit
 );

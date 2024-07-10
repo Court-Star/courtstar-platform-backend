@@ -46,12 +46,6 @@ public class Slot {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonIgnore
-    List<BookingSchedule> bookingSchedules;
-
-    @OneToMany(mappedBy = "slot", cascade = CascadeType.ALL, orphanRemoval = true)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    @JsonIgnore
     List<SlotUnavailable> slotUnavailables;
 
     @Override
