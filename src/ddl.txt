@@ -142,6 +142,12 @@ create table booking_schedule
   success bit
 );
 
+create table booking_schedule_slots
+(
+    booking_schedule_id int not null references booking_schedule(id),
+    slots_id int not null references slot(id)
+)
+
 create table feedback
 (
   id int identity(1,1) primary key,
