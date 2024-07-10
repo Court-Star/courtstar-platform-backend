@@ -19,7 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
 @EnableWebSecurity
 @EnableMethodSecurity
@@ -29,9 +29,12 @@ public class SlotService {
     private final SlotRepository slotRepository;
     private final CourtRepository courtRepository;
 
-    public SlotUnavailable disableSlot (BookingRequest request) {
+    public Boolean disableSlot(BookingRequest request) {
 
-        Slot slot = slotRepository.findById(request.getSlotIds().get(0)).orElseThrow(null);
+        List<Integer> slotIds = request.getSlotIds();
+        List<Slot> slots = slotIds.stream().map(
+                slotId -> slotRepository.findById(slotId).orElseThrow(null)
+        ).toList();
         List<Court> courts = courtRepository.findAllByCourtNo(request.getCourtNo());
 
         Court court = courts.stream()
@@ -39,10 +42,16 @@ public class SlotService {
                 .findFirst()
                 .orElseThrow(null);
 
-        return slotUnavailableRepository.save(SlotUnavailable.builder()
-                .date(request.getDate())
-                .court(court)
-                .slot(slot)
-                .build());
+        slots.forEach(
+                slot -> {
+                    slotUnavailableRepository.save(SlotUnavailable.builder()
+                            .date(request.getDate())
+                            .court(court)
+                            .slot(slot)
+                            .build());
+                }
+        );
+
+        return true;
     }
 }
