@@ -16,6 +16,7 @@ public class TransferMoneyRequest {
     private String nameBanking;
     private String numberBanking;
     private double amount;
+    String cardHolderName;
     @Builder.Default
     private LocalDateTime dateCreateWithdrawalOrder = LocalDateTime.now();
 }
