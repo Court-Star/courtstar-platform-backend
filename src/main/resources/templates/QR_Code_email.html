@@ -62,7 +62,10 @@
         <li><span class="label">Date:</span><span class="value" th:text="${date}">[Date]</span></li>
         <li><span class="label">Court Number:</span><span class="value" th:text="${courtNo}">[Court No]</span></li>
         <li><span class="label">Price:</span><span class="value" th:text="${price}">[Price]</span></li>
-        <li><span class="label">Slot:</span><span class="value" th:text="${slot.slotNo + ' (' + slot.startTime + ' - ' + slot.endTime + ')'}">[Slot]</span></li>
+        <li th:each="slot : ${slots}">
+            <span class="label">Slot:</span>
+            <span class="value" th:text="${slot.slotNo + ' (' + slot.startTime + ' - ' + slot.endTime + ')'}">[Slot]</span>
+        </li>
     </ul>
     <span>Or you can see your booking at:</span>
     <a th:href="@{'http://localhost:3000/payment/result?apptransid=' + ${appTransId} + '&status=1'}">Booking Schedule</a>

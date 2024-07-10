@@ -113,7 +113,7 @@ public class BookingService {
         Payment payment = Payment.builder()
                 .date(LocalDate.now())
                 .status(false)
-                .amount(centre.getPricePerHour())
+                .amount(centre.getPricePerHour()*slots.size())
                 .bookingSchedule(bookingSchedule)
                 .build();
 
