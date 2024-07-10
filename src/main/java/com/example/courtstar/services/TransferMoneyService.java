@@ -22,6 +22,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class TransferMoneyService {
         return transferMoneyMapper.toTransferMoneyResponse(transferMoneyRepository.save(transferMoney));
     }
 
-    public AuthWithdrawalOrderResponse authenticateTransferMoney(AuthWithdrawalOrderRequest request, int idTransfer) {
+    public AuthWithdrawalOrderResponse authenticateTransferMoney(int idTransfer) {
 
         TransferMoney transferMoney = transferMoneyRepository.findById(idTransfer).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_TRANSFER_MONEY));
         if(transferMoney.isStatus()==true){
@@ -66,7 +67,20 @@ public class TransferMoneyService {
         }
         centreManager.setCurrentBalance(centreManager.getCurrentBalance()-transferMoney.getAmount());
         transferMoney.setStatus(true);
-        transferMoney.setDateAuthenticate(request.getDateAuthenticate());
+        transferMoney.setDateAuthenticate(LocalDateTime.now());
+        centreManagerRepository.save(centreManager);
+        return transferMoneyMapper.toAuthWithdrawalOrderResponse(transferMoneyRepository.save(transferMoney));
+    }
+
+    public AuthWithdrawalOrderResponse authenticateDenyTransferMoney(int idTransfer) {
+
+        TransferMoney transferMoney = transferMoneyRepository.findById(idTransfer).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_TRANSFER_MONEY));
+        if(transferMoney.isStatus()==true){
+            throw new AppException(ErrorCode.TRANFER_MONEY_SUCCESS);
+        }
+        CentreManager centreManager = centreManagerRepository.findById(transferMoney.getManager().getId())
+                .orElseThrow(null);
+        transferMoney.setDateAuthenticate(LocalDateTime.now());
         centreManagerRepository.save(centreManager);
         return transferMoneyMapper.toAuthWithdrawalOrderResponse(transferMoneyRepository.save(transferMoney));
     }
