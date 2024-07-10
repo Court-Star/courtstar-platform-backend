@@ -101,7 +101,7 @@ public class BookingService {
 
         BookingSchedule bookingSchedule = bookingScheduleRepository.save(BookingSchedule.builder()
                 .date(request.getDate())
-                .totalPrice(centre.getPricePerHour())
+                .totalPrice(centre.getPricePerHour()*slots.size())
                 .status(false)
                 .success(false)
                 .account(account)
