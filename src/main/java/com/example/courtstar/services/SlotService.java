@@ -31,7 +31,7 @@ public class SlotService {
 
     public SlotUnavailable disableSlot (BookingRequest request) {
 
-        Slot slot = slotRepository.findById(request.getSlotId()).orElseThrow(null);
+        Slot slot = slotRepository.findById(request.getSlotIds().get(0)).orElseThrow(null);
         List<Court> courts = courtRepository.findAllByCourtNo(request.getCourtNo());
 
         Court court = courts.stream()

@@ -95,13 +95,18 @@ public class RefundPaymentService {
             finalResult.put(key, jsonResult.get(key));
         }
 
-        slotUnavailableRepository.delete(
-                slotUnavailableRepository.findByDateAndCourtIdAndSlotId
-                    (bookingSchedule.getDate()
-                            , bookingSchedule.getCourt().getId()
-                            , bookingSchedule.getSlot().getId())
-                .orElseThrow(null)
-        );
+        bookingSchedule.getSlots()
+                        .forEach(
+                                slot -> {
+                                    slotUnavailableRepository.delete(
+                                            slotUnavailableRepository.findByDateAndCourtIdAndSlotId
+                                                            (bookingSchedule.getDate()
+                                                                    , bookingSchedule.getCourt().getId()
+                                                                    , slot.getId())
+                                                    .orElseThrow(null)
+                                    );
+                                }
+                        );
 
         payment.setStatus(false);
         bookingSchedule.setSuccess(false);

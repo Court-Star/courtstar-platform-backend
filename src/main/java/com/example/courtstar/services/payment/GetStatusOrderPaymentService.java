@@ -92,7 +92,7 @@ public class GetStatusOrderPaymentService {
             return null;
         }
         BookingSchedule bookingSchedule = payment.getBookingSchedule();
-        Centre centre = bookingSchedule.getSlot().getCentre();
+        Centre centre = bookingSchedule.getCourt().getCentre();
         BookingScheduleResponse bookingScheduleResponse = bookingScheduleMapper.toBookingScheduleResponse(bookingSchedule);
         bookingScheduleResponse.setCentreId(centre.getId());
         bookingScheduleResponse.setCentreName(centre.getName());

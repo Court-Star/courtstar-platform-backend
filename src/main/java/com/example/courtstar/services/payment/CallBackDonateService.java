@@ -1,15 +1,9 @@
 package com.example.courtstar.services.payment;
 
-import com.example.courtstar.entity.Centre;
 import com.example.courtstar.entity.CentreManager;
-import com.example.courtstar.entity.Payment;
-import com.example.courtstar.entity.TopUp;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.repositories.CentreManagerRepository;
-import com.example.courtstar.repositories.CentreRepository;
-import com.example.courtstar.repositories.TopUpRepository;
-import com.example.courtstar.services.QrCodeService;
 import jakarta.xml.bind.DatatypeConverter;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -36,8 +30,6 @@ public class CallBackDonateService {
 
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
-    @Autowired
-    private TopUpRepository topUpRepository;
 
     public Object doCallBack(JSONObject result, String jsonStr) throws JSONException, NoSuchAlgorithmException, InvalidKeyException {
         HmacSHA256  = Mac.getInstance("HmacSHA256");
@@ -66,12 +58,6 @@ public class CallBackDonateService {
                 JSONArray jsonArray = new JSONArray(data.getString("item"));
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
                 int id_manager_centre = jsonObject.getInt("id_manager_centre");
-                int id_topup = jsonObject.getInt("id_topup");
-
-                TopUp topUp = topUpRepository.findById(id_topup).orElseThrow(null);
-                topUp.setStatus(true);
-                topUp.setZpTransId(data.getString("zp_trans_id"));
-                topUpRepository.save(topUp);
 
                 CentreManager centreManager = centreManagerRepository.findById(id_manager_centre).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
                 Long amount = (long) (centreManager.getCurrentBalance()+data.getLong("amount"));

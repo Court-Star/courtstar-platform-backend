@@ -88,7 +88,10 @@ public class BookingService {
         }
 
         Centre centre = centreRepository.findById(request.getCentreId()).orElseThrow(null);
-        Slot slot = slotRepository.findById(request.getSlotId()).orElseThrow(null);
+        List<Integer> slotIds = request.getSlotIds();
+        List<Slot> slots = slotIds.stream().map(
+                slotId -> slotRepository.findById(slotId).orElseThrow(null)
+                ).toList();
         List<Court> courts = courtRepository.findAllByCourtNo(request.getCourtNo());
 
         Court court = courts.stream()
@@ -103,7 +106,7 @@ public class BookingService {
                 .success(false)
                 .account(account)
                 .guest(guest)
-                .slot(slot)
+                .slots(slots)
                 .court(court)
                 .build());
 
@@ -143,7 +146,7 @@ public class BookingService {
         return allSchedules.stream()
                 .filter(BookingSchedule::isSuccess) // Assuming isSuccess is a boolean getter method
                 .map(bookingSchedule -> {
-                    Centre centre = bookingSchedule.getSlot().getCentre();
+                    Centre centre = bookingSchedule.getCourt().getCentre();
                     Feedback feedback = feedbackRepository.findByBookingScheduleId(bookingSchedule.getId()).orElse(null);
                     int rate = feedback!=null ? feedback.getRate() :  0;
                     BookingScheduleResponse bookingScheduleResponse = bookingScheduleMapper.toBookingScheduleResponse(bookingSchedule);
