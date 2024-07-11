@@ -39,8 +39,9 @@ public class TransferMoneyService {
     AccountReponsitory accountReponsitory;
 
     public TransferMoneyResponse createTransferMoney(int id, TransferMoneyRequest request) {
+        request.setAmount(request.getAmount().replace(".",""));
         CentreManager centreManager = centreManagerRepository.findById(id).orElse(null);
-        if(centreManager.getCurrentBalance()-request.getAmount()<2000000){
+        if(centreManager.getCurrentBalance()-Double.parseDouble(request.getAmount())<2000000){
             throw new AppException(ErrorCode.NOT_ENOUGHT_MONEY);
         }
         TransferMoney transferMoney = transferMoneyMapper.toTransferMoney(request);

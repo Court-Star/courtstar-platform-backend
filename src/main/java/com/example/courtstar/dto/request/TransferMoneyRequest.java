@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 public class TransferMoneyRequest {
     private String nameBanking;
     private String numberBanking;
-    private double amount;
+    private String amount;
     String cardHolderName;
     @Builder.Default
     private LocalDateTime dateCreateWithdrawalOrder = LocalDateTime.now();
