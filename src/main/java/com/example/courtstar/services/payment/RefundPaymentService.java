@@ -5,7 +5,6 @@ import com.example.courtstar.entity.BookingSchedule;
 import com.example.courtstar.entity.Payment;
 import com.example.courtstar.repositories.BookingScheduleRepository;
 import com.example.courtstar.repositories.PaymentRepository;
-import com.example.courtstar.repositories.SlotUnavailableRepository;
 import com.example.courtstar.util.HMACUtil;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -32,8 +31,6 @@ public class RefundPaymentService {
     private BookingScheduleRepository bookingScheduleRepository;
     @Autowired
     private PaymentRepository paymentRepository;
-    @Autowired
-    private SlotUnavailableRepository slotUnavailableRepository;
     @Value("${payment.zalopay.APP_ID}")
     private String APP_ID;
     @Value("${payment.zalopay.KEY1}")
@@ -95,18 +92,18 @@ public class RefundPaymentService {
             finalResult.put(key, jsonResult.get(key));
         }
 
-        bookingSchedule.getSlots()
-                        .forEach(
-                                slot -> {
-                                    slotUnavailableRepository.delete(
-                                            slotUnavailableRepository.findByDateAndCourtIdAndSlotId
-                                                            (bookingSchedule.getDate()
-                                                                    , bookingSchedule.getCourt().getId()
-                                                                    , slot.getId())
-                                                    .orElseThrow(null)
-                                    );
-                                }
-                        );
+//        bookingSchedule.getSlots()
+//                        .forEach(
+//                                slot -> {
+//                                    slotUnavailableRepository.delete(
+//                                            slotUnavailableRepository.findByDateAndCourtIdAndSlotId
+//                                                            (bookingSchedule.getDate()
+//                                                                    , bookingSchedule.getCourt().getId()
+//                                                                    , slot.getId())
+//                                                    .orElseThrow(null)
+//                                    );
+//                                }
+//                        );
 
         payment.setStatus(false);
         bookingSchedule.setSuccess(false);

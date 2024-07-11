@@ -87,33 +87,29 @@ public class BookingService {
             );
         }
 
-        Centre centre = centreRepository.findById(request.getCentreId()).orElseThrow(null);
-        List<Integer> slotIds = request.getSlotIds();
-        List<Slot> slots = slotIds.stream().map(
-                slotId -> slotRepository.findById(slotId).orElseThrow(null)
+        List<BookingDetail> bookingDetails = request.getBookingDetails().stream()
+                .map(
+                    req -> BookingDetail.builder()
+                            .slot(slotRepository.findById(req.getSlotId()).orElse(null))
+                            .court(courtRepository.findById(req.getCourtId()).orElse(null))
+                            .date(req.getDate())
+                            .build()
                 ).toList();
-        List<Court> courts = courtRepository.findAllByCourtNo(request.getCourtNo());
 
-        Court court = courts.stream()
-                .filter(c -> c.getCentre().getId().equals(request.getCentreId()))
-                .findFirst()
-                .orElseThrow(null);
+        Centre centre = bookingDetails.get(0).getCourt().getCentre();
 
         BookingSchedule bookingSchedule = bookingScheduleRepository.save(BookingSchedule.builder()
-                .date(request.getDate())
-                .totalPrice(centre.getPricePerHour()*slots.size())
-                .status(false)
+                .totalPrice(centre.getPricePerHour()*bookingDetails.size())
                 .success(false)
                 .account(account)
                 .guest(guest)
-                .slots(slots)
-                .court(court)
+                .bookingDetails(bookingDetails)
                 .build());
 
         Payment payment = Payment.builder()
                 .date(LocalDate.now())
                 .status(false)
-                .amount(centre.getPricePerHour()*slots.size())
+                .amount(centre.getPricePerHour()*bookingDetails.size())
                 .bookingSchedule(bookingSchedule)
                 .build();
 
@@ -129,10 +125,11 @@ public class BookingService {
         return createOrderService.createOrder(orderRequest);
     }
 
-    public List<BookingSchedule> getBookingSchedules(int centreId) {
+    public List<BookingDetail> getBookingScheduleDetails(int centreId) {
         List<BookingSchedule> allSchedules = bookingScheduleRepository.findAllByCentreId(centreId);
         return allSchedules.stream()
-                .filter(BookingSchedule::isSuccess) // Assuming isSuccess is a boolean getter method
+                .filter(BookingSchedule::isSuccess)
+                .flatMap(bookingSchedule -> bookingSchedule.getBookingDetails().stream())
                 .collect(Collectors.toList());
     }
 
@@ -146,7 +143,7 @@ public class BookingService {
         return allSchedules.stream()
                 .filter(BookingSchedule::isSuccess) // Assuming isSuccess is a boolean getter method
                 .map(bookingSchedule -> {
-                    Centre centre = bookingSchedule.getCourt().getCentre();
+                    Centre centre = bookingSchedule.getBookingDetails().get(0).getCourt().getCentre();
                     Feedback feedback = feedbackRepository.findByBookingScheduleId(bookingSchedule.getId()).orElse(null);
                     int rate = feedback!=null ? feedback.getRate() :  0;
                     BookingScheduleResponse bookingScheduleResponse = bookingScheduleMapper.toBookingScheduleResponse(bookingSchedule);

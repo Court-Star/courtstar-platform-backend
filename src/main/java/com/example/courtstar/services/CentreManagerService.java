@@ -89,15 +89,15 @@ public class CentreManagerService {
                 .sum();
     }
 
-    private Map<LocalDate, Double> getTotalRevenuePerDay(CentreManager manager) {
-        return manager.getCentres().stream()
-                .flatMap(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
-                        .stream().filter(BookingSchedule::isSuccess))
-                .collect(Collectors.groupingBy(
-                        BookingSchedule::getDate, // Group by date
-                        Collectors.summingDouble(BookingSchedule::getTotalPrice) // Sum the revenue for each date
-                ));
-    }
+//    private Map<LocalDate, Double> getTotalRevenuePerDay(CentreManager manager) {
+//        return manager.getCentres().stream()
+//                .flatMap(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
+//                        .stream().filter(BookingSchedule::isSuccess))
+//                .collect(Collectors.groupingBy(
+//                        BookingSchedule::getDate, // Group by date
+//                        Collectors.summingDouble(BookingSchedule::getTotalPrice) // Sum the revenue for each date
+//                ));
+//    }
 
     private double getRevenueToday(CentreManager manager) {
         LocalDate today = LocalDate.now();

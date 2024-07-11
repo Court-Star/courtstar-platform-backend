@@ -41,7 +41,7 @@ public class CallBackPaymentService {
     @Autowired
     private BookingScheduleRepository bookingScheduleRepository;
     @Autowired
-    private SlotUnavailableRepository slotUnavailableRepository;
+    private BookingDetailRepository bookingDetailRepository;
 
     public Object doCallBack(JSONObject result, String jsonStr) throws JSONException, NoSuchAlgorithmException, InvalidKeyException {
         HmacSHA256  = Mac.getInstance("HmacSHA256");
@@ -80,18 +80,10 @@ public class CallBackPaymentService {
 
                 BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingId).orElseThrow(null);
                 bookingSchedule.setSuccess(true);
+                bookingSchedule.getBookingDetails()
+                                .forEach(detail -> detail.setStatus(true));
                 bookingScheduleRepository.save(bookingSchedule);
 
-                bookingSchedule.getSlots()
-                                .forEach(
-                                        slot -> {
-                                            slotUnavailableRepository.save(SlotUnavailable.builder()
-                                                    .date(bookingSchedule.getDate())
-                                                    .court(bookingSchedule.getCourt())
-                                                    .slot(slot)
-                                                    .build());
-                                        }
-                                );
 
                 qrCodeService.generateQrCode(bookingId, payment.getTransactionCode());
 

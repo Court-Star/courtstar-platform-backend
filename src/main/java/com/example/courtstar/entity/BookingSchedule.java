@@ -21,15 +21,8 @@ public class BookingSchedule {
     @Column(name = "id", nullable = false)
     Integer id;
 
-    @Column(name = "date")
-    LocalDate date;
-
     @Column(name = "total_price")
     double totalPrice;
-
-    @Column(name = "status")
-    @Builder.Default
-    boolean status = false;
 
     @Column(name = "success")
     @Builder.Default
@@ -49,14 +42,9 @@ public class BookingSchedule {
     @ToString.Exclude
     Guest guest;
 
-    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    @JsonIgnore
-    List<Slot> slots;
-
-    @ManyToOne
-//    @JsonIgnore
-    @JoinColumn(name = "court_id")
+    @OneToMany(mappedBy = "bookingSchedule", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    Court court;
+    List<BookingDetail> bookingDetails;
 }

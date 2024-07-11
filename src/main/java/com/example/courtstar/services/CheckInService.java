@@ -1,11 +1,10 @@
 package com.example.courtstar.services;
 
 import com.example.courtstar.dto.response.AccountResponse;
-import com.example.courtstar.entity.Account;
-import com.example.courtstar.entity.BookingSchedule;
-import com.example.courtstar.entity.Slot;
+import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
+import com.example.courtstar.repositories.BookingDetailRepository;
 import com.example.courtstar.repositories.BookingScheduleRepository;
 import com.example.courtstar.repositories.SlotRepository;
 import lombok.AccessLevel;
@@ -45,24 +44,26 @@ public class CheckInService {
     private final AccountService accountService;
     @Autowired
     private final SlotRepository slotRepository;
+    @Autowired
+    private BookingDetailRepository bookingDetailRepository;
 
-    public Boolean checkIn(int bookingScheduleId) {
+    public Boolean checkIn(int bookingDetailId) {
         boolean result = false;
-        BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingScheduleId).orElse(null);
-        if (bookingSchedule != null) {
-            bookingSchedule.setStatus(true);
-            bookingScheduleRepository.save(bookingSchedule);
+        BookingDetail bookingDetail = bookingDetailRepository.findById(bookingDetailId).orElse(null);
+        if (bookingDetail != null) {
+            bookingDetail.setCheckedIn(true);
+            bookingDetailRepository.save(bookingDetail);
             result = true;
         }
         return result;
     }
 
-    public Boolean undoCheckIn(int bookingScheduleId) {
+    public Boolean undoCheckIn(int bookingDetailId) {
         boolean result = false;
-        BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingScheduleId).orElse(null);
-        if (bookingSchedule != null) {
-            bookingSchedule.setStatus(false);
-            bookingScheduleRepository.save(bookingSchedule);
+        BookingDetail bookingDetail = bookingDetailRepository.findById(bookingDetailId).orElse(null);
+        if (bookingDetail != null) {
+            bookingDetail.setCheckedIn(false);
+            bookingDetailRepository.save(bookingDetail);
             result = true;
         }
         return result;

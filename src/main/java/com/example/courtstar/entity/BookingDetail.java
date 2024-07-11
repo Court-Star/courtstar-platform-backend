@@ -9,12 +9,12 @@ import java.time.LocalDate;
 
 @Entity
 @Data
-@Table(name = "slot_unavailable")
+@Table(name = "booking_detail")
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class SlotUnavailable {
+public class BookingDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -24,7 +24,6 @@ public class SlotUnavailable {
     LocalDate date;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "court_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
@@ -35,4 +34,20 @@ public class SlotUnavailable {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     Slot slot;
+
+    @Column(name = "status")
+    @Builder.Default
+    @JsonIgnore
+    boolean status = false;
+
+    @Column(name = "checked_in")
+    @Builder.Default
+    boolean checkedIn = false;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "booking_schedule_id")
+    @EqualsAndHashCode.Exclude
+    @ToString.Exclude
+    BookingSchedule bookingSchedule;
 }
