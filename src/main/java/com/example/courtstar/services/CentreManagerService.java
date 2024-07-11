@@ -65,6 +65,7 @@ public class CentreManagerService {
         CentreManager manager = centreManagerRepository.findByAccountId(account.getId()).orElseThrow(null);
         AccountResponse accountResponse = accountMapper.toAccountResponse(account);
         return CentreManagerResponse.builder()
+                .id(manager.getId())
                 .account(accountResponse)
                 .address(manager.getAddress())
                 .currentBalance(manager.getCurrentBalance())
