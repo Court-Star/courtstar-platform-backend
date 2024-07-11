@@ -5,7 +5,12 @@ import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.dto.response.CourtResponse;
 import com.example.courtstar.entity.Court;
+import com.example.courtstar.exception.AppException;
+import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.CentreMapper;
+import com.example.courtstar.mapper.CourtMapper;
+import com.example.courtstar.mapper.CourtMapperImpl;
+import com.example.courtstar.repositories.CourtRepository;
 import com.example.courtstar.services.CentreService;
 import com.example.courtstar.services.CourtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +26,23 @@ import java.util.Set;
 public class CourtController {
     @Autowired
     private CourtService courtService;
+    @Autowired
+    private CourtRepository courtRepository;
+    @Autowired
+    private CourtMapper courtMapper;
 
     @GetMapping("/getAllCourt")
     public ApiResponse<List<CourtResponse>> GetAllCourt() {
         return ApiResponse.<List<CourtResponse>>builder()
                 .data(courtService.getAllCourts())
+                .build();
+    }
+
+    @GetMapping("/booking-detail/{id}")
+    public ApiResponse<CourtResponse> getCourtById(@PathVariable int id) {
+        return ApiResponse.<CourtResponse>builder()
+                .data(courtMapper.toCourtResponse(courtRepository.findById(id)
+                        .orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_COURT))))
                 .build();
     }
 

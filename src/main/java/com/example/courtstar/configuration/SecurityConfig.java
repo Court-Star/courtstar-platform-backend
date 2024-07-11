@@ -30,7 +30,8 @@ public class SecurityConfig {
             ,"/auth/logout","/auth/refresh","/account/reset-password","/booking","/payment/order-status"
             ,"/payment/donate-callback","/payment/booking-callback","/payment/order-info"
             ,"/payment/refund","/payment/refund-status"};
-    private final String[] PUBLIC_URLS_GET = {"/centre/getAllCentreActive", "/centre/getCentre/{id}","/court/{centreId}/{courtNo}"
+    private final String[] PUBLIC_URLS_GET = {"/centre/getAllCentreActive", "/centre/getCentre/{id}"
+            ,"/court/{centreId}/{courtNo}", "/booking-detail/{id}"
             ,"/feedback/{id}"};
     private final String[] PUBLIC_URLS_PUT = {"/account/regenerate-otp"};
     @Bean
