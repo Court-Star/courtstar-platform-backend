@@ -1,6 +1,6 @@
-create database courtstarv4
+create database courtstarv5
 
-use courtstarv4
+use courtstarv5
 
 create table guest
 (
@@ -73,6 +73,7 @@ create table transfer_money
     date_create_withdrawal_order datetime,
     name_banking varchar(255),
     number_banking varchar(255),
+    card_holder_name varchar(255),
     status bit not null,
     manager_id int foreign key references centre_manager(id)
 )
@@ -122,31 +123,25 @@ create table slot
   centre_id int foreign key references centre(id),
 );
 
-create table slot_unavailable
+create table booking_schedule
+(
+  id int identity(1,1) primary key,
+  total_price money,
+  account_id int foreign key references account(id),
+  guest_id int foreign key references guest(id),
+  success bit
+)
+
+create table booking_detail
 (
   id int identity(1,1) primary key,
   date date,
   slot_id int foreign key references slot(id),
   court_id int foreign key references court(id),
-);
-
-create table booking_schedule
-(
-  id int identity(1,1) primary key,
-  date date,
-  total_price money,
   status bit,
-  account_id int foreign key references account(id),
-  guest_id int foreign key references guest(id),
-  court_id int foreign key references court(id),
-  success bit
+  checked_in bit,
+  booking_schedule_id int foreign key references booking_schedule(id)
 );
-
-create table booking_schedule_slots
-(
-    booking_schedule_id int not null references booking_schedule(id),
-    slots_id int not null references slot(id)
-)
 
 create table feedback
 (
@@ -194,8 +189,7 @@ create table notification
 
 
 -- Create permissions
--- INSERT INTO permission (name, description) VALUES ('READ_PRIVILEGE', 'Allows reading');
--- INSERT INTO permission (name, description) VALUES ('WRITE_PRIVILEGE', 'Allows writing');
+INSERT INTO permission (name, description) VALUES ('GET_MY_INFO', 'Allows reading');
 
 -- Create roles and associate permissions
 INSERT INTO role (name, description) VALUES ('ADMIN', 'Administrator role');
@@ -204,11 +198,10 @@ INSERT INTO role (name, description) VALUES ('STAFF', 'Staff role');
 INSERT INTO role (name, description) VALUES ('CUSTOMER', 'Customer role');
 
 -- Assuming you have a join table for role and permission
--- INSERT INTO role_permissions (role_id, permission_id) VALUES ('ADMIN', 'READ_PRIVILEGE');
--- INSERT INTO role_permissions (role_id, permission_id) VALUES ('ADMIN', 'WRITE_PRIVILEGE');
--- INSERT INTO role_permissions (role_id, permission_id) VALUES ('MANAGER', 'READ_PRIVILEGE');
--- INSERT INTO role_permissions (role_id, permission_id) VALUES ('STAFF', 'READ_PRIVILEGE');
--- INSERT INTO role_permissions (role_id, permission_id) VALUES ('CUSTOMER', 'READ_PRIVILEGE');
+ INSERT INTO role_permissions (role_name, permissions_name) VALUES ('ADMIN', 'GET_MY_INFO');
+ INSERT INTO role_permissions (role_name, permissions_name) VALUES ('MANAGER', 'GET_MY_INFO');
+ INSERT INTO role_permissions (role_name, permissions_name) VALUES ('STAFF', 'GET_MY_INFO');
+ INSERT INTO role_permissions (role_name, permissions_name) VALUES ('CUSTOMER', 'GET_MY_INFO');
 
 -- Create accounts and associate roles, pass 123
 INSERT INTO account (email, password, phone, first_name, last_name, deleted, role_name) VALUES ('thanh@gmail.com', '$2a$10$wVJxdHDOO/dY.WgpWNa7c.fIS8fJ5kle.09DfHUTy5q4bWX0z.vsK', '1234567890', 'Thanh', 'Nguyen', 0, 'ADMIN');

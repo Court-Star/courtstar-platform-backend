@@ -46,7 +46,7 @@ public class Slot {
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JsonIgnore
-    List<SlotUnavailable> slotUnavailables;
+    List<BookingDetail> bookingDetails;
 
     @Override
     public boolean equals(Object o) {

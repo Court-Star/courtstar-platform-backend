@@ -2,8 +2,7 @@ package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.BookingRequest;
-import com.example.courtstar.entity.SlotUnavailable;
-import com.example.courtstar.services.SlotService;
+import com.example.courtstar.services.CentreService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,12 +13,12 @@ import org.springframework.web.bind.annotation.*;
 public class SlotController {
 
     @Autowired
-    private SlotService slotService;
+    private CentreService centreService;
 
     @PostMapping("/disable")
     public ApiResponse<Boolean> disabledSlot(@RequestBody BookingRequest request){
         return ApiResponse.<Boolean>builder()
-                .data(slotService.disableSlot(request))
+                .data(centreService.disableSlot(request))
                 .build();
     }
 }

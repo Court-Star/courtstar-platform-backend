@@ -47,12 +47,10 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .firstName(guest.getFullName())
                     .lastName("")
                     .phone(guest.getPhone())
-                    .centreName(bookingSchedule.getCourt().getCentre().getName())
-                    .centreAddress(bookingSchedule.getCourt().getCentre().getAddress())
-                    .date(bookingSchedule.getDate())
-                    .courtNo(bookingSchedule.getCourt().getCourtNo())
+                    .centreName(bookingSchedule.getBookingDetails().get(0).getCourt().getCentre().getName())
+                    .centreAddress(bookingSchedule.getBookingDetails().get(0).getCourt().getCentre().getAddress())
                     .price(bookingSchedule.getTotalPrice())
-                    .slots(bookingSchedule.getSlots())
+                    .bookingDetails(bookingSchedule.getBookingDetails())
                     .appTransId(appTransId)
                     .build();
         } else {
@@ -62,12 +60,10 @@ public class QrCodeServiceImpl implements QrCodeService {
                     .firstName(account.getFirstName())
                     .lastName(account.getLastName())
                     .phone(account.getPhone())
-                    .centreName(bookingSchedule.getCourt().getCentre().getName())
-                    .centreAddress(bookingSchedule.getCourt().getCentre().getAddress())
-                    .date(bookingSchedule.getDate())
-                    .courtNo(bookingSchedule.getCourt().getCourtNo())
+                    .centreName(bookingSchedule.getBookingDetails().get(0).getCourt().getCentre().getName())
+                    .centreAddress(bookingSchedule.getBookingDetails().get(0).getCourt().getCentre().getAddress())
                     .price(bookingSchedule.getTotalPrice())
-                    .slots(bookingSchedule.getSlots())
+                    .bookingDetails(bookingSchedule.getBookingDetails())
                     .appTransId(appTransId)
                     .build();
         }

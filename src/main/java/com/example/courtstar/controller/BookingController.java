@@ -3,6 +3,7 @@ package com.example.courtstar.controller;
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.BookingRequest;
 import com.example.courtstar.dto.response.BookingScheduleResponse;
+import com.example.courtstar.entity.BookingDetail;
 import com.example.courtstar.entity.BookingSchedule;
 import com.example.courtstar.services.BookingService;
 import com.google.zxing.WriterException;
@@ -31,9 +32,9 @@ public class BookingController {
     }
 
     @GetMapping("/{centreId}")
-    public ApiResponse<List<BookingSchedule>> getBookingSchedules(@PathVariable int centreId){
-        return ApiResponse.<List<BookingSchedule>>builder()
-                .data(bookingService.getBookingSchedules(centreId))
+    public ApiResponse<List<BookingDetail>> getBookingSchedules(@PathVariable int centreId){
+        return ApiResponse.<List<BookingDetail>>builder()
+                .data(bookingService.getBookingScheduleDetails(centreId))
                 .build();
     }
 

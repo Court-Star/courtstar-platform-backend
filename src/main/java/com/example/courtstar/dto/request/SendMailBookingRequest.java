@@ -1,5 +1,6 @@
 package com.example.courtstar.dto.request;
 
+import com.example.courtstar.entity.BookingDetail;
 import com.example.courtstar.entity.Slot;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -19,9 +20,7 @@ public class SendMailBookingRequest {
     String phone;
     String centreName;
     String centreAddress;
-    LocalDate date;
-    int courtNo;
     double price;
-    List<Slot> slots;
+    List<BookingDetail> bookingDetails;
     String appTransId;
 }

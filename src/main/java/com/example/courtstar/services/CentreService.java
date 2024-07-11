@@ -1,6 +1,7 @@
 package com.example.courtstar.services;
 
 import com.example.courtstar.constant.PredefinedNotificationType;
+import com.example.courtstar.dto.request.BookingRequest;
 import com.example.courtstar.dto.request.CentreRequest;
 import com.example.courtstar.dto.request.CourtRequest;
 import com.example.courtstar.dto.response.CentreActiveResponse;
@@ -60,6 +61,8 @@ public class CentreService {
     private CentreStaffRepository centreStaffRepository;
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private BookingDetailRepository bookingDetailRepository;
 
     public CentreResponse createCentre(CentreRequest request) {
         Centre centre = centreMapper.toCentre(request);
@@ -347,6 +350,20 @@ public class CentreService {
                 .sorted(Comparator.comparing(Slot::getStartTime))
                 .forEachOrdered(slot -> slot.setSlotNo(slotNo.getAndIncrement()));
 
+    }
+
+    public Boolean disableSlot(BookingRequest request) {
+        List<BookingDetail> bookingDetails = request.getBookingDetails().stream()
+                .map(bookingDetailRequest ->
+                        BookingDetail.builder()
+                                .date(bookingDetailRequest.getDate())
+                                .slot(slotRepository.findById(bookingDetailRequest.getSlotId()).orElse(null))
+                                .court(courtRepository.findById(bookingDetailRequest.getCourtId()).orElse(null))
+                                .status(true)
+                                .build()
+                ).collect(Collectors.toList());
+        bookingDetailRepository.saveAll(bookingDetails);
+        return true;
     }
 
 }

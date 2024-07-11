@@ -36,13 +36,11 @@ public class EmailBookingUtil {
 
         Context context = new Context();
         context.setVariable("name", request.getFirstName() + " " + request.getLastName());
-        context.setVariable("courtNo", request.getCourtNo());
         context.setVariable("email", request.getEmail());
         context.setVariable("centreName", request.getCentreName());
         context.setVariable("centreAddress", request.getCentreAddress());
-        context.setVariable("date", request.getDate());
         context.setVariable("price", request.getPrice());
-        context.setVariable("slots", request.getSlots());
+        context.setVariable("bookingDetails", request.getBookingDetails());
         context.setVariable("appTransId", request.getAppTransId());
 
         String qrCodeContentId = "qrcode";
