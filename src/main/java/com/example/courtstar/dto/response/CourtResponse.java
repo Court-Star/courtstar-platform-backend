@@ -15,5 +15,5 @@ public class CourtResponse {
     int id;
     int courtNo;
     boolean status;
-    List<BookingDetail> bookingDetails;
+    List<BookingDetailResponse> bookingDetails;
 }
