@@ -136,6 +136,9 @@ public class BookingService {
         return allSchedules.stream()
                 .filter(BookingSchedule::isSuccess)
                 .flatMap(bookingSchedule -> bookingSchedule.getBookingDetails().stream())
+                .filter(
+                    bookingDetail -> bookingDetail.getBookingSchedule() != null
+                )
                 .collect(Collectors.toList());
     }
 

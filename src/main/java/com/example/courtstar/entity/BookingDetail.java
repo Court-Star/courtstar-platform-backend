@@ -44,7 +44,6 @@ public class BookingDetail {
     boolean checkedIn = false;
 
     @ManyToOne
-    @JsonIgnore
     @JoinColumn(name = "booking_schedule_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
