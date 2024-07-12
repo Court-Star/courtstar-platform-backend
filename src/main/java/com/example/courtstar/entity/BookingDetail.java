@@ -37,7 +37,6 @@ public class BookingDetail {
 
     @Column(name = "status")
     @Builder.Default
-    @JsonIgnore
     boolean status = false;
 
     @Column(name = "checked_in")
