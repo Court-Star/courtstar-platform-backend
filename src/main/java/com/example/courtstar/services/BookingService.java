@@ -63,6 +63,8 @@ public class BookingService {
     private FeedbackRepository feedbackRepository;
     @Autowired
     private BookingScheduleMapper bookingScheduleMapper;
+    @Autowired
+    private BookingDetailRepository bookingDetailRepository;
 
 
     public Map<String, Object> booking(BookingRequest request) throws IOException, JSONException {
@@ -87,24 +89,28 @@ public class BookingService {
             );
         }
 
+        BookingSchedule bookingSchedule = bookingScheduleRepository.save(BookingSchedule.builder()
+                .success(false)
+                .account(account)
+                .guest(guest)
+                .build());
+
         List<BookingDetail> bookingDetails = request.getBookingDetails().stream()
                 .map(
                     req -> BookingDetail.builder()
                             .slot(slotRepository.findById(req.getSlotId()).orElse(null))
                             .court(courtRepository.findById(req.getCourtId()).orElse(null))
                             .date(req.getDate())
+                            .bookingSchedule(bookingSchedule)
                             .build()
-                ).toList();
+
+                ).collect(Collectors.toList());
 
         Centre centre = bookingDetails.get(0).getCourt().getCentre();
 
-        BookingSchedule bookingSchedule = bookingScheduleRepository.save(BookingSchedule.builder()
-                .totalPrice(centre.getPricePerHour()*bookingDetails.size())
-                .success(false)
-                .account(account)
-                .guest(guest)
-                .bookingDetails(bookingDetails)
-                .build());
+        bookingSchedule.setBookingDetails(bookingDetails);
+        bookingSchedule.setTotalPrice(centre.getPricePerHour()*bookingDetails.size());
+        bookingScheduleRepository.save(bookingSchedule);
 
         Payment payment = Payment.builder()
                 .date(LocalDate.now())
