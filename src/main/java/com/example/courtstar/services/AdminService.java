@@ -131,7 +131,8 @@ public class AdminService {
 
         return partnerPerDay.entrySet().stream()
                 .filter(entry -> !entry.getKey().isBefore(startOfWeek) && !entry.getKey().isAfter(today))
-                .count();
+                .mapToLong(Map.Entry::getValue)
+                .sum();
     }
     private Long getCustomerThisWeek(Map<LocalDate, Long> customerPerDay) {
         LocalDate today = LocalDate.now();
@@ -139,7 +140,8 @@ public class AdminService {
 
         return customerPerDay.entrySet().stream()
                 .filter(entry -> !entry.getKey().isBefore(startOfWeek) && !entry.getKey().isAfter(today))
-                .count();
+                .mapToLong(Map.Entry::getValue)
+                .sum();
     }
 
     private Long getCentreThisWeek(Map<LocalDate, Long> centrePerDay) {
@@ -148,7 +150,8 @@ public class AdminService {
 
         return centrePerDay.entrySet().stream()
                 .filter(entry -> !entry.getKey().isBefore(startOfWeek) && !entry.getKey().isAfter(today))
-                .count();
+                .mapToLong(Map.Entry::getValue)
+                .sum();
     }
 
 
