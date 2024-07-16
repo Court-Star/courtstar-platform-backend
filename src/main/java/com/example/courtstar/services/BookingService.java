@@ -8,7 +8,9 @@ import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.BookingScheduleMapper;
 import com.example.courtstar.repositories.*;
+import com.example.courtstar.services.paymentVnpay.OrderPaymentService;
 import com.example.courtstar.services.paymentZalopay.CreateOrderService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -53,31 +55,28 @@ public class BookingService {
     private GuestRepository guestRepository;
 
     @Autowired
-    private CentreRepository centreRepository;
-
-    @Autowired
     private CreateOrderService createOrderService;
     @Autowired
     private FeedbackRepository feedbackRepository;
     @Autowired
     private BookingScheduleMapper bookingScheduleMapper;
     @Autowired
-    private BookingDetailRepository bookingDetailRepository;
+    private OrderPaymentService orderPaymentService;
 
 
-    public Map<String, Object> booking(BookingRequest request) throws IOException, JSONException {
+    public Map<String, Object> booking(HttpServletRequest request, BookingRequest bookingRequest) throws IOException, JSONException {
         var context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
 
         Account account = null;
         Guest guest = null;
         if (name.equals("anonymousUser")) {
-            guest = guestRepository.findByEmail(request.getEmail());
+            guest = guestRepository.findByEmail(bookingRequest.getEmail());
             if (guest == null) {
                 guest = Guest.builder()
-                        .email(request.getEmail())
-                        .phone(request.getPhone())
-                        .fullName(request.getFullName())
+                        .email(bookingRequest.getEmail())
+                        .phone(bookingRequest.getPhone())
+                        .fullName(bookingRequest.getFullName())
                         .build();
                 guestRepository.save(guest);
             }
@@ -93,7 +92,7 @@ public class BookingService {
                 .guest(guest)
                 .build());
 
-        List<BookingDetail> bookingDetails = request.getBookingDetails().stream()
+        List<BookingDetail> bookingDetails = bookingRequest.getBookingDetails().stream()
                 .map(
                     req -> BookingDetail.builder()
                             .slot(slotRepository.findById(req.getSlotId()).orElse(null))
@@ -125,7 +124,9 @@ public class BookingService {
                 .payment(payment)
                 .build();
 
-
+        if (bookingRequest.getPaymentType().equals("VNPAY")) {
+            return orderPaymentService.createOrder(request, orderRequest);
+        }
         return createOrderService.createOrder(orderRequest);
     }
 

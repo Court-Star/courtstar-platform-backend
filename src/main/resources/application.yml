@@ -67,7 +67,7 @@ payment:
     REFUND_STATUS_PAYMENT_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/query_refund"
   vnpay:
     VNP_PAY_URL : "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html"
-    VNP_RETURN_URL : "http://localhost:8080/courtstar/paymentvnpay/callback"
+    VNP_RETURN_URL : "https://courtstar-platform-backend-production.up.railway.app/courtstar/payment-vn-pay/callback"
     VNP_TMN_CODE : "6P4HZ4D4"
     SECRET_KEY : "HECUONEHZKNXYLSVMCEALUHGSRLLJZPV"
     VNP_API_URL : "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction"
