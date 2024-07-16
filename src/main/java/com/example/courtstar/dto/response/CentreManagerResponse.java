@@ -14,7 +14,7 @@ public class CentreManagerResponse {
     Integer id;
     String address;
     double currentBalance;
-    double totalRevenue;
+    double weekRevenue;
     double todayIncome;
     long todayBookings;
     Map<String, Double> percent;

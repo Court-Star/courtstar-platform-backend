@@ -19,6 +19,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -69,7 +70,7 @@ public class CentreManagerService {
                 .account(accountResponse)
                 .address(manager.getAddress())
                 .currentBalance(manager.getCurrentBalance())
-                .totalRevenue(getTotalRevenue(manager))
+                .weekRevenue(getRevenueThisWeek(manager))
                 .todayIncome(getRevenueToday(manager))
                 .todayBookings(getBookingToday(manager))
                 .percent(getPercentageChangesMap(manager))
@@ -83,22 +84,6 @@ public class CentreManagerService {
         percentageChanges.put("booking", getPercentageBookingChangeFromYesterday(manager));
         return percentageChanges;
     }
-
-    private double getTotalRevenue(CentreManager manager) {
-        return manager.getCentres().stream()
-                .mapToDouble(Centre::getRevenue)
-                .sum();
-    }
-
-//    private Map<LocalDate, Double> getTotalRevenuePerDay(CentreManager manager) {
-//        return manager.getCentres().stream()
-//                .flatMap(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
-//                        .stream().filter(BookingSchedule::isSuccess))
-//                .collect(Collectors.groupingBy(
-//                        BookingSchedule::getDate, // Group by date
-//                        Collectors.summingDouble(BookingSchedule::getTotalPrice) // Sum the revenue for each date
-//                ));
-//    }
 
     private double getRevenueToday(CentreManager manager) {
         LocalDate today = LocalDate.now();
@@ -117,6 +102,26 @@ public class CentreManagerService {
                 .sum();
         return revenueToday * 0.95;
     }
+
+    private double getRevenueThisWeek(CentreManager manager) {
+        LocalDate today = LocalDate.now();
+        LocalDate startOfWeek = today.with(DayOfWeek.MONDAY); // Lấy ngày đầu tuần (Thứ Hai)
+
+        return manager.getCentres().stream()
+                .flatMapToDouble(centre -> bookingScheduleRepository.findAllByCentreId(centre.getId())
+                        .stream()
+                        .filter(
+                                schedule -> {
+                                    Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
+                                            .orElseThrow(null);
+                                    return payment.isStatus() && !payment.getDate().isBefore(startOfWeek) && !payment.getDate().isAfter(today);
+                                }
+                        )
+                        .mapToDouble(BookingSchedule::getTotalPrice)
+                )
+                .sum();
+    }
+
 
     private long getBookingToday(CentreManager manager) {
         LocalDate today = LocalDate.now();
@@ -181,7 +186,7 @@ public class CentreManagerService {
 
     private double getPendingTotal(CentreManager manager) {
         return manager.getTransferMonies().stream()
-                        .filter(money -> !money.isStatus())
+                        .filter(money -> money.getDateAuthenticate() == null)
                         .mapToDouble(TransferMoney::getAmount)
                         .sum();
     }
