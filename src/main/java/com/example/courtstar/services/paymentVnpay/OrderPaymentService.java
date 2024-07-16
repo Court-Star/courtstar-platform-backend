@@ -2,16 +2,19 @@ package com.example.courtstar.services.paymentVnpay;
 
 
 import com.example.courtstar.dto.request.OrderRequest;
+import com.example.courtstar.repositories.PaymentRepository;
 import com.example.courtstar.util.VnPayHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Service
@@ -35,6 +38,17 @@ public class OrderPaymentService {
     @Value("${payment.vnpay.VNP_PAY_URL}")
     private String VNP_PAY_URL;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
+    private String getCurrentTimeString(String format) {
+
+        Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT+7"));
+        SimpleDateFormat fmt = new SimpleDateFormat(format);
+        fmt.setCalendar(cal);
+        return fmt.format(cal.getTimeInMillis());
+    }
+
     public Map<String, Object> createOrder(HttpServletRequest request, OrderRequest orderRequest) throws UnsupportedEncodingException {
 
         List<Map<String, Object>> item = new ArrayList<>();
@@ -54,7 +68,7 @@ public class OrderPaymentService {
             put("vnp_Version", VNP_VERSION);
             put("vnp_Command", VNP_COMMAND_ORDER);
             put("vnp_TmnCode", VNP_TMN_CODE);
-            put("vnp_Amount", String.valueOf(orderRequest.getBookingSchedule().getTotalPrice() * 100));
+            put("vnp_Amount", String.valueOf((long)orderRequest.getBookingSchedule().getTotalPrice() * 100));
             put("vnp_CurrCode", VNP_CURRENCY_CODE);
             put("vnp_TxnRef",  VnPayHelper.getRandomNumber(8));
             put("vnp_OrderInfo", itemArray.toString());
@@ -67,12 +81,16 @@ public class OrderPaymentService {
             put("vnp_ExtraData","");
         }};
 
+        String transaction_id =  getCurrentTimeString("yyMMdd") +"_"+ new Date().getTime();
+        orderRequest.getPayment().setTransactionCode(transaction_id);
+        paymentRepository.save(orderRequest.getPayment());
+
         String queryUrl = getQueryUrl(payload).get("queryUrl")
                 + "&vnp_SecureHash="
                 + VnPayHelper.hmacSHA512(SECRET_KEY, getQueryUrl(payload).get("hashData"));
 
         String paymentUrl = VNP_PAY_URL + "?" + queryUrl;
-        payload.put("redirect_url", paymentUrl);
+        payload.put("order_url", paymentUrl);
 
         return payload;
     }
