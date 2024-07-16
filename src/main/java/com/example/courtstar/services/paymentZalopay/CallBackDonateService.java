@@ -1,17 +1,15 @@
-package com.example.courtstar.services.payment;
+package com.example.courtstar.services.paymentZalopay;
 
-import com.example.courtstar.entity.*;
+import com.example.courtstar.entity.CentreManager;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
-import com.example.courtstar.repositories.*;
-import com.example.courtstar.services.QrCodeService;
+import com.example.courtstar.repositories.CentreManagerRepository;
 import jakarta.xml.bind.DatatypeConverter;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -21,27 +19,17 @@ import java.security.NoSuchAlgorithmException;
 import java.util.logging.Logger;
 
 
-
 @Service
-public class CallBackPaymentService {
+public class CallBackDonateService {
     @Value("${payment.zalopay.KEY2}")
     private String KEY2;
     private Mac HmacSHA256;
-    @Autowired
-    private QrCodeService qrCodeService;
-    @Autowired
-    private CentreRepository centreRepository;
+
     @Autowired
     private CentreManagerRepository centreManagerRepository;
 
 
     private Logger logger = Logger.getLogger(this.getClass().getName());
-    @Autowired
-    private PaymentRepository paymentRepository;
-    @Autowired
-    private BookingScheduleRepository bookingScheduleRepository;
-    @Autowired
-    private BookingDetailRepository bookingDetailRepository;
 
     public Object doCallBack(JSONObject result, String jsonStr) throws JSONException, NoSuchAlgorithmException, InvalidKeyException {
         HmacSHA256  = Mac.getInstance("HmacSHA256");
@@ -69,35 +57,12 @@ public class CallBackPaymentService {
                 //
                 JSONArray jsonArray = new JSONArray(data.getString("item"));
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
-                int bookingId = jsonObject.getInt("bookingId");
-                int paymentId = jsonObject.getInt("paymentId");
-                int centreId = jsonObject.getInt("centreId");
+                int id_manager_centre = jsonObject.getInt("id_manager_centre");
 
-                Payment payment = paymentRepository.findById(paymentId).orElseThrow(null);
-                payment.setStatus(true);
-                payment.setZpTransId(data.getString("zp_trans_id"));
-                paymentRepository.save(payment);
-
-                BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingId).orElseThrow(null);
-                bookingSchedule.setSuccess(true);
-                bookingSchedule.getBookingDetails()
-                                .forEach(detail -> detail.setStatus(true));
-                bookingScheduleRepository.save(bookingSchedule);
-
-
-                qrCodeService.generateQrCode(bookingId, payment.getTransactionCode());
-
-
-                Centre centre =centreRepository.findById(centreId).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-                Double payMoney = centre.getRevenue()+data.getLong("amount");
-                centre.setRevenue(payMoney);
-                centreRepository.save(centre);
-
-                Double totalPayMoney = centre.getManager().getCurrentBalance()+data.getLong("amount")*0.95;
-                centre.getManager().setCurrentBalance(totalPayMoney);
-                centreManagerRepository.save(centre.getManager());
-
-
+                CentreManager centreManager = centreManagerRepository.findById(id_manager_centre).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_USER));
+                Long amount = (long) (centreManager.getCurrentBalance()+data.getLong("amount"));
+                centreManager.setCurrentBalance(amount);
+                centreManagerRepository.save(centreManager);
                 //
                 result.put("return_code", 1);
                 result.put("return_message", "success");

@@ -1,4 +1,4 @@
-package com.example.courtstar.services.payment;
+package com.example.courtstar.services.paymentZalopay;
 
 import com.example.courtstar.dto.request.RefundRequest;
 import com.example.courtstar.entity.BookingSchedule;
