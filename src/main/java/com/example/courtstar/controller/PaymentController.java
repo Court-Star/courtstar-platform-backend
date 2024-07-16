@@ -2,7 +2,7 @@ package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.*;
 import com.example.courtstar.dto.response.BookingScheduleResponse;
-import com.example.courtstar.services.payment.*;
+import com.example.courtstar.services.paymentZalopay.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
 import java.util.Map;
 
 @CrossOrigin(origins = {"http://localhost:3000", "https://courtstar-platform-frontend.vercel.app/"})
