@@ -76,11 +76,11 @@ public class CallbackPaymentController {
 
 
                 Centre centre =centreRepository.findById(centreId).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
-                Double payMoney = centre.getRevenue()+Long.parseLong((String)callBackInfo.get("vnp_Amount"));
+                Double payMoney = centre.getRevenue()+Long.parseLong((String)callBackInfo.get("vnp_Amount"))/100;
                 centre.setRevenue(payMoney);
                 centreRepository.save(centre);
 
-                Double totalPayMoney = centre.getManager().getCurrentBalance()+Long.parseLong((String)callBackInfo.get("vnp_Amount"))*0.95;
+                Double totalPayMoney = centre.getManager().getCurrentBalance()+Long.parseLong((String)callBackInfo.get("vnp_Amount"))*0.95/100;
                 centre.getManager().setCurrentBalance(totalPayMoney);
                 centreManagerRepository.save(centre.getManager());
             }
