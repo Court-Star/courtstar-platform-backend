@@ -25,6 +25,7 @@ public class TransferMoney {
     LocalDateTime dateCreateWithdrawalOrder;
     LocalDateTime dateAuthenticate;
     String cardHolderName;
+    String description;
 
     @ManyToOne
     @JsonIgnore

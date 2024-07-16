@@ -75,6 +75,7 @@ create table transfer_money
     number_banking varchar(255),
     card_holder_name varchar(255),
     status bit not null,
+    description nvarchar(255),
     manager_id int foreign key references centre_manager(id)
 )
 

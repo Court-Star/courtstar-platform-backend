@@ -1,6 +1,7 @@
 package com.example.courtstar.services;
 
 import com.example.courtstar.constant.PredefinedNotificationType;
+import com.example.courtstar.dto.request.DescriptionRequest;
 import com.example.courtstar.dto.response.PlatformResponse;
 import com.example.courtstar.entity.*;
 import com.example.courtstar.repositories.*;
@@ -50,7 +51,7 @@ public class AdminService {
         return true;
     }
 
-    public Boolean deniedCentre(int centreId) {
+    public Boolean deniedCentre(int centreId, DescriptionRequest descriptionRequest) {
         Centre centre = centreRepository.findById(centreId).orElseThrow(
                 () -> new IllegalArgumentException("Centre not found")
         );
@@ -60,7 +61,7 @@ public class AdminService {
         notificationRepository.save(Notification.builder()
                 .type(PredefinedNotificationType.DENIED_CENTRE)
                 .date(LocalDateTime.now())
-                .content(PredefinedNotificationType.DENIED_CENTRE_CONTENT)
+                .content(descriptionRequest.getDescription())
                 .account(centre.getManager().getAccount())
                 .build());
         return true;

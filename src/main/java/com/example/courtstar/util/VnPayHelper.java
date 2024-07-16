@@ -10,6 +10,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class VnPayHelper {
@@ -17,16 +20,14 @@ public class VnPayHelper {
     private static String SECRET_KEY;
     public static String generateDate(boolean forExpire) {
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("UTC+7"));
-        SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+        ZonedDateTime gmtDateTime = ZonedDateTime.now(ZoneId.of("GMT"));
 
-        if (forExpire == false) {
-
-            return formatter.format(cld.getTime());
+        if (!forExpire) {
+            return gmtDateTime.plusHours(7).format(formatter);
         }
 
-        cld.add(Calendar.MINUTE, 15);
-        return formatter.format(cld.getTime());
+        return gmtDateTime.plusHours(7).plusMinutes(15).format(formatter);
     }
 
     public static String md5(String message) {

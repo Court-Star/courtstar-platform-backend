@@ -2,6 +2,7 @@ package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.ApiResponse;
 import com.example.courtstar.dto.request.AuthWithdrawalOrderRequest;
+import com.example.courtstar.dto.request.DescriptionRequest;
 import com.example.courtstar.dto.request.TransferMoneyRequest;
 import com.example.courtstar.dto.response.AuthWithdrawalOrderResponse;
 import com.example.courtstar.dto.response.TransferMoneyResponse;
@@ -31,9 +32,9 @@ public class TransferMoneyController {
     }
 
     @PostMapping("/authenticate-deny-withdrawal-order/{id}")
-    public ApiResponse<AuthWithdrawalOrderResponse> authenticateDenyWithdrawalOrder(@PathVariable int id){
+    public ApiResponse<AuthWithdrawalOrderResponse> authenticateDenyWithdrawalOrder(@PathVariable int id, @RequestBody DescriptionRequest descriptionRequest){
         return ApiResponse.<AuthWithdrawalOrderResponse>builder()
-                .data(transferMoneyService.authenticateDenyTransferMoney(id))
+                .data(transferMoneyService.authenticateDenyTransferMoney(id,descriptionRequest))
                 .build();
     }
 

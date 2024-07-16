@@ -20,4 +20,5 @@ public class TransferMoneyResponse {
     LocalDateTime dateAuthenticate;
     String cardHolderName;
     String managerEmail;
+    String description;
 }
