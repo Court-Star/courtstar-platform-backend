@@ -1,6 +1,7 @@
 package com.example.courtstar.services;
 
 import com.example.courtstar.dto.request.AuthWithdrawalOrderRequest;
+import com.example.courtstar.dto.request.DescriptionRequest;
 import com.example.courtstar.dto.request.TransferMoneyRequest;
 import com.example.courtstar.dto.response.AuthWithdrawalOrderResponse;
 import com.example.courtstar.dto.response.TransferMoneyResponse;
@@ -73,7 +74,7 @@ public class TransferMoneyService {
         return transferMoneyMapper.toAuthWithdrawalOrderResponse(transferMoneyRepository.save(transferMoney));
     }
 
-    public AuthWithdrawalOrderResponse authenticateDenyTransferMoney(int idTransfer) {
+    public AuthWithdrawalOrderResponse authenticateDenyTransferMoney(int idTransfer, DescriptionRequest descriptionRequest) {
 
         TransferMoney transferMoney = transferMoneyRepository.findById(idTransfer).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_TRANSFER_MONEY));
         if(transferMoney.isStatus()==true){
@@ -82,6 +83,7 @@ public class TransferMoneyService {
         CentreManager centreManager = centreManagerRepository.findById(transferMoney.getManager().getId())
                 .orElseThrow(null);
         transferMoney.setDateAuthenticate(LocalDateTime.now());
+        transferMoney.setDescription(descriptionRequest.getDescription());
         centreManagerRepository.save(centreManager);
         return transferMoneyMapper.toAuthWithdrawalOrderResponse(transferMoneyRepository.save(transferMoney));
     }

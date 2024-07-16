@@ -1,6 +1,7 @@
 package com.example.courtstar.controller;
 
 import com.example.courtstar.dto.request.ApiResponse;
+import com.example.courtstar.dto.request.DescriptionRequest;
 import com.example.courtstar.dto.response.PlatformResponse;
 import com.example.courtstar.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +30,9 @@ public class AdminController {
     }
 
     @PostMapping("/centre/deny/{id}")
-    public ApiResponse<Boolean> denyCentre(@PathVariable int id){
+    public ApiResponse<Boolean> denyCentre(@PathVariable int id, DescriptionRequest descriptionRequest){
         return ApiResponse.<Boolean>builder()
-                .data(adminService.deniedCentre(id))
+                .data(adminService.deniedCentre(id, descriptionRequest))
                 .build();
     }
 }
