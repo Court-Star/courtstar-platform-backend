@@ -15,4 +15,5 @@ public class BookingRequest {
     String phone;
     String email;
     List<BookingDetailRequest> bookingDetails;
+    String paymentType;
 }

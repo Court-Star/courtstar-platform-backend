@@ -58,7 +58,7 @@ public class CallbackPaymentController {
             int centreId = jsonObject.getInt("centreId");
             Payment payment = paymentRepository.findById(paymentId).orElseThrow(null);
             payment.setStatus(true);
-            payment.setZpTransId((String) callBackInfo.get("vnp_TransactionStatus"));
+            payment.setVnpTransId((String) callBackInfo.get("vnp_TransactionStatus"));
             paymentRepository.save(payment);
 
             BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingId).orElseThrow(null);

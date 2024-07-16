@@ -25,6 +25,9 @@ public class Payment {
     @Column(name="zp_trans_id")
     String zpTransId;
 
+    @Column(name="vnp_trans_id")
+    String vnpTransId;
+
     @Column(name = "date")
     LocalDate date;
 
