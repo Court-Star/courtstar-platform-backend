@@ -17,7 +17,7 @@ public class VnPayHelper {
     private static String SECRET_KEY;
     public static String generateDate(boolean forExpire) {
 
-        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
+        Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
 
         if (forExpire == false) {
