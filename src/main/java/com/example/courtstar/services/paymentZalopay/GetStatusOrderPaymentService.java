@@ -96,6 +96,7 @@ public class GetStatusOrderPaymentService {
         bookingScheduleResponse.setCentreId(centre.getId());
         bookingScheduleResponse.setCentreName(centre.getName());
         bookingScheduleResponse.setCentreAddress(centre.getAddress());
+        bookingScheduleResponse.setCentreDistrict(centre.getDistrict());
         return bookingScheduleResponse;
     }
 }

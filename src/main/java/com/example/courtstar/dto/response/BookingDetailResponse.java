@@ -13,8 +13,10 @@ import java.time.LocalDate;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Builder
 public class BookingDetailResponse {
+    int id;
     LocalDate date;
     Court court;
     Slot slot;
-    boolean status = false;
+    boolean status;
+    boolean checkedIn;
 }
