@@ -22,7 +22,8 @@ public class BookingScheduleResponse {
     String centreName;
     String centreAddress;
     String centreImg;
+    String centreDistrict;
     int rate;
     boolean success;
-    List<BookingDetail> bookingDetails;
+    List<BookingDetailResponse> bookingDetails;
 }

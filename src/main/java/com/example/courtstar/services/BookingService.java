@@ -158,6 +158,7 @@ public class BookingService {
                     bookingScheduleResponse.setCentreId(centre.getId());
                     bookingScheduleResponse.setCentreName(centre.getName());
                     bookingScheduleResponse.setCentreAddress(centre.getAddress());
+                    bookingScheduleResponse.setCentreDistrict(centre.getDistrict());
                     bookingScheduleResponse.setRate(rate);
                     bookingScheduleResponse.setCentreImg(centre.getImages().get(0).getUrl());
                     return bookingScheduleResponse;
