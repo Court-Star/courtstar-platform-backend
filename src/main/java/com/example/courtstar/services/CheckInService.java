@@ -45,8 +45,8 @@ public class CheckInService {
     @Autowired
     private BookingScheduleRepository bookingScheduleRepository;
 
-    public Boolean checkInQR(int bookingId) {
-        boolean result = false;
+    public Integer checkInQR(int bookingId) {
+        int result = 0;
         BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingId).orElse(null);
 
         if (bookingSchedule != null) {
@@ -66,7 +66,7 @@ public class CheckInService {
                 if (bookingTimeString.equals(currentDateTime)) {
                     bookingDetail.setCheckedIn(true);
                     bookingDetailRepository.save(bookingDetail);
-                    result = true;
+                    result = bookingDetail.getId();
                     break;
                 }
             }

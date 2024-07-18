@@ -22,7 +22,7 @@ public class CheckInController {
     }
 
     @PostMapping("/qr/{id}")
-    public ApiResponse<Boolean> checkInQr(@PathVariable("id") int id) {
+    public ApiResponse<Integer> checkInQr(@PathVariable("id") int id) {
         ApiResponse apiResponse = ApiResponse.builder()
                 .data(checkInService.checkInQR(id))
                 .build();
