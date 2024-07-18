@@ -8,6 +8,7 @@ import com.nimbusds.jose.JOSEException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.text.ParseException;
 
@@ -27,6 +28,18 @@ public class AuthenticationController {
                 .message("Login Success")
                 .build();
     }
+
+    @GetMapping("/token")
+    public RedirectView authenticate(@RequestParam String email, String password) throws JOSEException {
+        AuthenticationRequest request = AuthenticationRequest.builder()
+                .email(email)
+                .password(password)
+                .build();
+        AuthenticationResponse authenticationResponse =authentication.Authenticate(request);
+        return new RedirectView("http://localhost:3000?code=" + authenticationResponse.getToken() + "&role=" + authenticationResponse.getRole());
+    }
+
+
     @PostMapping("/introspect")
     public ApiResponse<IntrospectResponse> introspect(@RequestBody IntrospectRequest request) throws JOSEException, ParseException {
         var authenticated = authentication.introspect(request);
