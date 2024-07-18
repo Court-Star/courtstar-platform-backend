@@ -51,7 +51,7 @@ public class EmailBookingUtil {
         MimeMessage mimeMessage = mailSender.createMimeMessage();
         MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-        mimeMessageHelper.setFrom("minhoan305@gmail.com");
+        mimeMessageHelper.setFrom("courtstar.se@gmail.com");
         mimeMessageHelper.setTo(request.getEmail());
         mimeMessageHelper.setSubject("Your Booking Schedule");
         mimeMessageHelper.setText(htmlContent, true);
