@@ -27,6 +27,10 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.stereotype.Service;
 
+import java.time.*;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE,makeFinal = true)
@@ -37,15 +41,38 @@ import org.springframework.stereotype.Service;
 public class CheckInService {
 
     @Autowired
-    private final BookingScheduleRepository bookingScheduleRepository;
-    @Autowired
-    private final BookingService bookingService;
-    @Autowired
-    private final AccountService accountService;
-    @Autowired
-    private final SlotRepository slotRepository;
-    @Autowired
     private BookingDetailRepository bookingDetailRepository;
+    @Autowired
+    private BookingScheduleRepository bookingScheduleRepository;
+
+    public Boolean checkInQR(int bookingId) {
+        boolean result = false;
+        BookingSchedule bookingSchedule = bookingScheduleRepository.findById(bookingId).orElse(null);
+
+        if (bookingSchedule != null) {
+            List<BookingDetail> bookingDetails = bookingSchedule.getBookingDetails();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHH");
+            ZonedDateTime gmtDateTime = ZonedDateTime.now(ZoneId.of("GMT"));
+            String currentDateTime = gmtDateTime.plusHours(7).format(formatter);
+
+            for (BookingDetail bookingDetail : bookingDetails) {
+                LocalDate bookingDate = bookingDetail.getDate();
+                LocalTime startTime = bookingDetail.getSlot().getStartTime();
+
+                ZonedDateTime bookingDateTime = ZonedDateTime.of(bookingDate, startTime, ZoneId.of("GMT+7"));
+                String bookingTimeString = bookingDateTime.format(formatter);
+
+                if (bookingTimeString.equals(currentDateTime)) {
+                    bookingDetail.setCheckedIn(true);
+                    bookingDetailRepository.save(bookingDetail);
+                    result = true;
+                    break;
+                }
+            }
+        }
+        return result;
+    }
 
     public Boolean checkIn(int bookingDetailId) {
         boolean result = false;
@@ -68,23 +95,5 @@ public class CheckInService {
         }
         return result;
     }
-  
-//    public boolean checkInBooking(String email, int court_id, int slotId){
-//        Account account = accountService.getAccountByEmail1(email);
-//        if(account == null){
-//            throw new AppException(ErrorCode.NOT_FOUND_USER);
-//        }
-//        BookingSchedule service = bookingService.getBookingSchedule(account.getId());
-//        Slot slot = slotRepository.findById(slotId).orElse(null);
-//
-//        boolean checkIn = false;
-//        if(service.getCourt().isStatus()==false
-//                && service.getCourt().getId()==court_id
-//                && service.getSlot()==slot){
-//            service.setStatus(true);
-//            bookingScheduleRepository.save(service);
-//            checkIn = true;
-//        }
-//        return checkIn;
-//    }
+
 }

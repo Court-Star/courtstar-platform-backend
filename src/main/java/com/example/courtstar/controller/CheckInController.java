@@ -21,6 +21,14 @@ public class CheckInController {
         return apiResponse;
     }
 
+    @PostMapping("/qr/{id}")
+    public ApiResponse<Boolean> checkInQr(@PathVariable("id") int id) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(checkInService.checkInQR(id))
+                .build();
+        return apiResponse;
+    }
+
     @PostMapping("/undo/{booking_detail_id}")
     public ApiResponse<Boolean> undoCheckIn(@PathVariable("booking_detail_id") int bookingScheduleId) {
         ApiResponse apiResponse = ApiResponse.builder()
