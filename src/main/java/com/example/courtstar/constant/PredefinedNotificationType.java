@@ -16,6 +16,9 @@ public class PredefinedNotificationType {
     public static final String BOOKING_CONTENT = "BOOKING_CONTENT";
     public static final String OTHER_CONTENT = "OTHER_CONTENT";
 
+    public static final String ACCEPT_WITHDRAWAL = "ACCEPT_WITHDRAWAL";
+    public static final String DENIED_WITHDRAWAL = "DENIED_WITHDRAWAL";
+
 
     private PredefinedNotificationType() {}
 }
