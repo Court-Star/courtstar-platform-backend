@@ -1,5 +1,6 @@
 package com.example.courtstar.services;
 
+import com.example.courtstar.constant.PredefinedNotificationType;
 import com.example.courtstar.dto.request.AuthWithdrawalOrderRequest;
 import com.example.courtstar.dto.request.DescriptionRequest;
 import com.example.courtstar.dto.request.TransferMoneyRequest;
@@ -7,12 +8,14 @@ import com.example.courtstar.dto.response.AuthWithdrawalOrderResponse;
 import com.example.courtstar.dto.response.TransferMoneyResponse;
 import com.example.courtstar.entity.Account;
 import com.example.courtstar.entity.CentreManager;
+import com.example.courtstar.entity.Notification;
 import com.example.courtstar.entity.TransferMoney;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.TransferMoneyMapper;
 import com.example.courtstar.repositories.AccountReponsitory;
 import com.example.courtstar.repositories.CentreManagerRepository;
+import com.example.courtstar.repositories.NotificationRepository;
 import com.example.courtstar.repositories.TransferMoneyRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +41,7 @@ public class TransferMoneyService {
     TransferMoneyRepository transferMoneyRepository;
     CentreManagerRepository centreManagerRepository;
     AccountReponsitory accountReponsitory;
+    private final NotificationRepository notificationRepository;
 
     public TransferMoneyResponse createTransferMoney(int id, TransferMoneyRequest request) {
         request.setAmount(request.getAmount().replace(".",""));
@@ -74,6 +78,14 @@ public class TransferMoneyService {
         transferMoney.setStatus(true);
         transferMoney.setDateAuthenticate(LocalDateTime.now());
         centreManagerRepository.save(centreManager);
+
+        notificationRepository.save(Notification.builder()
+                .type(PredefinedNotificationType.ACCEPT_WITHDRAWAL)
+                .date(LocalDateTime.now())
+                .content(PredefinedNotificationType.ACCEPT_WITHDRAWAL)
+                .account(centreManager.getAccount())
+                .build());
+
         return transferMoneyMapper.toAuthWithdrawalOrderResponse(transferMoneyRepository.save(transferMoney));
     }
 
@@ -88,6 +100,14 @@ public class TransferMoneyService {
         transferMoney.setDateAuthenticate(LocalDateTime.now());
         transferMoney.setDescription(descriptionRequest.getDescription());
         centreManagerRepository.save(centreManager);
+
+        notificationRepository.save(Notification.builder()
+                .type(PredefinedNotificationType.DENIED_WITHDRAWAL)
+                .date(LocalDateTime.now())
+                .content(descriptionRequest.getDescription())
+                .account(centreManager.getAccount())
+                .build());
+
         return transferMoneyMapper.toAuthWithdrawalOrderResponse(transferMoneyRepository.save(transferMoney));
     }
 
