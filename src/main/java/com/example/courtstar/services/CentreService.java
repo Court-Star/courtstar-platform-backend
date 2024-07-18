@@ -299,6 +299,7 @@ public class CentreService {
         centre.setCloseTime(request.getCloseTime());
         centre.setPricePerHour(Double.parseDouble(request.getPricePerHour().replace(".", "")));
         centre.setDescription(request.getDescription());
+        centre.setApproveDate(null);
 
         //update new slot range
         updateSlots(centre);
@@ -311,6 +312,13 @@ public class CentreService {
         oldImages.addAll(newImages);
 
         centreRepository.save(centre);
+
+        notificationRepository.save(Notification.builder()
+                .type(PredefinedNotificationType.EDIT_CENTRE)
+                .date(LocalDateTime.now())
+                .content(PredefinedNotificationType.EDIT_CENTRE_CONTENT)
+                .account(accountReponsitory.findByEmail("Admin@gmail.com").orElse(null))
+                .build());
 
         CentreResponse centreResponse = centreMapper.toCentreResponse(centre);
         centreResponse.setManagerId(manager.getId());
