@@ -23,4 +23,12 @@ public class NotificationController {
                 .build();
         return apiResponse;
     }
+
+    @PutMapping("/{id}")
+    public ApiResponse<List<Notification>> updateNotification(@PathVariable int id) {
+        ApiResponse apiResponse = ApiResponse.builder()
+                .data(notificationService.updateNotification(id))
+                .build();
+        return apiResponse;
+    }
 }
