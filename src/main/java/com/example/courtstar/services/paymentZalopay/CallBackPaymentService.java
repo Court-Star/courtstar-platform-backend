@@ -18,8 +18,10 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
-
+import java.util.stream.Collectors;
 
 
 @Service
@@ -42,6 +44,8 @@ public class CallBackPaymentService {
     private BookingScheduleRepository bookingScheduleRepository;
     @Autowired
     private BookingDetailRepository bookingDetailRepository;
+    @Autowired
+    private SlotRepository slotRepository;
 
     public Object doCallBack(JSONObject result, String jsonStr) throws JSONException, NoSuchAlgorithmException, InvalidKeyException {
         HmacSHA256  = Mac.getInstance("HmacSHA256");
@@ -58,6 +62,21 @@ public class CallBackPaymentService {
 
 
             if (!reqMac.equals(mac)) {
+                JSONObject data = new JSONObject(dataStr);
+                logger.info("update order's status = success where app_trans_id = " + data.getString("app_trans_id"));
+                JSONArray jsonArray = new JSONArray(data.getString("item"));
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                int bookingId = jsonObject.getInt("bookingId");
+                BookingSchedule findBookingSchedual = bookingScheduleRepository.findById(bookingId).orElse(null);
+                if(findBookingSchedual!=null) {
+                 findBookingSchedual.getBookingDetails()
+                            .forEach(
+                                    req -> req.setStatus(false)
+                            );
+                }
+                bookingScheduleRepository.save(findBookingSchedual);
+
+
                 result.put("return_code", -1);
                 result.put("return_message", "mac not equal");
             } else {
@@ -82,6 +101,8 @@ public class CallBackPaymentService {
                 bookingSchedule.setSuccess(true);
                 bookingSchedule.getBookingDetails()
                                 .forEach(detail -> detail.setStatus(true));
+
+
                 bookingScheduleRepository.save(bookingSchedule);
 
 
@@ -106,6 +127,7 @@ public class CallBackPaymentService {
             result.put("return_code", 0);
             result.put("return_message", ex.getMessage());
         }
+
 
 
         return result;

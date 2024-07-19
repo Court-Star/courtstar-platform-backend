@@ -62,7 +62,7 @@ payment:
     KEY1: "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL"
     KEY2: "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz"
     ORDER_CREATE_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/create"
-    ORDER_STATUS_ENDPOINT: "https://sandbox.zalopay.com.vn/v001/tpe/getstatusbyapptransid"
+    ORDER_STATUS_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/query"
     REFUND_PAYMENT_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/refund"
     REFUND_STATUS_PAYMENT_ENDPOINT: "https://sb-openapi.zalopay.vn/v2/query_refund"
   vnpay:

@@ -6,6 +6,7 @@ import com.example.courtstar.entity.BookingSchedule;
 import com.example.courtstar.entity.Centre;
 import com.example.courtstar.entity.Payment;
 import com.example.courtstar.mapper.BookingScheduleMapper;
+import com.example.courtstar.repositories.BookingScheduleRepository;
 import com.example.courtstar.repositories.PaymentRepository;
 import com.example.courtstar.util.HMACUtil;
 import org.apache.http.NameValuePair;
@@ -37,6 +38,8 @@ public class GetStatusOrderPaymentService {
     private PaymentRepository paymentRepository;
     @Autowired
     private BookingScheduleMapper bookingScheduleMapper;
+    @Autowired
+    private BookingScheduleRepository bookingScheduleRepository;
 
     @Value("${payment.zalopay.APP_ID}")
     private String APP_ID;
@@ -44,6 +47,8 @@ public class GetStatusOrderPaymentService {
     private String KEY1;
     @Value("${payment.zalopay.ORDER_STATUS_ENDPOINT}")
     private String ORDER_STATUS_ENDPOINT;
+
+
 
     public Map<String, Object> statusOrder(StatusRequest statusRequestDTO) throws URISyntaxException, IOException, JSONException {
 
@@ -74,6 +79,7 @@ public class GetStatusOrderPaymentService {
         }
 
         JSONObject result = new JSONObject(resultJsonStr.toString());
+
         Map<String, Object> finalResult = new HashMap<>();
         finalResult.put("return_code", result.get("return_code"));
         finalResult.put("return_message", result.get("return_message"));
@@ -81,6 +87,23 @@ public class GetStatusOrderPaymentService {
         finalResult.put("amount", result.get("amount"));
         finalResult.put("discount_amount", result.get("discount_amount"));
         finalResult.put("zp_trans_id", result.get("zp_trans_id"));
+
+
+        BookingSchedule bookingSchedule = paymentRepository.findByTransactionCode(statusRequestDTO.getAppTransId()).get().getBookingSchedule();
+        String returncode = finalResult.get("return_code").toString();
+        if(Integer.parseInt(returncode)==3) {
+
+            BookingSchedule findBookingSchedual = bookingScheduleRepository.findById(bookingSchedule.getId()).orElse(null);
+            if(findBookingSchedual!=null) {
+                findBookingSchedual.getBookingDetails()
+                        .forEach(
+                                req -> req.setStatus(false)
+                        );
+            }
+            bookingScheduleRepository.save(findBookingSchedual);
+        }else{
+            System.out.println("hello");
+        }
         return finalResult;
     }
 
