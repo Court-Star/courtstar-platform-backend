@@ -62,6 +62,8 @@ public class BookingService {
     private BookingScheduleMapper bookingScheduleMapper;
     @Autowired
     private OrderPaymentService orderPaymentService;
+    @Autowired
+    private BookingDetailRepository bookingDetailRepository;
 
 
     public Map<String, Object> booking(HttpServletRequest request, BookingRequest bookingRequest) throws IOException, JSONException {
@@ -94,13 +96,17 @@ public class BookingService {
 
         List<BookingDetail> bookingDetails = bookingRequest.getBookingDetails().stream()
                 .map(
-                    req -> BookingDetail.builder()
-                            .slot(slotRepository.findById(req.getSlotId()).orElse(null))
-                            .court(courtRepository.findById(req.getCourtId()).orElse(null))
-                            .date(req.getDate())
-                            .bookingSchedule(bookingSchedule)
-                            .build()
-
+                    req -> {
+                        if (bookingDetailRepository.findByDateAndCourtIdAndSlotId(req.getDate(), req.getCourtId(), req.getSlotId()).orElse(null) != null) {
+                            throw new AppException(ErrorCode.NOT_FOUND_USER);
+                        }
+                        return BookingDetail.builder()
+                                .slot(slotRepository.findById(req.getSlotId()).orElse(null))
+                                .court(courtRepository.findById(req.getCourtId()).orElse(null))
+                                .date(req.getDate())
+                                .bookingSchedule(bookingSchedule)
+                                .build();
+                    }
                 ).collect(Collectors.toList());
 
         Centre centre = bookingDetails.get(0).getCourt().getCentre();
