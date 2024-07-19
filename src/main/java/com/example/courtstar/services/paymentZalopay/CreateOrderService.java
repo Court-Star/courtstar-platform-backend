@@ -80,7 +80,12 @@ public class CreateOrderService {
             put("callback_url",orderRequest.getCallbackUrl()+""); // URL callback
         }};
 
+        System.out.println("============");
+        System.out.println(order.get("app_trans_id"));
+        System.out.println("============");
+
         order.put("description", "CourtStar - Booking Court " + order.get("app_trans_id"));
+
         String transaction_id =  order.get("app_trans_id") + "";
         orderRequest.getPayment().setTransactionCode(transaction_id);
         paymentRepository.save(orderRequest.getPayment());

@@ -98,11 +98,14 @@ public class BookingService {
                 .map(
                     req -> {
                         if (bookingDetailRepository.findByDateAndCourtIdAndSlotId(req.getDate(), req.getCourtId(), req.getSlotId()).orElse(null) != null) {
-                            throw new AppException(ErrorCode.NOT_FOUND_USER);
+                            throw new AppException(ErrorCode.INVALID_SLOT_BOOKING);
                         }
+                        Slot findSlot = slotRepository.findById(req.getSlotId()).orElseThrow(null);
+
                         return BookingDetail.builder()
-                                .slot(slotRepository.findById(req.getSlotId()).orElse(null))
+                                .slot(findSlot)
                                 .court(courtRepository.findById(req.getCourtId()).orElse(null))
+                                .status(true)
                                 .date(req.getDate())
                                 .bookingSchedule(bookingSchedule)
                                 .build();

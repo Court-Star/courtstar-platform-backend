@@ -3,6 +3,7 @@ package com.example.courtstar.dto.request;
 import com.example.courtstar.entity.BookingSchedule;
 import com.example.courtstar.entity.Centre;
 import com.example.courtstar.entity.Payment;
+import com.example.courtstar.entity.Slot;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +20,6 @@ public class OrderRequest{
     private Centre centre;
 
     @Builder.Default
-    private String callbackUrl="https://courtstar-platform-backend-production.up.railway.app/courtstar/payment/booking-callback";;
+    private String callbackUrl="https://courtstar-platform-backend-production.up.railway.app/courtstar/booking-callback/order-status";;
 
 }
