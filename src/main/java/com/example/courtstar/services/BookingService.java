@@ -101,15 +101,15 @@ public class BookingService {
         List<BookingDetail> bookingDetails = bookingRequest.getBookingDetails().stream()
                 .map(
                     req -> {
-                        BookingDetail bookingDetail = bookingDetailRepository.findByDateAndCourtIdAndSlotId(req.getDate(), req.getCourtId(), req.getSlotId()).orElse(null);
-                        if (bookingDetail != null && !bookingDetail.isStatus()) {
-                            BookingSchedule b = bookingDetail.getBookingSchedule();
+                        List<BookingDetail> listBookingDetail = bookingDetailRepository.findByDateAndCourtIdAndSlotId(req.getDate(), req.getCourtId(), req.getSlotId()).orElse(null);
+                        if (listBookingDetail != null && !listBookingDetail.isEmpty()) {
+                            BookingSchedule b = listBookingDetail.get(listBookingDetail.size() - 1).getBookingSchedule();
                             if (b != null) {
                                 Payment payment = paymentRepository.findByBookingScheduleId(b.getId()).orElse(null);
                                 if (payment != null) {
                                     LocalDateTime time = payment.getDate();
                                     LocalDateTime now = LocalDateTime.now();
-                                    if (now.isAfter(time.plusMinutes(15))) {
+                                    if (!now.isAfter(time.plusMinutes(15))) {
                                         throw new AppException(ErrorCode.INVALID_SLOT_BOOKING);
                                     }
                                 }
