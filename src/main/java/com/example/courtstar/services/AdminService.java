@@ -93,7 +93,7 @@ public class AdminService {
                                         .orElseThrow(null)
                         )).filter(Payment::isStatus)
                 .collect(Collectors.groupingBy(
-                        Payment::getDate, // Group by date
+                        payment -> payment.getDate().toLocalDate(), // Group by date
                         Collectors.summingDouble(Payment::getAmount) // Sum the revenue for each date
                 ));
     }

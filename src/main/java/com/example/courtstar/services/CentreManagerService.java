@@ -94,7 +94,7 @@ public class CentreManagerService {
                                 schedule -> {
                                     Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
                                             .orElseThrow(null);
-                                    return payment.isStatus() && payment.getDate().isEqual(today);
+                                    return payment.isStatus() && payment.getDate().toLocalDate().isEqual(today);
                                 }
                         )
                         .mapToDouble(BookingSchedule::getTotalPrice)
@@ -114,7 +114,7 @@ public class CentreManagerService {
                                 schedule -> {
                                     Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
                                             .orElseThrow(null);
-                                    return payment.isStatus() && !payment.getDate().isBefore(startOfWeek) && !payment.getDate().isAfter(today);
+                                    return payment.isStatus() && !payment.getDate().toLocalDate().isBefore(startOfWeek) && !payment.getDate().toLocalDate().isAfter(today);
                                 }
                         )
                         .mapToDouble(BookingSchedule::getTotalPrice)
@@ -131,7 +131,7 @@ public class CentreManagerService {
                     schedule -> {
                         Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
                                 .orElseThrow(null);
-                        return payment.isStatus() && payment.getDate().isEqual(today);
+                        return payment.isStatus() && payment.getDate().toLocalDate().isEqual(today);
                     }
                 )
                 .count();
@@ -146,7 +146,7 @@ public class CentreManagerService {
                         .filter(schedule -> {
                             Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
                                     .orElseThrow(null);
-                            return payment.isStatus() && payment.getDate().isEqual(yesterday);
+                            return payment.isStatus() && payment.getDate().toLocalDate().isEqual(yesterday);
                         })
                         .mapToDouble(BookingSchedule::getTotalPrice)
                 )
@@ -170,7 +170,7 @@ public class CentreManagerService {
                         schedule -> {
                             Payment payment = paymentRepository.findByBookingScheduleId(schedule.getId())
                                     .orElseThrow(null);
-                            return payment.isStatus() && payment.getDate().isEqual(yesterday);
+                            return payment.isStatus() && payment.getDate().toLocalDate().isEqual(yesterday);
                         }
                 )
                 .count();
