@@ -20,6 +20,5 @@ public class OrderRequest{
     private Centre centre;
 
     @Builder.Default
-    private String callbackUrl="https://courtstar-platform-backend-production.up.railway.app/courtstar/booking-callback/order-status";;
-
+    private String callbackUrl="https://courtstar-platform-backend-production.up.railway.app/courtstar/payment/booking-callback";
 }

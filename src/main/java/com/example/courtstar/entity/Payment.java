@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Data
@@ -29,7 +30,7 @@ public class Payment {
     String vnpTransId;
 
     @Column(name = "date")
-    LocalDate date;
+    LocalDateTime date;
 
     @Column(name = "status")
     boolean status;

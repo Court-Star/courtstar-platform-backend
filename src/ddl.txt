@@ -169,7 +169,7 @@ create table payment
   transaction_code varchar(255),
   zp_trans_id varchar(255),
   vnp_trans_id varchar(255),
-  date date,
+  date datetime,
   status bit,
   amount float,
   booking_schedule_id int unique foreign key references booking_schedule(id)
