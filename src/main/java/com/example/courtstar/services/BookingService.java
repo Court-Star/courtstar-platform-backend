@@ -24,6 +24,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -97,15 +101,24 @@ public class BookingService {
         List<BookingDetail> bookingDetails = bookingRequest.getBookingDetails().stream()
                 .map(
                     req -> {
-                        if (bookingDetailRepository.findByDateAndCourtIdAndSlotId(req.getDate(), req.getCourtId(), req.getSlotId()).orElse(null) != null) {
-                            throw new AppException(ErrorCode.INVALID_SLOT_BOOKING);
-                        }
-                        Slot findSlot = slotRepository.findById(req.getSlotId()).orElseThrow(null);
+                        BookingDetail bookingDetail = bookingDetailRepository.findByDateAndCourtIdAndSlotId(req.getDate(), req.getCourtId(), req.getSlotId()).orElse(null);
+                        if (bookingDetail != null && !bookingDetail.isStatus()) {
+                            BookingSchedule b = bookingDetail.getBookingSchedule();
+                            if (b != null) {
+                                Payment payment = paymentRepository.findByBookingScheduleId(b.getId()).orElse(null);
+                                if (payment != null) {
+                                    LocalDateTime time = payment.getDate();
+                                    LocalDateTime now = LocalDateTime.now();
+                                    if (now.isAfter(time.plusMinutes(15))) {
+                                        throw new AppException(ErrorCode.INVALID_SLOT_BOOKING);
+                                    }
+                                }
+                            }
 
+                        }
                         return BookingDetail.builder()
-                                .slot(findSlot)
+                                .slot(slotRepository.findById(req.getSlotId()).orElse(null))
                                 .court(courtRepository.findById(req.getCourtId()).orElse(null))
-                                .status(true)
                                 .date(req.getDate())
                                 .bookingSchedule(bookingSchedule)
                                 .build();
@@ -119,7 +132,7 @@ public class BookingService {
         bookingScheduleRepository.save(bookingSchedule);
 
         Payment payment = Payment.builder()
-                .date(LocalDate.now())
+                .date(LocalDateTime.now())
                 .status(false)
                 .amount(centre.getPricePerHour()*bookingDetails.size())
                 .bookingSchedule(bookingSchedule)

@@ -29,7 +29,7 @@ public class SecurityConfig {
     private final String[] PUBLIC_URLS_POST = {"/account","/account/partner","/auth/token","/auth/introspect"
             ,"/auth/logout","/auth/refresh","/account/reset-password","/booking","/payment/order-status"
             ,"/payment/donate-callback","/payment/booking-callback","/payment/order-info"
-            ,"/payment/refund","/payment/refund-status","/payment-vn-pay/create-order","/payment/order-status"};
+            ,"/payment/refund","/payment/refund-status","/payment-vn-pay/create-order"};
     private final String[] PUBLIC_URLS_GET = {"/centre/getAllCentreActive", "/centre/getCentre/{id}"
             ,"/court/{centreId}/{courtNo}", "/booking-detail/{id}"
             ,"/feedback/{id}","/payment-vn-pay/callback"};
