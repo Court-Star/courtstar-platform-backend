@@ -1,6 +1,6 @@
-create database courtstarv5
+create database courtstarv6
 
-use courtstarv5
+use courtstarv6
 
 create table guest
 (

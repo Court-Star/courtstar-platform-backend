@@ -8,8 +8,8 @@ server:
       force: true
 spring:
   datasource:
-    url: jdbc:sqlserver://courtstar.database.windows.net:1433;database=courtstarv5;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
-    username: adminv4
+    url: jdbc:sqlserver://courtstarv6.database.windows.net:1433;database=courtstarv6;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;
+    username: adminv6
     password: Aa@123456
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
   mail:
