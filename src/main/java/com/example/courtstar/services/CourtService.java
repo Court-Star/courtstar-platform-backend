@@ -1,17 +1,15 @@
 package com.example.courtstar.services;
 
-import com.example.courtstar.dto.request.CentreRequest;
-import com.example.courtstar.dto.request.CourtRequest;
-import com.example.courtstar.dto.response.CentreResponse;
 import com.example.courtstar.dto.response.CourtResponse;
 import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
-import com.example.courtstar.mapper.CentreMapper;
 import com.example.courtstar.mapper.CourtMapper;
-import com.example.courtstar.repositories.AccountReponsitory;
+import com.example.courtstar.repositories.BookingDetailRepository;
 import com.example.courtstar.repositories.CentreRepository;
 import com.example.courtstar.repositories.CourtRepository;
+import com.example.courtstar.util.EmailRefundUtil;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,8 +19,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,6 +37,10 @@ public class CourtService {
     CourtMapper courtMapper;
     @Autowired
     private CentreRepository centreRepository;
+    @Autowired
+    private EmailRefundUtil emailRefundUtil;
+    @Autowired
+    private BookingDetailRepository bookingDetailRepository;
 
     public CourtResponse getCourtById(int centreId, int courtNo) throws AppException {
         List<Court> courts = courtRepository.findAllByCourtNo(courtNo);
@@ -58,6 +60,35 @@ public class CourtService {
                 .findFirst()
                 .orElseThrow(null);
         court.setStatus(!court.isStatus());
+        courtRepository.save(court);
+
+        if (!court.isStatus()) {
+            court.getBookingDetails().forEach(
+                    bookingDetail -> {
+                        if (bookingDetail.isStatus() && bookingDetail.getDate().isAfter(LocalDate.now())) {
+                            String email;
+                            String fullName;
+                            if (bookingDetail.getBookingSchedule() == null) {
+                                return;
+                            }
+                            if (bookingDetail.getBookingSchedule().getAccount() != null) {
+                                email = bookingDetail.getBookingSchedule().getAccount().getEmail();
+                                fullName = bookingDetail.getBookingSchedule().getAccount().getFirstName();
+                            } else {
+                                email = bookingDetail.getBookingSchedule().getGuest().getEmail();
+                                fullName = bookingDetail.getBookingSchedule().getGuest().getFullName();
+                            }
+                            try {
+                                emailRefundUtil.sendRefundMail(email, fullName);
+                                bookingDetail.setStatus(false);
+                                bookingDetailRepository.save(bookingDetail);
+                            } catch (MessagingException e) {
+                                throw new RuntimeException(e);
+                            }
+                        }
+                    }
+            );
+        }
         courtRepository.save(court);
 
         return courtMapper.toCourtResponse(courtRepository.findById(court.getId())

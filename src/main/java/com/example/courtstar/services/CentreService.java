@@ -3,17 +3,16 @@ package com.example.courtstar.services;
 import com.example.courtstar.constant.PredefinedNotificationType;
 import com.example.courtstar.dto.request.BookingRequest;
 import com.example.courtstar.dto.request.CentreRequest;
-import com.example.courtstar.dto.request.CourtRequest;
 import com.example.courtstar.dto.response.CentreActiveResponse;
 import com.example.courtstar.dto.response.CentreNameResponse;
 import com.example.courtstar.dto.response.CentreResponse;
-import com.example.courtstar.dto.response.CourtResponse;
 import com.example.courtstar.entity.*;
 import com.example.courtstar.exception.AppException;
 import com.example.courtstar.exception.ErrorCode;
 import com.example.courtstar.mapper.CentreMapper;
-import com.example.courtstar.mapper.CourtMapper;
 import com.example.courtstar.repositories.*;
+import com.example.courtstar.util.EmailRefundUtil;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,7 +22,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -63,11 +61,12 @@ public class CentreService {
     private NotificationRepository notificationRepository;
     @Autowired
     private BookingDetailRepository bookingDetailRepository;
+    @Autowired
+    private BookingScheduleRepository bookingScheduleRepository;
+    private EmailRefundUtil emailRefundUtil;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
-    public CentreResponse createCentre(CentreRequest request) {
-        Centre centre = centreMapper.toCentre(request);
-        return centreMapper.toCentreResponse(centreRepository.save(centre));
-    }
 
     public List<CentreResponse> getAllCentres() {
         return centreRepository.findAll()
@@ -167,6 +166,37 @@ public class CentreService {
         Centre centre = centreRepository.findById(id).orElseThrow(()->new AppException(ErrorCode.NOT_FOUND_CENTRE));
         centre.setDeleted(true);
         centreRepository.save(centre);
+        List<BookingSchedule> bookingSchedules = bookingScheduleRepository.findAllByCentreId(id);
+        if (!bookingSchedules.isEmpty()) {
+            for (BookingSchedule bookingSchedule : bookingSchedules) {
+                bookingSchedule.getBookingDetails().forEach(
+                        bookingDetail -> {
+                            if (bookingDetail.isStatus() && bookingDetail.getDate().isAfter(LocalDate.now())) {
+                                String email;
+                                String fullName;
+                                if (bookingDetail.getBookingSchedule() == null) {
+                                    return;
+                                }
+                                if (bookingDetail.getBookingSchedule().getAccount() != null) {
+                                    email = bookingDetail.getBookingSchedule().getAccount().getEmail();
+                                    fullName = bookingDetail.getBookingSchedule().getAccount().getFirstName();
+                                } else {
+                                    email = bookingDetail.getBookingSchedule().getGuest().getEmail();
+                                    fullName = bookingDetail.getBookingSchedule().getGuest().getFullName();
+                                }
+                                try {
+                                    emailRefundUtil.sendRefundMail(email, fullName);
+                                    bookingDetail.setStatus(false);
+                                    bookingDetailRepository.save(bookingDetail);
+                                } catch (MessagingException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }
+                        }
+                );
+                bookingScheduleRepository.save(bookingSchedule);
+            }
+        }
         return true;
     }
 
@@ -251,23 +281,66 @@ public class CentreService {
 
     private List<Slot> generateSlots(Centre centre) {
         List<Slot> slots = new ArrayList<>();
-        LocalTime currentTime = centre.getOpenTime();
+        LocalTime openTime = centre.getOpenTime();
         LocalTime closeTime = centre.getCloseTime();
         int slotDuration = centre.getSlotDuration();
         int slotNo = 1;
 
-        while (!currentTime.isAfter(closeTime.minusHours(slotDuration))) {
-            slots.add(Slot.builder()
-                    .slotNo(slotNo++)
-                    .startTime(currentTime)
-                    .endTime(currentTime.plusHours(slotDuration))
-                    .centre(centre)
-                    .build());
-            currentTime = currentTime.plusHours(slotDuration);
+        LocalTime currentTime = openTime;
+        boolean is24Hours = openTime.equals(closeTime);
+        boolean crossesMidnight = closeTime.isBefore(openTime);
+
+        if (is24Hours) {
+            // Tạo các slot từ 0 đến 23 giờ
+            for (int i = 0; i < 24; i++) {
+                slots.add(Slot.builder()
+                        .slotNo(slotNo++)
+                        .startTime(currentTime)
+                        .endTime(currentTime.plusHours(1))
+                        .centre(centre)
+                        .build());
+                currentTime = currentTime.plusHours(1);
+            }
+        } else if (crossesMidnight) {
+            // Tạo các slot từ nửa đêm đến closeTime
+            currentTime = LocalTime.MIDNIGHT;
+            while (!currentTime.isAfter(closeTime.minusHours(slotDuration))) {
+                slots.add(Slot.builder()
+                        .slotNo(slotNo++)
+                        .startTime(currentTime)
+                        .endTime(currentTime.plusHours(slotDuration))
+                        .centre(centre)
+                        .build());
+                currentTime = currentTime.plusHours(slotDuration);
+            }
+            // Tạo các slot từ openTime đến nửa đêm
+            currentTime = openTime;
+            while (!currentTime.equals(LocalTime.MIDNIGHT)) {
+                slots.add(Slot.builder()
+                        .slotNo(slotNo++)
+                        .startTime(currentTime)
+                        .endTime(currentTime.plusHours(slotDuration))
+                        .centre(centre)
+                        .build());
+                currentTime = currentTime.plusHours(slotDuration);
+            }
+
+        } else {
+            // Tạo các slot bình thường
+            while (!currentTime.isAfter(closeTime.minusHours(slotDuration))) {
+                slots.add(Slot.builder()
+                        .slotNo(slotNo++)
+                        .startTime(currentTime)
+                        .endTime(currentTime.plusHours(slotDuration))
+                        .centre(centre)
+                        .build());
+                currentTime = currentTime.plusHours(slotDuration);
+            }
         }
 
         return slots;
     }
+
 
     public CentreResponse updateCentre(int centreId, CentreRequest request) {
         // Lấy ngữ cảnh bảo mật và lấy tên của người dùng hiện đang xác thực
