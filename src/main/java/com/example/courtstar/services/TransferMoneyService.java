@@ -70,7 +70,7 @@ public class TransferMoneyService {
         }
         CentreManager centreManager = centreManagerRepository.findById(transferMoney.getManager().getId())
                 .orElseThrow(null);
-        if(centreManager.getCurrentBalance()-transferMoney.getAmount()<2000000){
+        if(centreManager.getCurrentBalance()-transferMoney.getAmount()<0){
             transferMoney.setStatus(false);
             throw new AppException(ErrorCode.NOT_ENOUGHT_MONEY);
         }
