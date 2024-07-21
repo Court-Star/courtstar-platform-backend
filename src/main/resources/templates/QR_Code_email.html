@@ -65,7 +65,7 @@
     <ul>
         <li><span class="label">Centre Name:</span><span class="value" th:text="${centreName}">[Centre Name]</span></li>
         <li><span class="label">Centre Address:</span><span class="value" th:text="${centreAddress}">[Centre Address]</span></li>
-        <li><span class="label">Price:</span><span class="value" th:text="${price} VND">[Price]</span></li>
+        <li><span class="label">Price:</span><span class="value" th:text="${price}">[Price]</span> VND</li>
         <li><span class="label">Court Number:</span><span class="value" th:text="${bookingDetails.get(0).court.courtNo}">[Court No]</span></li>
         <li th:each="detail : ${bookingDetails}">
             <span class="label">Date:</span>
